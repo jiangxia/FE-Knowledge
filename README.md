@@ -22,7 +22,7 @@
             + [词法介绍][1]
         * 语法
             + [基本规则][2]
-            + 语法特性
+            + [语法特性][3]
             + 语句
             + 表达式
     - 运行时
@@ -77,3 +77,4 @@
 
 [1]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/%E8%AF%8D%E6%B3%95.md
 [2]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/%E5%9F%BA%E6%9C%AC%E8%A7%84%E5%88%99.md
+[3]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/%E8%AF%AD%E6%B3%95%E7%89%B9%E6%80%A7.md
