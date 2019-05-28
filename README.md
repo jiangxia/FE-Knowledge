@@ -19,6 +19,7 @@
 1. javascript
     - 文法
         * 词法
+            + [词法介绍][1]
         * 语法
             + 基本规则
             + 语法特性
@@ -69,3 +70,9 @@
     - 性能优化
     - 监控
     - 设计模式
+
+
+
+
+
+[1]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/%E8%AF%8D%E6%B3%95.md
