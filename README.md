@@ -76,4 +76,4 @@
 
 
 [1]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/%E8%AF%8D%E6%B3%95.md
-[2]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/%E8%AF%8D%E6%B3%95.md
+[2]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/%E5%9F%BA%E6%9C%AC%E8%A7%84%E5%88%99.md
