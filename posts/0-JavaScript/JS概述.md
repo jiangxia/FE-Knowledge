@@ -4,6 +4,6 @@ JS 的知识体系，可以分为：文法、语义、运行时。也就是“�
 
 综上，JS部分的重点落在文法和运行时上。
 
-最后，送上JS 知识体系图。
+最后，送上不完整的 JS 知识体系图。
 
 ![images](https://github.com/jiangxia/FE-Knowledge/raw/master/images/3.png)

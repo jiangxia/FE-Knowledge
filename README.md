@@ -16,7 +16,7 @@
 
 # 体系
 
-1. javascript
+1. [javascript][0]
     - 文法
         * 词法
             + [词法介绍][1]
@@ -75,6 +75,7 @@
 
 
 
+[0]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/JS%E6%A6%82%E8%BF%B0.md
 [1]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/%E8%AF%8D%E6%B3%95.md
 [2]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/%E5%9F%BA%E6%9C%AC%E8%A7%84%E5%88%99.md
 [3]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/%E8%AF%AD%E6%B3%95%E7%89%B9%E6%80%A7.md
