@@ -21,7 +21,7 @@
         * 词法
             + [词法介绍][1]
         * 语法
-            + 基本规则
+            + [基本规则][2]
             + 语法特性
             + 语句
             + 表达式
@@ -76,3 +76,4 @@
 
 
 [1]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/%E8%AF%8D%E6%B3%95.md
+[2]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/%E8%AF%8D%E6%B3%95.md
