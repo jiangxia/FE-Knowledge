@@ -29,7 +29,7 @@ role的定义是一个树形的继承关系，我们先来理解一下它的整�
 
 
 <br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/74.png' width='600'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/74.jpg' width='600'>
 <br/>
 
 其中，widget表示一些可交互的组件，structure表示文档中的结构，window则代表窗体。
@@ -46,14 +46,14 @@ role的定义是一个树形的继承关系，我们先来理解一下它的整�
 
 
 <br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/75.png' width='800'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/75.jpg' width='800'>
 <br/>
 
 我们这里按照继承关系给出一份列表和简要说明：
 
 
 <br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/76.png' width='800'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/76.jpeg' width='800'>
 <br/>
 
 ARIA role允许多继承，这里有些角色我没有重复写。
@@ -106,7 +106,7 @@ Tree 是树形控件，它的内部含有 Treeitem 树形控件项，它还有�
 
 
 <br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/77.png' width='600'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/77.jpg' width='600'>
 <br/>
 
 注：separator在允许焦点时属于组件，在不允许焦点时属于文档结构。
@@ -115,7 +115,7 @@ Tree 是树形控件，它的内部含有 Treeitem 树形控件项，它还有�
 
 
 <br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/78.png' width='600'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/78.jpg' width='600'>
 <br/>
 
 # window角色

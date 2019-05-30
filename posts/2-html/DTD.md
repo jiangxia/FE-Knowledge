@@ -20,7 +20,7 @@ SGML还规定了一些特殊的节点类型，在我们之前的DOM课程中已�
 
 
 <br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/70.png' width='800'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/70.jpg' width='800'>
 <br/>
 
 这里我们从语法的角度，再逐个具体了解一下。
