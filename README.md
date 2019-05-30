@@ -4,15 +4,26 @@
 
 一方面，大学并没有开设前端这一门专业课，前端工程师更像是野路子，基本都是靠自学，没有接受系统的学习训练。
 
-另一方面，前端知识点既多且杂，学过便忘，感觉自己懂了很多，却又说不出自己到底懂了什么。
+另一方面，前端知识点既多且杂，学过便忘，感觉自己懂了很多，却又说不清自己到底懂了什么。
+
+最后，大家学知识都奔着实用性去的，这样学出来的知识体系又怎么可能完备呢？
 
 如果你也有类似的感受，那么，是时候系统学习前端了。
 
 本项目专为前端工程师而设，希望用最简洁的语言，构建尽可能完善的前端知识体系。
 
-关于该前端知识体系，并非作者自创，是借鉴了winter大神的《重学前端》，并且对《重学前端》的内容进行提炼。感谢winter大神！
+关于该前端知识体系，并非作者自创，而是借鉴了winter大神的《重学前端》，并且对《重学前端》的内容进行提炼。感谢winter大神！本项目不会止于《重学前端》，作者会在此体系的基础上，持续更新。
 
-本项目不会止于《重学前端》，作者会在此体系的基础上，持续更新，敬请关注！
+可能你会有疑问，学这些偏门的知识有什么用，工作中又用不到！
+
+winter大神说得好：
+
+> 我希望的是，通过这个有点偏的问题，引起你对这部分知识领域的关注，知道这部分知识的边界在哪里，从而形成一个完备的知识网络。让你在遇见不会的问题时候，可以快速定位到知识点，达成有效学习。并且，你也可以通过自己之前没有关注过的不同视角，来重新学习一遍这部分的知识。
+> ……
+> 比如，对JavaScript问题，先搞清楚看不懂的是词法问题、语法问题、还是运行时问题？定位清楚了问题，你已经距离解决问题前进了一大步。
+
+好了，让我们一起努力，构建属于自己的前端知识体系吧！
+
 
 # 体系
 
@@ -47,13 +58,20 @@
         + 排版
             - [正常流][18]
             - [flex][19]
+        + 交互
+            - [CSS动画与交互][44]
+        + 绘制
+            - [渲染:绘制颜色][46]
 3. [html][20]
     - 标签（功能）
         + [语义类标签][21]
         + [元信息类标签][22]
         + [链接][23]
         + [替换型元素][24]
+    - 语言
+        + [DTD][45]
     - 补充标准
+        + [ARIA][47]
 4. [浏览器原理和API][25]
     - 原理
         + [浏览器实现原理][26]
@@ -73,7 +91,12 @@
         + [跨域][39]
         + [存储][40]
 5. 前端工程化
+    - [性能][48]
     - [性能优化][41]
+    - [工具链][49]
+    - [持续集成][50]
+    - [搭建系统][51]
+    - [前端架构][52]
     - [监控][42]
     - [设计模式][43]
 
@@ -101,11 +124,15 @@
 [17]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/1-css/选择器.md
 [18]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/1-css/正常流.md
 [19]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/1-css/flex.md
+[44]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/1-css/CSS动画与交互.md
+[46]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/1-css/绘制颜色.md
 [20]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/2-html/html概述.md
 [21]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/2-html/语义类标签.md
 [22]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/2-html/元信息类标签.md
 [23]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/2-html/链接.md
 [24]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/2-html/替换型元素.md
+[45]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/2-html/DTD.md
+[47]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/2-html/ARIA.md
 [25]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/3-浏览器原理和api/浏览器原理和API概述.md
 [26]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/3-浏览器原理和api/浏览器实现原理概述.md
 [27]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/3-浏览器原理和api/网络通讯.md
@@ -123,5 +150,10 @@
 [39]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/3-浏览器原理和api/跨域.md
 [40]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/3-浏览器原理和api/存储.md
 [41]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/性能优化.md
+[48]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/性能.md
+[49]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/工具链.md
+[50]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/持续集成.md
+[51]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/搭建系统.md
+[52]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/前端架构.md
 [42]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/监控.md
 [43]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/设计模式.md
