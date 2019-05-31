@@ -102,7 +102,8 @@ winter大神说得好：
     - [前端架构][406]
     - [监控][407]
     - [设计模式][408]
-
+6. 其他
+    - [VS Code使用手册][501]
 
 
 
@@ -174,3 +175,5 @@ winter大神说得好：
 [406]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/前端架构.md
 [407]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/监控.md
 [408]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/设计模式.md
+
+[501]:https://www.yuque.com/mingyi-8nuow/rm3h54/gdf9cq
