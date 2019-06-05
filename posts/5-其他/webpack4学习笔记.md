@@ -109,6 +109,83 @@ Prefetching/Preloading 是有区别的：
 所以Prefetching会更合适。
 
 
+### webpack 与 浏览器缓存
+我们打包的文件，浏览器是会缓存的，当我们修改了内容，用户刷新页面，此时加载的还是缓存中的文件。为了解决这个问题，我们需要修改production模式下的配置文件。
+
+```js
+const commonConfig = require('./webpack.common.js');
+
+const prodConfig = {
+  mode: 'production',
+  devtool: 'cheap-module-source-map',
+  output: {
+    filename: '[name].[contenthash].js',
+    chunkFilename: '[name].[contenthash].js'
+  },
+  optimization: {
+    runtimeChunk: {
+      name: 'runtime'  // 旧版本必须配置此项，否则即便文件内容没有发生改变，hash值也会改变
+    },
+  }
+}
+
+module.exports = merge(commonConfig, prodConfig);
+```
+
+contenthash 会根据文件内容生成hash值，当我们文件内容改变时，contenthash就会改变，从而通知浏览器重新向服务器请求文件。
+
+之所以在旧版webpack下，文件代码没变，生成文件的hash值也会改变的原因是：
+
+我们业务逻辑的代码打包到main.js里，依赖库的代码打包到vendors.js里，但main.js跟vendors.js是有依赖关系的，这些依赖关系的代码会保存在manifest文件里。manifest文件既存在于main.js，也存在vendors.js里。而在旧版webpack每次打包manifest可能会有差异，这个差异导致vendors.js的hash值也会改变。设置runtimeChunk后，manifest相关的代码会被抽离出来，放到runtime文件里去，这样就能解决这个问题。
+
+### Shimming 垫片
+jQuery时代，我们需要先引入jQuery，再引入其他依赖jQuery的类库，比如jQuery.ui.js。这在webpack中就有问题。比如这样：
+
+```js
+// a.js
+import $ from 'jquery'
+import 'jquery.ui'
+```
+
+这样引用，jquery.ui.js会报错：找不到$。之所以这样，是因为webpack是模块化，$只能在a.js里引用，jquery.ui.js是引用不到$的，而jquery.ui.js是第三方库，我们又不能去修改jquery.ui.js的代码，怎么办呢？
+
+我们可以添加ProvidePlugin插件。在ProvidePlugin里我们设置了$，当JS文件中用到$，在当前又没引用$时，这个配置就会生效，告诉JS文件$指向jquery。
+
+关于ProvidePlugin，可以到官网看[资料](https://webpack.js.org/plugins/provide-plugin)
+
+```js
+const webpack = require('webpack');
+module.exports = {
+  plugins: [
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      _join: ['lodash', 'join']
+    }),
+  ],
+  performance: false, // 额外补充：设置为false，打包时不会警告性能方面的问题
+}
+```
+
+关于垫片机制，还有其他用法。比如我们在一个模块中全局打印this，发现this指向的是模块本身，而不是window对象，如果想要让this指向window，可以这样：
+
+```js
+module.exports = {
+  module: {
+    rules: [{
+      test: /\.js$/,
+      exclude: /node_modules/,
+      use: [{
+        loader: 'babel-loader'
+      }, {
+        loader: 'imports-loader?this=>window'
+      }]
+    }]
+  },
+}
+```
+
+我们需要安装imports-loader，设置this指向window。
+
 
 ## 市场应用趋势
 
@@ -537,6 +614,8 @@ module.exports = {
   },
 }
 ```
+
+我们也可以为css进行代码分割，使用到的插件是[MiniCssExtractPlugin](https://webpack.js.org/plugins/mini-css-extract-plugin)，只需要用MiniCssExtractPlugin提供的loader 代替 style-loader 即可，具体内容看官网。
 
 
 <br/>
