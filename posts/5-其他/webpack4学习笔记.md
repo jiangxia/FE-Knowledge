@@ -86,9 +86,9 @@ document.addEventListener('click', () => {
 我们可以用Chrome的coverage工具看代码的利用率。
 
 <br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/82.png' width='800'>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/83.png' width='800'>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/84.png' width='800'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/82.gif' width='800'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/83.gif' width='800'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/84.gif' width='800'>
 <br/>
 
 
