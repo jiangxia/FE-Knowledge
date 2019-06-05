@@ -57,12 +57,35 @@ webpack 默认会读取 webpack.config.js文件，我们也可以更改默认的
 ### 模式
 webpack 配置文件需要指定 mode，默认是production，打包后的文件会被压缩。可以指定成 development。不设置mode，会有警告
 
+```js
+
+module.exports = {
+  // ……
+	mode: 'production',
+}
+```
+
 <br/>
 
 ### Entry 与 Output
 entry 支持数组，数组的key是文件名，当entry配置多个入口文件时，output的filename不能写死，不然会报错，可以写成 `filename: [name].js`。
 
-output 还可以配置导出JS文件的前缀，通过 publicPath，通过这个配置，可以设置CDN地址。
+output 还可以配置导出JS文件的前缀，通过 publicPath ，通过这个配置，可以设置CDN地址。
+
+```js
+module.exports = {
+	entry: {
+		main: './src/index.js',
+    sub: './src/index.js'
+	},
+	output: {
+		filename: '[name].js',
+		chunkFilename: '[name].chunk.js',
+    publicPath: 'http://cdn.com',
+		path: path.resolve(__dirname, '../dist')
+	}
+}
+```
 
 <br/>
 
@@ -70,6 +93,25 @@ output 还可以配置导出JS文件的前缀，通过 publicPath，通过这个
 loader就是打包方案。
 
 比如，打包jpg图片时，可以使用 file-loader 进行打包，也可以使用url-loader，url-loader包含了 file-loader 所有的功能，而且，他默认会将图片转成base64格式。如果不希望转成base64位，可以设置 limit，这样的话，当图片大于设置值的时候，就不会转成base64。
+
+```js
+// webpack.config.js
+module.exports = {
+	module: {
+		rules: [{
+			test: /\.(jpg|png|gif)$/,
+			use: {
+				loader: 'url-loader',
+				options: {
+					name: '[name]_[hash].[ext]',
+					outputPath: 'images/',
+					limit: 10240
+				}
+			} 
+		}]
+	}
+}
+```
 
 又比如，打包css文件时，需要同时引入两个loader：css-loader跟style-loader。css-loader会分析css文件的引用关系，最后把css文件合并成一段css。而style-loader的作用是把这段css放到head下的style标签下。
 
@@ -80,6 +122,53 @@ loader就是打包方案。
 为了防止css全局污染，我们需要引入css modules的概念，也就是css模块化。同样需要在css-loader 中设置 modules 为true。引入时可以使用类似的方式： `import style from './index.css'`
 
 如果css中引用了字体文件，还需要对 字体文件的格式设置loader，使用 file-loader 即可。
+
+```js
+module.exports = {
+	module: {
+		rules: [{
+			test: /\.scss$/,
+			use: [
+				'style-loader', 
+				{
+					loader: 'css-loader',
+					options: {
+						importLoaders: 2
+					}
+				},
+				'sass-loader',
+				'postcss-loader'
+			]
+		}, {
+			test: /\.css$/,
+			use: [
+				'style-loader',
+        {
+					loader: 'css-loader',
+					options: {
+						modules: true
+					}
+				},
+				'postcss-loader'
+			]
+		}, {
+			test: /\.(eot|ttf|svg)$/,
+			use: {
+				loader: 'file-loader'
+			} 
+		}]
+	},
+}
+```
+
+```js
+// postcss.config.js
+module.exports = {
+  plugins: [
+  	require('autoprefixer')
+  ]
+}
+```
 
 > 如果有多个loader时，会从后往前执行。
 
@@ -94,6 +183,20 @@ htmlWebpackPlugin 会在打包结束后，自动生成一个HTML文件，并把�
 
 cleanWebpackPlugin 会在打包之前，删除某一个文件夹（比如dist文件夹）
 
+```js
+module.exports = {
+  // ……
+	plugins: [
+		new HtmlWebpackPlugin({
+			template: 'src/index.html'
+		}), 
+		new CleanWebpackPlugin(['dist'], {
+			root: path.resolve(__dirname, '../')
+		})
+	]
+}
+```
+
 <br/>
 
 ### sourceMap
@@ -104,11 +207,90 @@ sourceMap 是一个映射关系，当我们打包的文件报错时，它能提�
 development 环境，推荐使用 `devtool: 'cheap-module-eval-source-map'`
 production 环境，推荐使用 `devtool: 'cheap-module-source-map'`
 
-
-
+```js
+module.exports = {
+  // ……
+	mode: 'development',
+	devtool: 'cheap-module-eval-source-map',
+}
+```
 
 <br/>
 
+### webpackDevServer
+
+每次修改代码都要重新打包，这是非常繁琐的，我们可以修改npm scripts成`webpack --watch`。
+
+但如果我们想实现更酷炫的效果，比如自动打开浏览器、自动刷新浏览器等，这个操作就做不到。此时，可以借助webpackDevServer 来实现。
+
+webpack支持 devServer , 可以帮我们启动了一个服务器。我们在日常开发中，经常需要发ajax请求，这大大提高了我们的开发效率。此外，devServer打包后的文件，其实保存在内存中，这样打包的速度更快。
+
+之前 devServer 还不够完善，所以很多脚手架工具会自己实现一个devServer，现在webpack的devServer已经非常完善了。
+
+更多请参考[官网](https://www.webpackjs.com/configuration/dev-server/#devserver-proxy)
+
+```js
+module.exports = {
+	devServer: {
+		contentBase: './dist', // 服务器的根目录
+		open: true, // 自动打开浏览器
+		port: 8080,
+		hot: true,
+    proxy: { // 设置代理，访问/api，直接转发到3000端口
+      "/api": "http://localhost:3000"
+    }
+	},
+}
+```
+
+我们也可以手写一个 devServer，新建server.js，增加 npm scripts : `node server.js`。
+
+```js
+const express = require('express);
+const webpack = require('webpack');
+const webpackDevMiddleware = require('webpack-dev-middleware');
+const config = require('./webpack.config.js');
+const complier = webpack(config)
+
+const app = express(); // 启动一个http服务器
+app.use(webpackDevMiddleware(complier, {}))
+
+app.listen(3000, ()=>{
+  console.log("server is running");  
+})
+```
+
+通过这个例子，也可以看到webpack有两种使用方式，一种是在命令行中使用，一种是在node中直接使用webpack。
+
+在命令行使用webpack，可以参考官网[资料](https://www.webpackjs.com/api/cli/)
+
+在node中使用webpack，可以参考官网[资料](https://www.webpackjs.com/api/node/)
+
+<br/>
+
+
+
+### hot mudule replacement 热更新
+我们每一次修改代码，devServer都会帮我们刷新页面，但我们只希望显示修改的内容，而不刷新页面，此时就要用到热更新。
+
+```js
+const webpack = require('webpack');
+
+module.exports = {
+	devServer: {
+		contentBase: './dist',
+		open: true,
+		port: 8080,
+		hot: true,
+    hotOnly: true, // 可选，即便hot功能不生效，浏览器也不刷新
+	},
+	plugins: [
+		new webpack.HotModuleReplacementPlugin()
+	],
+}
+```
+
+<br/>
 
 ## 优劣局限
 
