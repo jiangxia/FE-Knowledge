@@ -294,7 +294,59 @@ module.exports = {
 <br/>
 
 ### Babel
-有些浏览器还不支持ES6的语法，此时就需要用babel转义。
+有些浏览器还不支持ES6的语法，此时就需要用babel转义，将ES6语法转成ES5。
+
+babel提供了详细的使用指南，在[官网setup页面](https://babeljs.io/setup#installation)选择webpack选项就可以看到。
+
+1. Installation
+```
+npm install --save-dev babel-loader @babel/core
+```
+
+> babel-loader @babel/core 是 babel 跟 webpack 之间的桥梁
+
+2. Usage
+```js
+module: {
+  rules: [
+    { test: /\.js$/, exclude: /node_modules/, loader: "babel-loader" }
+  ]
+}
+```
+
+3. Create .babelrc configuration file
+新建 .babelrc 并按照 env preset
+
+```
+npm install @babel/preset-env --save-dev
+```
+
+```js
+// .babelrc
+{
+  "presets": ["@babel/preset-env"]
+}
+```
+
+> @babel/preset-env 将ES6转义成ES5
+
+```js
+module.exports = {
+  // ……
+  module: {
+    rules: [{
+      test: /\.js$/,
+      exclude: /node_modules/,
+      loader: 'babel-loader'
+      // use: [{
+      //   loader: 'babel-loader'
+      // }, {
+      //   loader: 'imports-loader?this=>window'
+      // }]
+    }]
+  },
+}
+```
 
 <br/>
 
