@@ -58,10 +58,9 @@ webpack 默认会读取 webpack.config.js文件，我们也可以更改默认的
 webpack 配置文件需要指定 mode，默认是production，打包后的文件会被压缩。可以指定成 development。不设置mode，会有警告
 
 ```js
-
 module.exports = {
   // ……
-	mode: 'production',
+  mode: 'production',
 }
 ```
 
@@ -74,16 +73,16 @@ output 还可以配置导出JS文件的前缀，通过 publicPath ，通过这�
 
 ```js
 module.exports = {
-	entry: {
-		main: './src/index.js',
+  entry: {
+    main: './src/index.js',
     sub: './src/index.js'
-	},
-	output: {
-		filename: '[name].js',
-		chunkFilename: '[name].chunk.js',
+  },
+  output: {
+    filename: '[name].js',
+    chunkFilename: '[name].chunk.js',
     publicPath: 'http://cdn.com',
-		path: path.resolve(__dirname, '../dist')
-	}
+    path: path.resolve(__dirname, '../dist')
+  }
 }
 ```
 
@@ -97,19 +96,19 @@ loader就是打包方案。
 ```js
 // webpack.config.js
 module.exports = {
-	module: {
-		rules: [{
-			test: /\.(jpg|png|gif)$/,
-			use: {
-				loader: 'url-loader',
-				options: {
-					name: '[name]_[hash].[ext]',
-					outputPath: 'images/',
-					limit: 10240
-				}
-			} 
-		}]
-	}
+  module: {
+    rules: [{
+      test: /\.(jpg|png|gif)$/,
+      use: {
+        loader: 'url-loader',
+        options: {
+          name: '[name]_[hash].[ext]',
+          outputPath: 'images/',
+          limit: 10240
+        }
+      }
+    }]
+  }
 }
 ```
 
@@ -125,39 +124,39 @@ module.exports = {
 
 ```js
 module.exports = {
-	module: {
-		rules: [{
-			test: /\.scss$/,
-			use: [
-				'style-loader', 
-				{
-					loader: 'css-loader',
-					options: {
-						importLoaders: 2
-					}
-				},
-				'sass-loader',
-				'postcss-loader'
-			]
-		}, {
-			test: /\.css$/,
-			use: [
-				'style-loader',
+  module: {
+    rules: [{
+      test: /\.scss$/,
+      use: [
+        'style-loader',
         {
-					loader: 'css-loader',
-					options: {
-						modules: true
-					}
-				},
-				'postcss-loader'
-			]
-		}, {
-			test: /\.(eot|ttf|svg)$/,
-			use: {
-				loader: 'file-loader'
-			} 
-		}]
-	},
+          loader: 'css-loader',
+          options: {
+            importLoaders: 2
+          }
+        },
+        'sass-loader',
+        'postcss-loader'
+      ]
+    }, {
+      test: /\.css$/,
+      use: [
+        'style-loader',
+        {
+          loader: 'css-loader',
+          options: {
+            modules: true
+          }
+        },
+        'postcss-loader'
+      ]
+    }, {
+      test: /\.(eot|ttf|svg)$/,
+      use: {
+        loader: 'file-loader'
+      }
+    }]
+  },
 }
 ```
 
@@ -165,7 +164,7 @@ module.exports = {
 // postcss.config.js
 module.exports = {
   plugins: [
-  	require('autoprefixer')
+    require('autoprefixer')
   ]
 }
 ```
@@ -186,14 +185,14 @@ cleanWebpackPlugin 会在打包之前，删除某一个文件夹（比如dist文
 ```js
 module.exports = {
   // ……
-	plugins: [
-		new HtmlWebpackPlugin({
-			template: 'src/index.html'
-		}), 
-		new CleanWebpackPlugin(['dist'], {
-			root: path.resolve(__dirname, '../')
-		})
-	]
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: 'src/index.html'
+    }),
+    new CleanWebpackPlugin(['dist'], {
+      root: path.resolve(__dirname, '../')
+    })
+  ]
 }
 ```
 
@@ -210,8 +209,8 @@ production 环境，推荐使用 `devtool: 'cheap-module-source-map'`
 ```js
 module.exports = {
   // ……
-	mode: 'development',
-	devtool: 'cheap-module-eval-source-map',
+  mode: 'development',
+  devtool: 'cheap-module-eval-source-map',
 }
 ```
 
