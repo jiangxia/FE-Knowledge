@@ -19,6 +19,8 @@ webpack 不仅可以打包JS，也可以打包其他格式的文件， 比如css
 <br/>
 
 ## 最佳实践
+
+### webpack的安装
 webpack 不建议全局安装，因为每个项目依赖的webpack版本可能不同，全局安装可能导致项目依赖的webpack版本不对而无法运行，建议局部安装，也就是 `npm i webpack webpack-cli -D`。
 
 局部安装完webpack后，如果要查看webpack的版本，执行 `webpack -v`是得不到预期的结果，因为webpack并没全局安装，此时要执行 `npx webpack -v`，npx是npm提供的命令，它会在我们当前目录下的node_modules文件下寻找安装过的依赖。
@@ -30,6 +32,68 @@ webpack 不建议全局安装，因为每个项目依赖的webpack版本可能�
 > webpack-cli 允许我们在命令里使用webpack这个命令。
 <br/>
 
+### webpack与 code splitting
+如果把所有的代码都打包到一个文件里，会带来两个问题：
+
+1. 文件过于庞大
+2. 基础库基本上不会改变，而业务代码却经常改变，一旦业务代码更改了，整个文件要重新加载，会极大的损耗性能。
+
+code splitting 是代码分割，没有webpack我们也可以手动做代码分割，从而提升性能。webpack能帮我们自动完成代码分割。
+ 
+webpack 中实现代码分割有两种方式：
+1. 同步代码，我们可以在 optimization 中设置splitChunks。
+2. 异步代码（import），无需任何配置，会自动进行代码分割。
+
+```js
+module.exports = {
+  // ……
+	optimization: {
+		splitChunks: {
+      chunks: 'all',
+    }
+	},
+}！
+```
+
+
+### 打包分析
+我们可以使用webpack提供的[analyse工具](https://github.com/webpack/analyse)进行打包分析.
+
+我们在打包时，需要增加命令`webpack --profile --json > stats.json`，也就是 `webpack --profile --json > stats.json --config ./build/webpack.dev.js`
+
+打包完的文件中，就会出现stats.json的文件。
+
+我们打开[链接](http://webpack.github.com/analyse)，上次stats.json，就会出现打包的分析报告。
+
+webpack官方提供的分析工具，除了analyse，还有[这些](https://www.webpackjs.com/guides/code-splitting/#bundle-%E5%88%86%E6%9E%90-bundle-analysis-)：
+
+1. [webpack-chart](https://alexkuz.github.io/webpack-chart/): webpack 数据交互饼图。
+2. [webpack-visualizer](https://chrisbateman.github.io/webpack-visualizer/): 可视化并分析你的 bundle，检查哪些模块占用空间，哪些可能是重复使用的。
+3. [webpack-bundle-analyzer](https://github.com/webpack-contrib/webpack-bundle-analyzer): 一款分析 bundle 内容的插件及 CLI 工具，以便捷的、交互式、可缩放的树状图形式展现给用户。
+
+
+### Prefetching/Preloading 
+webpack 建议我们写异步加载代码，也就是异步import。当代码执行时，才会去加载相应的代码，这样首屏的代码利用率就可以提高。类似：
+
+```js
+document.addEventListener('click', () => {
+  import('./click.js').then(({ default: func }) => {
+    func()
+  })
+})
+```
+
+我们可以用Chrome的coverage工具看代码的利用率。
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/82.png' width='800'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/83.png' width='800'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/84.png' width='800'>
+<br/>
+
+
+
+但我们不一定要等到用户操作时，才去加载相应的代码，我们可以在
 ## 市场应用趋势
 
 
@@ -52,7 +116,6 @@ webpack 默认会读取 webpack.config.js文件，我们也可以更改默认的
 
 ## 实现原理
 这里要重点讲解webpack的配置。
-
 
 ### 模式
 webpack 配置文件需要指定 mode，默认是production，打包后的文件会被压缩。可以指定成 development。不设置mode，会有警告
@@ -334,7 +397,7 @@ npm install @babel/preset-env --save-dev
 
 > @babel/preset-env 将ES6的语法转义成ES5语法，比如let转成var
 >
-> @babel/polyfill 提供了ES6的对象或方法，比如promise
+> @babel/polyfill 为低级浏览器注入了ES6的对象或方法，比如promise
 > 
 > 引入 @babel/polyfill 会让我们的文件变得非常大，可以配置 useBuiltIns 做到按需加载
 
@@ -371,6 +434,93 @@ module.exports = {
 babel-loader 中 options 的内容会非常多，可以把 options 的内容放到 .babelrc 中
 
 
+
+
+<br/>
+
+### tree shaking
+我们引入一个模块，只会引入该模块中的部分方法，tree shaking会帮我们把不需要的方法过滤掉，这样打包后的文件将显著变小。
+
+tree shaking 只支持 ES Module 的引用方式。
+
+development 模式下，默认是不支持 tree shaking，我们需要配置 optimization 的 usedExports 为true。
+
+我们还需要给 package.json 增加一项配置 `"sideEffects": ["@babel/polyfill", "*.css"]`,这样打包时 tree shaking 对 @babel/polyfill就不会有作用。这是因为我们引用@babel/polyfill时，是`import @babel/polyfill`，tree shaking 会认为 @babel/polyfill 不需要引用任何东西，从而把它忽略掉。同理，我们可以使用 `import "index.css"`，我们同样不希望tree shaking生效，我们可以在sideEffects中增加 *.css 的配置。
+
+如果设置`"sideEffects": false`，表示对所有模块都做 tree shaking。
+
+development 模式下，为了调试方便，虽然设置了 tree shaking，但打包出来的文件一样包含没有引用的模块。当我们上线时，会设置 mode 为 production，此时 tree shaking 就会把不需要模块的代码过滤掉。
+
+
+```js
+module.exports = {
+  // ……
+  mode: 'development',
+  optimization: {
+    usedExports: true,
+  },
+}
+```
+
+<br/>
+
+### development 和 production 模式的区分打包
+由于 development 和 production 模式下的配置是不一样的，我们可以抽离出公共的 webpack.common.js，以及Dev下的 webpack.dev.js 和 production下的webpack.prod.js。最后使用 webpack.merge 合并。
+
+```js
+const merge = require('webpack-merge');
+const commonConfig = require('./webpack.common.js');
+
+const devConfig = {
+  // ……
+}
+
+module.exports = merge(commonConfig, devConfig);
+```
+
+<br/>
+
+### splitChunksPlugin
+webpack代码分割底层使用了 splitChunksPlugin 插件。官网资料[地址](https://www.webpackjs.com/plugins/split-chunks-plugin/)。
+
+```js
+module.exports = {
+  splitChunks: {
+    chunks: "async", // 可选：all。async 只代码分割异步代码，all同时支持同步跟异步的方式
+    minSize: 30000, // 小于 30KB 不做代码分割，大于 30KB，还要根据cacheGroups的规则决定是否做代码分割
+    maxSize: 20000, // 大于 20KB 尝试做代码分割，但由于基础库是不允许分割的，所以一般不生效
+    minChunks: 1,  // 引用超过1次，会做代码分割。
+    maxAsyncRequests: 5, // 遇到的前5个库，会做代码分割，超过5个的不做代码分割
+    maxInitialRequests: 3, // 入口文件最多只能做三次代码分割
+    automaticNameDelimiter: '~', // 文件连接符
+    name: true, // 为true时，cacheGroups的filename才会生效
+    cacheGroups: { // 缓存组，满足以上要求的文件，会根据缓存组中的要求，加入缓存组，最终打包成文件。这样的好处是可以把多个库，输出成一个文件。此外，如果配置了上面的参数却没有代码分割，很可能就是缓存组的配置不满足
+      vendors: {
+        test: /[\\/]node_modules[\\/]/, // node_modules目录下的文件会被匹配
+        priority: -10, // 优先级，值越大优先级越大
+        // filename: 'vendors.js'
+      },
+      default: {
+        minChunks: 2,
+        priority: -20,
+        reuseExistingChunk: true  // 如果一个模块已经被打包了，则再打包时会忽略该模块
+      }
+    }
+  },
+}
+```
+
+小技巧：splitChunks 如果不配置，默认值就是上面的这些选项。简便写法是：
+
+
+```js
+module.exports = {
+  // …… 
+  splitChunks: {
+    chunks: "all", // 我们要对同步跟异步代码都做代码分割，所以改成all
+  },
+}
+```
 
 
 <br/>
