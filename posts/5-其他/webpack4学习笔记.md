@@ -91,9 +91,25 @@ document.addEventListener('click', () => {
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/84.gif' width='800'>
 <br/>
 
+但我们不一定要等到用户操作时，才去加载相应的代码，而是在网络空闲时就去加载。我们可以在webpack中进行配置。具体做法如下：
+
+```js
+// 关注下魔法注释，js的新特性
+document.addEventListener('click', () => {
+  import(/* webpackPrefetch: true */ './click.js').then(({ default: func }) => {
+    func()
+  })
+})
+```
+Prefetching/Preloading 是有区别的：
+
+1. Prefetching会等待核心代码加载完，网络空闲时才去加载
+2. Preloading是跟主要的代码一块加载的
+
+所以Prefetching会更合适。
 
 
-但我们不一定要等到用户操作时，才去加载相应的代码，我们可以在
+
 ## 市场应用趋势
 
 
