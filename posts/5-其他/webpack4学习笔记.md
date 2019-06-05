@@ -273,22 +273,29 @@ app.listen(3000, ()=>{
 ### hot mudule replacement 热更新
 我们每一次修改代码，devServer都会帮我们刷新页面，但我们只希望显示修改的内容，而不刷新页面，此时就要用到热更新。
 
+更多请参考官网[资料1](https://www.webpackjs.com/guides/hot-module-replacement/)、[资料2](https://www.webpackjs.com/api/hot-module-replacement/)
+
 ```js
 const webpack = require('webpack');
 
 module.exports = {
-	devServer: {
-		contentBase: './dist',
-		open: true,
-		port: 8080,
-		hot: true,
+  devServer: {
+    contentBase: './dist',
+    open: true,
+    port: 8080,
+    hot: true,
     hotOnly: true, // 可选，即便hot功能不生效，浏览器也不刷新
-	},
-	plugins: [
-		new webpack.HotModuleReplacementPlugin()
-	],
+  },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin()
+  ],
 }
 ```
+
+<br/>
+
+### Babel
+有些浏览器还不支持ES6的语法，此时就需要用babel转义。
 
 <br/>
 
