@@ -298,6 +298,10 @@ module.exports = {
 
 babel提供了详细的使用指南，在[官网setup页面](https://babeljs.io/setup#installation)选择webpack选项就可以看到。
 
+----
+
+babel的使用分为三步：
+
 1. Installation
 ```
 npm install --save-dev babel-loader @babel/core
@@ -328,7 +332,15 @@ npm install @babel/preset-env --save-dev
 }
 ```
 
-> @babel/preset-env 将ES6转义成ES5
+> @babel/preset-env 将ES6的语法转义成ES5语法，比如let转成var
+>
+> @babel/polyfill 提供了ES6的对象或方法，比如promise
+> 
+> 引入 @babel/polyfill 会让我们的文件变得非常大，可以配置 useBuiltIns 做到按需加载
+
+babel 内容非常多，建议直接看官网。
+
+----
 
 ```js
 module.exports = {
@@ -337,7 +349,15 @@ module.exports = {
     rules: [{
       test: /\.js$/,
       exclude: /node_modules/,
-      loader: 'babel-loader'
+      loader: 'babel-loader',
+      options: {
+        presets: [["@babel/preset-env", {
+          targets: {
+            chrome: '67',  // 告诉 babel 目标浏览器，babel可以根据目标浏览器决定是否做转化，这样就可以减少最终输出文件的大小
+          },
+          useBuiltIns: 'usage  // 提高性能：用到的才引用
+        }]]
+      }
       // use: [{
       //   loader: 'babel-loader'
       // }, {
@@ -347,6 +367,11 @@ module.exports = {
   },
 }
 ```
+
+babel-loader 中 options 的内容会非常多，可以把 options 的内容放到 .babelrc 中
+
+
+
 
 <br/>
 
