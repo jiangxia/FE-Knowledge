@@ -186,6 +186,7 @@ module.exports = {
 
 我们需要安装imports-loader，设置this指向window。
 
+关于shimming，可以看官网[资料](https://webpack.js.org/guides/shimming)
 
 ## 市场应用趋势
 
