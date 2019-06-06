@@ -1,11 +1,18 @@
 
 # 前言
+webpack 是当下最好用的前端模块打包工具，前端开发人员日常都要跟脚手架打交道，而手脚架就是用基于webpack构建的，深入理解webpack，对我们日常工作意义非常大。
+
+本文将系统讲解webpack，老规矩，一样从应用维度跟设计维度展开，由于作者能力有限，有些部分暂时整理不出来，如果你有所补充，欢迎push~
 
 # 应用维度
 
 <br/>
 
 ## 问题
+
+> 从技术的应用维度看，首先考虑的是要解决什么问题，这是技术产生的原因。问题这层，用来回答“干什么用”。
+
+
 随着前端越来越复杂，网页其实可以看做是功能丰富的应用，它们拥有着复杂的JavaScript代码和一大堆依赖包。
 
 由于浏览器对ES module的支持还不完善，所以就诞生了webpack，webpack官方定义就是一个模块打包工具。webpack不仅支持 ES module 的语法，也支持 CommonJS 的语法。
@@ -14,409 +21,8 @@ webpack 不仅可以打包JS，也可以打包其他格式的文件， 比如css
 <br/>
 
 ## 技术规范
+> 技术被研发出来，人们怎么用它才能解决问题呢？这就要看技术规范，可以理解为技术使用说明书。技术规范，回答“怎么用”的问题，反映你对该技术使用方法的理解深度。
 
-
-<br/>
-
-## 最佳实践
-
-### webpack的安装
-webpack 不建议全局安装，因为每个项目依赖的webpack版本可能不同，全局安装可能导致项目依赖的webpack版本不对而无法运行，建议局部安装，也就是 `npm i webpack webpack-cli -D`。
-
-局部安装完webpack后，如果要查看webpack的版本，执行 `webpack -v`是得不到预期的结果，因为webpack并没全局安装，此时要执行 `npx webpack -v`，npx是npm提供的命令，它会在我们当前目录下的node_modules文件下寻找安装过的依赖。
-
-如果我们是在package.json文件中配置 npm scripts，则不需要npx这个指令，因为 npm scripts 默认会在当前目录下的 node_modules 寻找依赖。
-
-安装webpack时，可以指定webpack的版本号，如果不清楚webpack有什么版本，可以使用`npm info webpack`查看
-
-> webpack-cli 允许我们在命令里使用webpack这个命令。
-<br/>
-
-### webpack与 code splitting
-如果把所有的代码都打包到一个文件里，会带来两个问题：
-
-1. 文件过于庞大
-2. 基础库基本上不会改变，而业务代码却经常改变，一旦业务代码更改了，整个文件要重新加载，会极大的损耗性能。
-
-code splitting 是代码分割，没有webpack我们也可以手动做代码分割，从而提升性能。webpack能帮我们自动完成代码分割。
- 
-webpack 中实现代码分割有两种方式：
-1. 同步代码，我们可以在 optimization 中设置splitChunks。
-2. 异步代码（import），无需任何配置，会自动进行代码分割。
-
-```js
-module.exports = {
-  // ……
-	optimization: {
-		splitChunks: {
-      chunks: 'all',
-    }
-	},
-}！
-```
-
-
-### 打包分析
-我们可以使用webpack提供的[analyse工具](https://github.com/webpack/analyse)进行打包分析.
-
-我们在打包时，需要增加命令`webpack --profile --json > stats.json`，也就是 `webpack --profile --json > stats.json --config ./build/webpack.dev.js`
-
-打包完的文件中，就会出现stats.json的文件。
-
-我们打开[链接](http://webpack.github.com/analyse)，上次stats.json，就会出现打包的分析报告。
-
-webpack官方提供的分析工具，除了analyse，还有[这些](https://www.webpackjs.com/guides/code-splitting/#bundle-%E5%88%86%E6%9E%90-bundle-analysis-)：
-
-1. [webpack-chart](https://alexkuz.github.io/webpack-chart/): webpack 数据交互饼图。
-2. [webpack-visualizer](https://chrisbateman.github.io/webpack-visualizer/): 可视化并分析你的 bundle，检查哪些模块占用空间，哪些可能是重复使用的。
-3. [webpack-bundle-analyzer](https://github.com/webpack-contrib/webpack-bundle-analyzer): 一款分析 bundle 内容的插件及 CLI 工具，以便捷的、交互式、可缩放的树状图形式展现给用户。
-
-
-### Prefetching/Preloading 
-webpack 建议我们写异步加载代码，也就是异步import。当代码执行时，才会去加载相应的代码，这样首屏的代码利用率就可以提高。类似：
-
-```js
-document.addEventListener('click', () => {
-  import('./click.js').then(({ default: func }) => {
-    func()
-  })
-})
-```
-
-我们可以用Chrome的coverage工具看代码的利用率。
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/82.gif' width='800'>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/83.gif' width='800'>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/84.gif' width='800'>
-<br/>
-
-但我们不一定要等到用户操作时，才去加载相应的代码，而是在网络空闲时就去加载。我们可以在webpack中进行配置。具体做法如下：
-
-```js
-// 关注下魔法注释，js的新特性
-document.addEventListener('click', () => {
-  import(/* webpackPrefetch: true */ './click.js').then(({ default: func }) => {
-    func()
-  })
-})
-```
-Prefetching/Preloading 是有区别的：
-
-1. Prefetching会等待核心代码加载完，网络空闲时才去加载
-2. Preloading是跟主要的代码一块加载的
-
-所以Prefetching会更合适。
-
-
-### webpack 与 浏览器缓存
-我们打包的文件，浏览器是会缓存的，当我们修改了内容，用户刷新页面，此时加载的还是缓存中的文件。为了解决这个问题，我们需要修改production模式下的配置文件。
-
-```js
-const commonConfig = require('./webpack.common.js');
-
-const prodConfig = {
-  mode: 'production',
-  devtool: 'cheap-module-source-map',
-  output: {
-    filename: '[name].[contenthash].js',
-    chunkFilename: '[name].[contenthash].js'
-  },
-  optimization: {
-    runtimeChunk: {
-      name: 'runtime'  // 旧版本必须配置此项，否则即便文件内容没有发生改变，hash值也会改变
-    },
-  }
-}
-
-module.exports = merge(commonConfig, prodConfig);
-```
-
-contenthash 会根据文件内容生成hash值，当我们文件内容改变时，contenthash就会改变，从而通知浏览器重新向服务器请求文件。
-
-之所以在旧版webpack下，文件代码没变，生成文件的hash值也会改变的原因是：
-
-我们业务逻辑的代码打包到main.js里，依赖库的代码打包到vendors.js里，但main.js跟vendors.js是有依赖关系的，这些依赖关系的代码会保存在manifest文件里。manifest文件既存在于main.js，也存在vendors.js里。而在旧版webpack每次打包manifest可能会有差异，这个差异导致vendors.js的hash值也会改变。设置runtimeChunk后，manifest相关的代码会被抽离出来，放到runtime文件里去，这样就能解决这个问题。
-
-### Shimming 垫片
-jQuery时代，我们需要先引入jQuery，再引入其他依赖jQuery的类库，比如jQuery.ui.js。这在webpack中就有问题。比如这样：
-
-```js
-// a.js
-import $ from 'jquery'
-import 'jquery.ui'
-```
-
-这样引用，jquery.ui.js会报错：找不到$。之所以这样，是因为webpack是模块化，$只能在a.js里引用，jquery.ui.js是引用不到$的，而jquery.ui.js是第三方库，我们又不能去修改jquery.ui.js的代码，怎么办呢？
-
-我们可以添加ProvidePlugin插件。在ProvidePlugin里我们设置了$，当JS文件中用到$，在当前又没引用$时，这个配置就会生效，告诉JS文件$指向jquery。
-
-关于ProvidePlugin，可以到官网看[资料](https://webpack.js.org/plugins/provide-plugin)
-
-```js
-const webpack = require('webpack');
-module.exports = {
-  plugins: [
-    new webpack.ProvidePlugin({
-      $: 'jquery',
-      _join: ['lodash', 'join']
-    }),
-  ],
-  performance: false, // 额外补充：设置为false，打包时不会警告性能方面的问题
-}
-```
-
-关于垫片机制，还有其他用法。比如我们在一个模块中全局打印this，发现this指向的是模块本身，而不是window对象，如果想要让this指向window，可以这样：
-
-```js
-module.exports = {
-  module: {
-    rules: [{
-      test: /\.js$/,
-      exclude: /node_modules/,
-      use: [{
-        loader: 'babel-loader'
-      }, {
-        loader: 'imports-loader?this=>window'
-      }]
-    }]
-  },
-}
-```
-
-我们需要安装imports-loader，设置this指向window。
-
-关于shimming，可以看官网[资料](https://webpack.js.org/guides/shimming)
-
-### library 的打包
-我们写的库，要支持多种方式的引用，诸如：
-
-```js
-// library.js
-export function math (){
-  console.log(1);
-}
-```
-
-```js
-import library from './library' // ES module
-const library = require('library'); // commonjs
-require(['library'], function(){}) // AMD
-```
-
-我们可以配置libraryTarget：
-
-```js
-module.exports = {
-  mode: 'production',
-  entry: {
-    main: './src/index.js'
-  },
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].js',
-    libraryTarget: 'umd' // umd 是通用的意思。配置了umd，就可以支持不同的引用方式
-  }
-}
-```
-
-如果你还想通过script标签引用，比如`<script src="./library.js"></script>`，那还需要配置
-
-```js
-module.exports = {
-  mode: 'production',
-  entry: {
-    main: './src/index.js'
-  },
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].js',
-    library: 'library', // 打包好的代码，挂载到页面library这个全局变量上
-    libraryTarget: 'umd' // umd 是通用的意思。配置了umd，就可以支持不同的引用方式
-  }
-}
-```
-
-打包后到浏览器控制台输入library，就会打印出全局变量
-
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/85.jpg' width='800'>
-<br/>
-
-这里要重点讲下 library 跟 libraryTarget 的关系。library的含义是要生成一个全局变量， libraryTarget 的含义是这个全局变量挂载到哪里。如果libraryTarget设置为umd，则两者关系不大。如果我们把libraryTarget 设置成this，则打包出来的文件不支持ES module、commonjs等的引用，他表示全局变量挂载到全局的this上。此时我们在浏览器控制台，输入`this.library`，就可以找到该全局变量。libraryTarget 还设置成 window、global。
-
-此外，我们在打包时，还会出现一种情况：
-
-```js
-// library.js
-import _ from lodash;
-// 其他代码
-```
-
-```js
-// a.js
-import _ from lodash;
-import library from './library';
-```
-
-这就造成lodash被打包了两次，我们希望library.js打包时，不要把lodash打包进去，可以这样配置：
-
-```js
-module.exports = {
-  externals: ['lodash] // 打包时，遇到lodash，自动忽略
-}
-```
-
-<br/>
-
-### PWA
-我们把生成的文件放到线上，用户就可以访问，如果服务器挂了，页面就会显示异常。这种时候，我们希望即便服务器挂了，用户还是可以看到之前访问的页面，而这就是PWA。
-
-要做到PWA很简单，首先配置webpack。
-
-```js
-const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
-module.exports = {
-  plugins: [
-    new WorkboxWebpackPlugin.GenerateSW({
-      clientsClaim: true,
-      skipWaiting: true
-    }),
-  ]
-}
-```
-
-然后在业务代码中，使用 serviceWorker。
-
-```js
-if('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(registration => {
-        console.log('service-worker register')
-      }).catch(error => {
-        console.log('service-worker register error')
-      })
-  })
-}
-```
-
-
-<br/>
-
-### 请求转发
-我们在开发时，经常会遇到跨域的问题，devServer 可以帮助我们实现请求转发，具体看官网[资料](https://www.webpackjs.com/configuration/dev-server/#devserver-proxy)
-
-我们只需要在webpack进行如下配置：
-
-```js
-module.exports = {
-  devServer: {
-    proxy: {
-      '/react/api': {
-        target: 'https://baidu.com/',
-        secure: false, // false 时才可以对https请求的转发
-        pathRewrite: {
-          'header.json': 'demo.json'
-        }
-      }
-    }
-  },
-}
-```
-devServer 中的proxy允许我们做请求转发。当我们请求'/react/api'就会被转发到'http://baidu.com/'的域名下。此外，我们在日常开发中，可能需要用到header.json这个API时，该API还没开发完，我们需要先访问demo.json进行开发，此时就可以设置pathRewrite达到效果。
-
-webpack的proxy内容非常多，底层使用的是http-proxy-middleware，可以上GitHub看相应的[资料](https://github.com/chimurai/http-proxy-middleware#options)
-
-### 单页面路由问题
-我们在写react应用时，需要用到react-router-dom实现路由，但是我们会发现，当我们访问/list时，预期是要访问到/list路由，但浏览器会发送请求到/list，从而页面显示出错。
-
-要解决这个问题，就要用到devServer的historyApiFallback这个API了。
-
-当我们在devServer里配置`historyApiFallback:true`后，我们不管访问什么url，都会执行根目录（也就是/）下的代码，从而解决了单页路由的问题。
-
-更多内容，看[官网](https://www.webpackjs.com/configuration/dev-server/#devserver-historyapifallback)
-
-### eslint
-eslint 跟 webpack关系不大，很多编辑器是可以支持eslint插件，但可能我们为了调试方便，希望eslint的错误显示在浏览器上，这样即便我们编辑器没有eslint插件，也可以看到问题。
-
-操作起来也很简单，我们先在自己的工程里安装eslint跟eslint-loader.
-
-```js
-module.exports = {
-  devServer: {
-    overlay: true  // 必须配置
-  },
-  rules: [
-    {
-      test: /\.js$/,
-      exclude: /node_modules/,
-      use: ["babel-loader", "eslint-loader"],  // 使用 eslint-loader 
-    },
-  ]
-}
-```
-
-关于eslint-loader，可以看官网[资料](https://webpack.js.org/loaders/eslint-loader)
-
-### webpack性能优化
-1. 跟上技术迭代（Node yarn npm ）
-2. 在尽可能少的模块上应用loader
-3. plugin 尽可能精简并确保可靠
-4. 合理配置resolve。
-5. 使用 DllPlugin 提高打包速度（5.10、5.11）
-6. 控制包文件大小
-7. 合理使用sourceMap
-8. 结合 stats 分析打包结果
-9. 开发环境内存编译（devServer打包文件存于内存，能提高速度）
-
-**跟上技术迭代**
-webpack运行于node，node版本更新，自然会提高webpack的打包效率，npm跟yarn等包管理工具也是同理。
-
-**在尽可能少的模块上应用loader**：
-为loader配置exclude，例如： `exclude: /node_moudles/`
-为loader配置include，例如：`include: path.resolve(__dirname, '../src')`
-
-**plugin 尽可能精简并确保可靠**
-比如开发环境下，不需要对代码进行压缩，这样就不需要在webpack.dev.js里引入相关的plugin
-
-**合理配置resolve**
-当我们没有写js后缀时，webpack默认会帮我们补上，如果我们的jsx文件也不希望写上后缀，希望webpack会帮我们默认补上，可以设置resolve。
-
-```js
-module.exports = {
-  resolve: {
-    extensions: ['.js', '.jsx'],
-    mainFiles: ['index', 'child'] // 当我们引用的是某个路径，webpack默认会帮我们读取index文件，如果我们设置了['index', 'child']，webpack会逐一帮我们查找index.js index.jsx child.js child.jsx
-  }
-}
-```
-
-
-
-
-## 市场应用趋势
-
-
-<br/>
-
-# 设计维度
-
-## 目标
-webpack 打包时，不同类型的文件，打包策略是不同的。如果打包的是图片，只需要拿到图片的路径即可。
-
-webpack没那么智能，无法自动识别文件的类型，所以就需要我们告诉它怎么打包。
-
-所以我们需要对webpack进行配置。
-
-webpack 默认会读取 webpack.config.js文件，我们也可以更改默认的文件名`npx webpack --config webpack.xxx.js`
-
-注：webpack开发团队为了提高开发体验，一直在丰富webpack的默认配置，所以我们虽然没有指定JS的打包策略，但一样可以打包成功。
-
-<br/>
-
-## 实现原理
 这里要重点讲解webpack的配置。
 
 ### 模式
@@ -826,12 +432,419 @@ module.exports = {
 
 我们也可以为css进行代码分割，使用到的插件是[MiniCssExtractPlugin](https://webpack.js.org/plugins/mini-css-extract-plugin)，只需要用MiniCssExtractPlugin提供的loader 代替 style-loader 即可，具体内容看官网。
 
+<br/>
+
+## 最佳实践
+
+> 最佳实践回答“怎么能用好”的问题，反映你实践经验的丰富程度。
+
+### webpack的安装
+webpack 不建议全局安装，因为每个项目依赖的webpack版本可能不同，全局安装可能导致项目依赖的webpack版本不对而无法运行，建议局部安装，也就是 `npm i webpack webpack-cli -D`。
+
+局部安装完webpack后，如果要查看webpack的版本，执行 `webpack -v`是得不到预期的结果，因为webpack并没全局安装，此时要执行 `npx webpack -v`，npx是npm提供的命令，它会在我们当前目录下的node_modules文件下寻找安装过的依赖。
+
+如果我们是在package.json文件中配置 npm scripts，则不需要npx这个指令，因为 npm scripts 默认会在当前目录下的 node_modules 寻找依赖。
+
+安装webpack时，可以指定webpack的版本号，如果不清楚webpack有什么版本，可以使用`npm info webpack`查看
+
+> webpack-cli 允许我们在命令里使用webpack这个命令。
+<br/>
+
+### webpack与 code splitting
+如果把所有的代码都打包到一个文件里，会带来两个问题：
+
+1. 文件过于庞大
+2. 基础库基本上不会改变，而业务代码却经常改变，一旦业务代码更改了，整个文件要重新加载，会极大的损耗性能。
+
+code splitting 是代码分割，没有webpack我们也可以手动做代码分割，从而提升性能。webpack能帮我们自动完成代码分割。
+ 
+webpack 中实现代码分割有两种方式：
+1. 同步代码，我们可以在 optimization 中设置splitChunks。
+2. 异步代码（import），无需任何配置，会自动进行代码分割。
+
+```js
+module.exports = {
+  // ……
+	optimization: {
+		splitChunks: {
+      chunks: 'all',
+    }
+	},
+}！
+```
+
+
+### 打包分析
+我们可以使用webpack提供的[analyse工具](https://github.com/webpack/analyse)进行打包分析.
+
+我们在打包时，需要增加命令`webpack --profile --json > stats.json`，也就是 `webpack --profile --json > stats.json --config ./build/webpack.dev.js`
+
+打包完的文件中，就会出现stats.json的文件。
+
+我们打开[链接](http://webpack.github.com/analyse)，上次stats.json，就会出现打包的分析报告。
+
+webpack官方提供的分析工具，除了analyse，还有[这些](https://www.webpackjs.com/guides/code-splitting/#bundle-%E5%88%86%E6%9E%90-bundle-analysis-)：
+
+1. [webpack-chart](https://alexkuz.github.io/webpack-chart/): webpack 数据交互饼图。
+2. [webpack-visualizer](https://chrisbateman.github.io/webpack-visualizer/): 可视化并分析你的 bundle，检查哪些模块占用空间，哪些可能是重复使用的。
+3. [webpack-bundle-analyzer](https://github.com/webpack-contrib/webpack-bundle-analyzer): 一款分析 bundle 内容的插件及 CLI 工具，以便捷的、交互式、可缩放的树状图形式展现给用户。
+
+
+### Prefetching/Preloading 
+webpack 建议我们写异步加载代码，也就是异步import。当代码执行时，才会去加载相应的代码，这样首屏的代码利用率就可以提高。类似：
+
+```js
+document.addEventListener('click', () => {
+  import('./click.js').then(({ default: func }) => {
+    func()
+  })
+})
+```
+
+我们可以用Chrome的coverage工具看代码的利用率。
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/82.gif' width='800'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/83.gif' width='800'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/84.gif' width='800'>
+<br/>
+
+但我们不一定要等到用户操作时，才去加载相应的代码，而是在网络空闲时就去加载。我们可以在webpack中进行配置。具体做法如下：
+
+```js
+// 关注下魔法注释，js的新特性
+document.addEventListener('click', () => {
+  import(/* webpackPrefetch: true */ './click.js').then(({ default: func }) => {
+    func()
+  })
+})
+```
+Prefetching/Preloading 是有区别的：
+
+1. Prefetching会等待核心代码加载完，网络空闲时才去加载
+2. Preloading是跟主要的代码一块加载的
+
+所以Prefetching会更合适。
+
+
+### webpack 与 浏览器缓存
+我们打包的文件，浏览器是会缓存的，当我们修改了内容，用户刷新页面，此时加载的还是缓存中的文件。为了解决这个问题，我们需要修改production模式下的配置文件。
+
+```js
+const commonConfig = require('./webpack.common.js');
+
+const prodConfig = {
+  mode: 'production',
+  devtool: 'cheap-module-source-map',
+  output: {
+    filename: '[name].[contenthash].js',
+    chunkFilename: '[name].[contenthash].js'
+  },
+  optimization: {
+    runtimeChunk: {
+      name: 'runtime'  // 旧版本必须配置此项，否则即便文件内容没有发生改变，hash值也会改变
+    },
+  }
+}
+
+module.exports = merge(commonConfig, prodConfig);
+```
+
+contenthash 会根据文件内容生成hash值，当我们文件内容改变时，contenthash就会改变，从而通知浏览器重新向服务器请求文件。
+
+之所以在旧版webpack下，文件代码没变，生成文件的hash值也会改变的原因是：
+
+我们业务逻辑的代码打包到main.js里，依赖库的代码打包到vendors.js里，但main.js跟vendors.js是有依赖关系的，这些依赖关系的代码会保存在manifest文件里。manifest文件既存在于main.js，也存在vendors.js里。而在旧版webpack每次打包manifest可能会有差异，这个差异导致vendors.js的hash值也会改变。设置runtimeChunk后，manifest相关的代码会被抽离出来，放到runtime文件里去，这样就能解决这个问题。
+
+### Shimming 垫片
+jQuery时代，我们需要先引入jQuery，再引入其他依赖jQuery的类库，比如jQuery.ui.js。这在webpack中就有问题。比如这样：
+
+```js
+// a.js
+import $ from 'jquery'
+import 'jquery.ui'
+```
+
+这样引用，jquery.ui.js会报错：找不到$。之所以这样，是因为webpack是模块化，$只能在a.js里引用，jquery.ui.js是引用不到$的，而jquery.ui.js是第三方库，我们又不能去修改jquery.ui.js的代码，怎么办呢？
+
+我们可以添加ProvidePlugin插件。在ProvidePlugin里我们设置了$，当JS文件中用到$，在当前又没引用$时，这个配置就会生效，告诉JS文件$指向jquery。
+
+关于ProvidePlugin，可以到官网看[资料](https://webpack.js.org/plugins/provide-plugin)
+
+```js
+const webpack = require('webpack');
+module.exports = {
+  plugins: [
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      _join: ['lodash', 'join']
+    }),
+  ],
+  performance: false, // 额外补充：设置为false，打包时不会警告性能方面的问题
+}
+```
+
+关于垫片机制，还有其他用法。比如我们在一个模块中全局打印this，发现this指向的是模块本身，而不是window对象，如果想要让this指向window，可以这样：
+
+```js
+module.exports = {
+  module: {
+    rules: [{
+      test: /\.js$/,
+      exclude: /node_modules/,
+      use: [{
+        loader: 'babel-loader'
+      }, {
+        loader: 'imports-loader?this=>window'
+      }]
+    }]
+  },
+}
+```
+
+我们需要安装imports-loader，设置this指向window。
+
+关于shimming，可以看官网[资料](https://webpack.js.org/guides/shimming)
+
+### library 的打包
+我们写的库，要支持多种方式的引用，诸如：
+
+```js
+// library.js
+export function math (){
+  console.log(1);
+}
+```
+
+```js
+import library from './library' // ES module
+const library = require('library'); // commonjs
+require(['library'], function(){}) // AMD
+```
+
+我们可以配置libraryTarget：
+
+```js
+module.exports = {
+  mode: 'production',
+  entry: {
+    main: './src/index.js'
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',
+    libraryTarget: 'umd' // umd 是通用的意思。配置了umd，就可以支持不同的引用方式
+  }
+}
+```
+
+如果你还想通过script标签引用，比如`<script src="./library.js"></script>`，那还需要配置
+
+```js
+module.exports = {
+  mode: 'production',
+  entry: {
+    main: './src/index.js'
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',
+    library: 'library', // 打包好的代码，挂载到页面library这个全局变量上
+    libraryTarget: 'umd' // umd 是通用的意思。配置了umd，就可以支持不同的引用方式
+  }
+}
+```
+
+打包后到浏览器控制台输入library，就会打印出全局变量
+
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/85.jpg' width='800'>
+<br/>
+
+这里要重点讲下 library 跟 libraryTarget 的关系。library的含义是要生成一个全局变量， libraryTarget 的含义是这个全局变量挂载到哪里。如果libraryTarget设置为umd，则两者关系不大。如果我们把libraryTarget 设置成this，则打包出来的文件不支持ES module、commonjs等的引用，他表示全局变量挂载到全局的this上。此时我们在浏览器控制台，输入`this.library`，就可以找到该全局变量。libraryTarget 还设置成 window、global。
+
+此外，我们在打包时，还会出现一种情况：
+
+```js
+// library.js
+import _ from lodash;
+// 其他代码
+```
+
+```js
+// a.js
+import _ from lodash;
+import library from './library';
+```
+
+这就造成lodash被打包了两次，我们希望library.js打包时，不要把lodash打包进去，可以这样配置：
+
+```js
+module.exports = {
+  externals: ['lodash] // 打包时，遇到lodash，自动忽略
+}
+```
+
+<br/>
+
+### PWA
+我们把生成的文件放到线上，用户就可以访问，如果服务器挂了，页面就会显示异常。这种时候，我们希望即便服务器挂了，用户还是可以看到之前访问的页面，而这就是PWA。
+
+要做到PWA很简单，首先配置webpack。
+
+```js
+const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
+module.exports = {
+  plugins: [
+    new WorkboxWebpackPlugin.GenerateSW({
+      clientsClaim: true,
+      skipWaiting: true
+    }),
+  ]
+}
+```
+
+然后在业务代码中，使用 serviceWorker。
+
+```js
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(registration => {
+        console.log('service-worker register')
+      }).catch(error => {
+        console.log('service-worker register error')
+      })
+  })
+}
+```
+
+
+<br/>
+
+### 请求转发
+我们在开发时，经常会遇到跨域的问题，devServer 可以帮助我们实现请求转发，具体看官网[资料](https://www.webpackjs.com/configuration/dev-server/#devserver-proxy)
+
+我们只需要在webpack进行如下配置：
+
+```js
+module.exports = {
+  devServer: {
+    proxy: {
+      '/react/api': {
+        target: 'https://baidu.com/',
+        secure: false, // false 时才可以对https请求的转发
+        pathRewrite: {
+          'header.json': 'demo.json'
+        }
+      }
+    }
+  },
+}
+```
+devServer 中的proxy允许我们做请求转发。当我们请求'/react/api'就会被转发到'http://baidu.com/'的域名下。此外，我们在日常开发中，可能需要用到header.json这个API时，该API还没开发完，我们需要先访问demo.json进行开发，此时就可以设置pathRewrite达到效果。
+
+webpack的proxy内容非常多，底层使用的是http-proxy-middleware，可以上GitHub看相应的[资料](https://github.com/chimurai/http-proxy-middleware#options)
+
+### 单页面路由问题
+我们在写react应用时，需要用到react-router-dom实现路由，但是我们会发现，当我们访问/list时，预期是要访问到/list路由，但浏览器会发送请求到/list，从而页面显示出错。
+
+要解决这个问题，就要用到devServer的historyApiFallback这个API了。
+
+当我们在devServer里配置`historyApiFallback:true`后，我们不管访问什么url，都会执行根目录（也就是/）下的代码，从而解决了单页路由的问题。
+
+更多内容，看[官网](https://www.webpackjs.com/configuration/dev-server/#devserver-historyapifallback)
+
+### eslint
+eslint 跟 webpack关系不大，很多编辑器是可以支持eslint插件，但可能我们为了调试方便，希望eslint的错误显示在浏览器上，这样即便我们编辑器没有eslint插件，也可以看到问题。
+
+操作起来也很简单，我们先在自己的工程里安装eslint跟eslint-loader.
+
+```js
+module.exports = {
+  devServer: {
+    overlay: true  // 必须配置
+  },
+  rules: [
+    {
+      test: /\.js$/,
+      exclude: /node_modules/,
+      use: ["babel-loader", "eslint-loader"],  // 使用 eslint-loader 
+    },
+  ]
+}
+```
+
+关于eslint-loader，可以看官网[资料](https://webpack.js.org/loaders/eslint-loader)
+
+### webpack性能优化
+1. 跟上技术迭代（Node yarn npm ）
+2. 在尽可能少的模块上应用loader
+3. plugin 尽可能精简并确保可靠
+4. 合理配置resolve。
+5. 使用 DllPlugin 提高打包速度（5.10、5.11）
+6. 控制包文件大小
+7. 合理使用sourceMap
+8. 结合 stats 分析打包结果
+9. 开发环境内存编译（devServer打包文件存于内存，能提高速度）
+
+**跟上技术迭代**
+webpack运行于node，node版本更新，自然会提高webpack的打包效率，npm跟yarn等包管理工具也是同理。
+
+**在尽可能少的模块上应用loader**：
+为loader配置exclude，例如： `exclude: /node_moudles/`
+为loader配置include，例如：`include: path.resolve(__dirname, '../src')`
+
+**plugin 尽可能精简并确保可靠**
+比如开发环境下，不需要对代码进行压缩，这样就不需要在webpack.dev.js里引入相关的plugin
+
+**合理配置resolve**
+当我们没有写js后缀时，webpack默认会帮我们补上，如果我们的jsx文件也不希望写上后缀，希望webpack会帮我们默认补上，可以设置resolve。
+
+```js
+module.exports = {
+  resolve: {
+    extensions: ['.js', '.jsx'],
+    mainFiles: ['index', 'child'] // 当我们引用的是某个路径，webpack默认会帮我们读取index文件，如果我们设置了['index', 'child']，webpack会逐一帮我们查找index.js index.jsx child.js child.jsx
+  }
+}
+```
+
+
+
+
+## 市场应用趋势
+> 随着技术生态的发展，和应用问题的变迁，技术的应用场景和流行趋势会受到影响。这层回答“谁用，用在哪”的问题，反映你对技术应用领域的认识宽度。
+
+<br/>
+
+# 设计维度
+
+## 目标
+> 为了解决用户的问题，技术本身要达成什么目标。这层定义“做到什么”。
+
+webpack 打包时，不同类型的文件，打包策略是不同的。如果打包的是图片，只需要拿到图片的路径即可。
+
+webpack没那么智能，无法自动识别文件的类型，所以就需要我们告诉它怎么打包。
+
+所以我们需要对webpack进行配置。
+
+webpack 默认会读取 webpack.config.js文件，我们也可以更改默认的文件名`npx webpack --config webpack.xxx.js`
+
+注：webpack开发团队为了提高开发体验，一直在丰富webpack的默认配置，所以我们虽然没有指定JS的打包策略，但一样可以打包成功。
+
+<br/>
+
+## 实现原理
+> 为了达到设计目标，该技术采用了什么原理和机制。实现原理层回答“怎么做到”的问题。把实现原理弄懂，并且讲清楚，是技术人员的基本功。
 
 <br/>
 
 ## 优劣局限
-
+> 每种技术实现，都有其局限性，在某些条件下能最大化的发挥效能，缺少了某些条件则暴露出其缺陷。优劣局限层回答“做得怎么样”的问题。对技术优劣局限的把握，更有利于应用时总结最佳实践，是分析各种“坑”的基础。
 <br/>
 
 
 ## 演进趋势
+> 技术是在迭代改进和不断淘汰的。了解技术的前生后世，分清技术不变的本质，和变化的脉络，以及与其他技术的共生关系，能体现你对技术发展趋势的关注和思考。这层体现“未来如何”。
