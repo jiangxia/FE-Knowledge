@@ -367,6 +367,9 @@ module.exports = {
 4. 合理配置resolve。
 5. 使用 DllPlugin 提高打包速度（5.10、5.11）
 6. 控制包文件大小
+7. 合理使用sourceMap
+8. 结合 stats 分析打包结果
+9. 开发环境内存编译（devServer打包文件存于内存，能提高速度）
 
 **跟上技术迭代**
 webpack运行于node，node版本更新，自然会提高webpack的打包效率，npm跟yarn等包管理工具也是同理。
