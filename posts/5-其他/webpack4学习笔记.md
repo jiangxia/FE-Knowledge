@@ -188,6 +188,123 @@ module.exports = {
 
 关于shimming，可以看官网[资料](https://webpack.js.org/guides/shimming)
 
+### library 的打包
+我们写的库，要支持多种方式的引用，诸如：
+
+```js
+// library.js
+export function math (){
+  console.log(1);
+}
+```
+
+```js
+import library from './library' // ES module
+const library = require('library'); // commonjs
+require(['library'], function(){}) // AMD
+```
+
+我们可以配置libraryTarget：
+
+```js
+module.exports = {
+  mode: 'production',
+  entry: {
+    main: './src/index.js'
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',
+    libraryTarget: 'umd' // umd 是通用的意思。配置了umd，就可以支持不同的引用方式
+  }
+}
+```
+
+如果你还想通过script标签引用，比如`<script src="./library.js"></script>`，那还需要配置
+
+```js
+module.exports = {
+  mode: 'production',
+  entry: {
+    main: './src/index.js'
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',
+    library: 'library', // 打包好的代码，挂载到页面library这个全局变量上
+    libraryTarget: 'umd' // umd 是通用的意思。配置了umd，就可以支持不同的引用方式
+  }
+}
+```
+
+打包后到浏览器控制台输入library，就会打印出全局变量
+
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/85.jpg' width='800'>
+<br/>
+
+这里要重点讲下 library 跟 libraryTarget 的关系。library的含义是要生成一个全局变量， libraryTarget 的含义是这个全局变量挂载到哪里。如果libraryTarget设置为umd，则两者关系不大。如果我们把libraryTarget 设置成this，则打包出来的文件不支持ES module、commonjs等的引用，他表示全局变量挂载到全局的this上。此时我们在浏览器控制台，输入`this.library`，就可以找到该全局变量。libraryTarget 还设置成 window、global。
+
+此外，我们在打包时，还会出现一种情况：
+
+```js
+// library.js
+import _ from lodash;
+// 其他代码
+```
+
+```js
+// a.js
+import _ from lodash;
+import library from './library';
+```
+
+这就造成lodash被打包了两次，我们希望library.js打包时，不要把lodash打包进去，可以这样配置：
+
+```js
+module.exports = {
+  externals: ['lodash] // 打包时，遇到lodash，自动忽略
+}
+```
+
+<br/>
+
+### PWA
+我们把生成的文件放到线上，用户就可以访问，如果服务器挂了，页面就会显示异常。这种时候，我们希望即便服务器挂了，用户还是可以看到之前访问的页面，而这就是PWA。
+
+要做到PWA很简单，首先配置webpack。
+
+```js
+const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
+module.exports = {
+  plugins: [
+    new WorkboxWebpackPlugin.GenerateSW({
+      clientsClaim: true,
+      skipWaiting: true
+    }),
+  ]
+}
+```
+
+然后在业务代码中，使用 serviceWorker。
+
+```js
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(registration => {
+        console.log('service-worker register')
+      }).catch(error => {
+        console.log('service-worker register error')
+      })
+  })
+}
+```
+
+
+<br/>
+
 ## 市场应用趋势
 
 
