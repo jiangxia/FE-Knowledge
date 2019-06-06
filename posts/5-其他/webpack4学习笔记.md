@@ -1,8 +1,10 @@
 
 # 前言
-webpack 是当下最好用的前端模块打包工具，前端开发人员日常都要跟脚手架打交道，而手脚架就是用基于webpack构建的，深入理解webpack，对我们日常工作意义非常大。
+webpack 是当下最好用的前端模块打包工具，前端开发人员日常都要跟脚手架打交道，而手脚架就是基于webpack构建的，深入理解webpack，对我们日常工作意义重大。
 
-本文将系统讲解webpack，老规矩，一样从应用维度跟设计维度展开，由于作者能力有限，有些部分暂时整理不出来，如果你有所补充，欢迎push~
+本文将系统讲解webpack，老规矩，从应用维度跟设计维度展开，由于作者能力有限，有些部分暂时整理不出来，如果你有所补充，欢迎push~
+
+<br/>
 
 # 应用维度
 
@@ -12,6 +14,7 @@ webpack 是当下最好用的前端模块打包工具，前端开发人员日常
 
 > 从技术的应用维度看，首先考虑的是要解决什么问题，这是技术产生的原因。问题这层，用来回答“干什么用”。
 
+<br/>
 
 随着前端越来越复杂，网页其实可以看做是功能丰富的应用，它们拥有着复杂的JavaScript代码和一大堆依赖包。
 
@@ -22,6 +25,8 @@ webpack 不仅可以打包JS，也可以打包其他格式的文件， 比如css
 
 ## 技术规范
 > 技术被研发出来，人们怎么用它才能解决问题呢？这就要看技术规范，可以理解为技术使用说明书。技术规范，回答“怎么用”的问题，反映你对该技术使用方法的理解深度。
+
+<br/>
 
 这里要重点讲解webpack的配置。
 
@@ -38,9 +43,9 @@ module.exports = {
 <br/>
 
 ### Entry 与 Output
-entry 支持数组，数组的key是文件名，当entry配置多个入口文件时，output的filename不能写死，不然会报错，可以写成 `filename: [name].js`。
+entry 支持配置多项，每一项的key是文件名，当entry配置多个入口文件时，output的filename不能写死，不然会报错，可以写成 `filename: [name].js`。
 
-output 还可以配置导出JS文件的前缀，通过 publicPath ，通过这个配置，可以设置CDN地址。
+output 还可以配置publicPath，从而设置导出JS文件的前缀，通过这个配置，可以设置CDN地址。
 
 ```js
 module.exports = {
@@ -49,7 +54,7 @@ module.exports = {
     sub: './src/index.js'
   },
   output: {
-    filename: '[name].js',
+    filename: '[name].js', // 设置成 index.js 会报错
     chunkFilename: '[name].chunk.js',
     publicPath: 'http://cdn.com',
     path: path.resolve(__dirname, '../dist')
@@ -201,15 +206,15 @@ webpack支持 devServer , 可以帮我们启动了一个服务器。我们在日
 
 ```js
 module.exports = {
-	devServer: {
-		contentBase: './dist', // 服务器的根目录
-		open: true, // 自动打开浏览器
-		port: 8080,
-		hot: true,
+  devServer: {
+    contentBase: './dist', // 服务器的根目录
+    open: true, // 自动打开浏览器
+    port: 8080,
+    hot: true,
     proxy: { // 设置代理，访问/api，直接转发到3000端口
       "/api": "http://localhost:3000"
     }
-	},
+  },
 }
 ```
 
@@ -438,6 +443,8 @@ module.exports = {
 
 > 最佳实践回答“怎么能用好”的问题，反映你实践经验的丰富程度。
 
+<br/>
+
 ### webpack的安装
 webpack 不建议全局安装，因为每个项目依赖的webpack版本可能不同，全局安装可能导致项目依赖的webpack版本不对而无法运行，建议局部安装，也就是 `npm i webpack webpack-cli -D`。
 
@@ -465,12 +472,12 @@ webpack 中实现代码分割有两种方式：
 ```js
 module.exports = {
   // ……
-	optimization: {
-		splitChunks: {
+  optimization: {
+    splitChunks: {
       chunks: 'all',
     }
-	},
-}！
+  },
+}
 ```
 
 
@@ -489,6 +496,7 @@ webpack官方提供的分析工具，除了analyse，还有[这些](https://www.
 2. [webpack-visualizer](https://chrisbateman.github.io/webpack-visualizer/): 可视化并分析你的 bundle，检查哪些模块占用空间，哪些可能是重复使用的。
 3. [webpack-bundle-analyzer](https://github.com/webpack-contrib/webpack-bundle-analyzer): 一款分析 bundle 内容的插件及 CLI 工具，以便捷的、交互式、可缩放的树状图形式展现给用户。
 
+<br/>
 
 ### Prefetching/Preloading 
 webpack 建议我们写异步加载代码，也就是异步import。当代码执行时，才会去加载相应的代码，这样首屏的代码利用率就可以提高。类似：
@@ -527,6 +535,8 @@ Prefetching/Preloading 是有区别的：
 所以Prefetching会更合适。
 
 
+<br/>
+
 ### webpack 与 浏览器缓存
 我们打包的文件，浏览器是会缓存的，当我们修改了内容，用户刷新页面，此时加载的还是缓存中的文件。为了解决这个问题，我们需要修改production模式下的配置文件。
 
@@ -555,6 +565,8 @@ contenthash 会根据文件内容生成hash值，当我们文件内容改变时�
 之所以在旧版webpack下，文件代码没变，生成文件的hash值也会改变的原因是：
 
 我们业务逻辑的代码打包到main.js里，依赖库的代码打包到vendors.js里，但main.js跟vendors.js是有依赖关系的，这些依赖关系的代码会保存在manifest文件里。manifest文件既存在于main.js，也存在vendors.js里。而在旧版webpack每次打包manifest可能会有差异，这个差异导致vendors.js的hash值也会改变。设置runtimeChunk后，manifest相关的代码会被抽离出来，放到runtime文件里去，这样就能解决这个问题。
+
+<br/>
 
 ### Shimming 垫片
 jQuery时代，我们需要先引入jQuery，再引入其他依赖jQuery的类库，比如jQuery.ui.js。这在webpack中就有问题。比如这样：
@@ -605,6 +617,8 @@ module.exports = {
 我们需要安装imports-loader，设置this指向window。
 
 关于shimming，可以看官网[资料](https://webpack.js.org/guides/shimming)
+
+<br/>
 
 ### library 的打包
 我们写的库，要支持多种方式的引用，诸如：
@@ -743,7 +757,8 @@ module.exports = {
   },
 }
 ```
-devServer 中的proxy允许我们做请求转发。当我们请求'/react/api'就会被转发到'http://baidu.com/'的域名下。此外，我们在日常开发中，可能需要用到header.json这个API时，该API还没开发完，我们需要先访问demo.json进行开发，此时就可以设置pathRewrite达到效果。
+
+devServer 中的proxy允许我们做请求转发。当我们请求'/react/api'就会被转发到`http://baidu.com/`的域名下。此外，我们在日常开发中，可能需要用到header.json这个API时，该API还没开发完，我们需要先访问demo.json进行开发，此时就可以设置pathRewrite达到效果。
 
 webpack的proxy内容非常多，底层使用的是http-proxy-middleware，可以上GitHub看相应的[资料](https://github.com/chimurai/http-proxy-middleware#options)
 
