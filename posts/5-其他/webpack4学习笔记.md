@@ -357,7 +357,40 @@ module.exports = {
   ]
 }
 ```
+
 关于eslint-loader，可以看官网[资料](https://webpack.js.org/loaders/eslint-loader)
+
+### webpack性能优化
+1. 跟上技术迭代（Node yarn npm ）
+2. 在尽可能少的模块上应用loader
+3. plugin 尽可能精简并确保可靠
+4. 合理配置resolve。
+5. 使用 DllPlugin 提高打包速度（5.10、5.11）
+6. 控制包文件大小
+
+**跟上技术迭代**
+webpack运行于node，node版本更新，自然会提高webpack的打包效率，npm跟yarn等包管理工具也是同理。
+
+**在尽可能少的模块上应用loader**：
+为loader配置exclude，例如： `exclude: /node_moudles/`
+为loader配置include，例如：`include: path.resolve(__dirname, '../src')`
+
+**plugin 尽可能精简并确保可靠**
+比如开发环境下，不需要对代码进行压缩，这样就不需要在webpack.dev.js里引入相关的plugin
+
+**合理配置resolve**
+当我们没有写js后缀时，webpack默认会帮我们补上，如果我们的jsx文件也不希望写上后缀，希望webpack会帮我们默认补上，可以设置resolve。
+
+```js
+module.exports = {
+  resolve: {
+    extensions: ['.js', '.jsx'],
+    mainFiles: ['index', 'child'] // 当我们引用的是某个路径，webpack默认会帮我们读取index文件，如果我们设置了['index', 'child']，webpack会逐一帮我们查找index.js index.jsx child.js child.jsx
+  }
+}
+```
+
+
 
 
 ## 市场应用趋势
