@@ -28,6 +28,7 @@ webpack 是当下最好用的前端模块打包工具，前端开发人员日常
 webpack官方定义就是一个模块打包工具。webpack不仅支持 ES module 的语法，也支持 CommonJS 的语法。
 
 webpack 不仅可以打包JS，也可以打包其他格式的文件， 比如css、image等。
+
 <br/>
 
 ## 技术规范
@@ -487,6 +488,8 @@ module.exports = {
 }
 ```
 
+
+<br/>
 
 ### 打包分析
 我们可以使用webpack提供的[analyse工具](https://github.com/webpack/analyse)进行打包分析.
