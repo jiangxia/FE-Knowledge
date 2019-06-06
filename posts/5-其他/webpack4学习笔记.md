@@ -810,22 +810,32 @@ module.exports = {
 8. 结合 stats 分析打包结果
 9. 开发环境内存编译（devServer打包文件存于内存，能提高速度）
 
+<br/>
+
 **跟上技术迭代**
 
 webpack运行于node，node版本更新，自然会提高webpack的打包效率，npm跟yarn等包管理工具也是同理。
+
+<br/>
 
 **在尽可能少的模块上应用loader**：
 
 为loader配置exclude，例如： `exclude: /node_moudles/`
 为loader配置include，例如：`include: path.resolve(__dirname, '../src')`
 
+<br/>
+
 **plugin 尽可能精简并确保可靠**
 
 比如开发环境下，不需要对代码进行压缩，这样就不需要在webpack.dev.js里引入相关的plugin
 
+<br/>
+
 **合理配置resolve**
 
 当我们没有写js后缀时，webpack默认会帮我们补上，如果我们的jsx文件也不希望写上后缀，希望webpack会帮我们默认补上，可以设置resolve。
+
+<br/>
 
 ```js
 module.exports = {
