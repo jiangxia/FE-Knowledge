@@ -868,13 +868,13 @@ module.exports = {
 
 <br/>
 
-webpack就是个模块打包工具，我们需要使用webpack打包不限于JS、CSS、image等文件，此外，webpack还要帮助我们生成最终上线的代码，这意味着webpack责任重大。
+webpack就是个模块打包工具，我们需要使用webpack打包不限于JS、CSS、image等文件。
 
-webpack 打包时，不同类型的文件，打包策略是不同的。如果打包的是图片，只需要拿到图片的路径即可。
+不同的文件，打包策略是不同的，所以我们需要配置loader。
 
-webpack没那么智能，无法自动识别文件的类型，所以就需要我们告诉它怎么打包。
+打包过程中，我们可能还需要做一些额外的操作，所以我们需要配置 plugin。
 
-所以我们需要对webpack进行配置。
+所以学习webpack的重点，就是理解与掌握loader跟plugin。
 
 webpack 默认会读取 webpack.config.js文件，我们也可以更改默认的文件名`npx webpack --config webpack.xxx.js`
 
