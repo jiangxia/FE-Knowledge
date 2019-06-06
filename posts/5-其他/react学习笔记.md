@@ -23,7 +23,9 @@ react 是数据驱动的框架，也是目前前端最火的框架之一，学�
 
 生命周期函数指的是在某一个时刻组件会自动调用执行的函数
 
-![20a0d9d1be7109b66140dea6bcc979f7.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1794)
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/86.jpg' width='800'>
+<br/>
 
 注意下update阶段，触发组件update有两种情况，props或者state的修改。
 
@@ -54,20 +56,27 @@ reducer其实并没有直接修改store，他只是通过旧的state，返回新
 首先，安装redux。可以使用`yarn add redux-thunk` 
 
 然后，引入redux-thunk。（按官方文档配置）
-![0b14b4ed1d83f03145a54f700886dea7.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1795)
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/87.png' width='800'>
+<br/>
 
 配置了redux-thunk后，他允许我们在action中写异步代码。
 
-![5ded0c80a2da5934e6fe5d103d5551fb.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1796)
-
-![03ad8613e8f550ee47fa4ec5a2ad2a50.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1797)
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/88.png' width='500'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/89.png' width='500'>
+<br/>
 
 没引入redux-thunk之前，action只能是一个js对象。现在，action可以是一个函数。如果没引入redux-thunk，那么action为函数时会报错。
 
 执行dispatch(action)时，默认会运行 action 返回的函数。
 
 action对应的其实是红框中的函数
-![c1994e17eff9651201154108cf6f7802.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1798)
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/90.png' width='500'>
+<br/>
 
 在这里，是可以拿到dispatch方法，等拿到异步请求回来的数据后，可以封装成最终的action对象，传给store。
 
@@ -76,7 +85,11 @@ action对应的其实是红框中的函数
 
 ### 到底什么是redux中间件
 
-![841bef70d6be653b3565e85dd158fd8f.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1799)
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/91.png' width='600'>
+<br/>
+
 
 view会派发一个action，通过dispatch方法发送给store。
 
@@ -119,17 +132,27 @@ redux-thunk 采用的是把异步操作放到action中操作。而 redux-saga �
 首先，安装saga。`yarn add redux-saga`
 
 然后，引入saga。（根据官方文档）
-![310162c990a02c42fb7472a4acd2b476.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1800)
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/92.png' width='500'>
+<br/>
 
 saga跟thunk的区别在于，saga把异步逻辑拆分到独立的文章执行，所以我们要新建saga 文件。
 
 saga文件内容如下：
-![094977fef3b9e3185f5a97fe90fbdda0.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1801)
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/93.png' width='500'>
+<br/>
+
 
 当组件dispatch的action是 GET_INIT_LIST 时，就会被 saga捕获，并去执行。
 
 执行完异步操作，生成最终的action，通过put方法传给reducer。
-![edfc5074a13a3805a165c0b8e78a8a9d.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1802)
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/94.png' width='500'>
+<br/>
 
 有了中间件，就可以处理异步操作。
 
