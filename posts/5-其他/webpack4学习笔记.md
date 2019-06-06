@@ -305,6 +305,61 @@ if('serviceWorker' in navigator) {
 
 <br/>
 
+### 请求转发
+我们在开发时，经常会遇到跨域的问题，devServer 可以帮助我们实现请求转发，具体看官网[资料](https://www.webpackjs.com/configuration/dev-server/#devserver-proxy)
+
+我们只需要在webpack进行如下配置：
+
+```js
+module.exports = {
+  devServer: {
+    proxy: {
+      '/react/api': {
+        target: 'https://baidu.com/',
+        secure: false, // false 时才可以对https请求的转发
+        pathRewrite: {
+          'header.json': 'demo.json'
+        }
+      }
+    }
+  },
+}
+```
+devServer 中的proxy允许我们做请求转发。当我们请求'/react/api'就会被转发到'http://baidu.com/'的域名下。此外，我们在日常开发中，可能需要用到header.json这个API时，该API还没开发完，我们需要先访问demo.json进行开发，此时就可以设置pathRewrite达到效果。
+
+webpack的proxy内容非常多，底层使用的是http-proxy-middleware，可以上GitHub看相应的[资料](https://github.com/chimurai/http-proxy-middleware#options)
+
+### 单页面路由问题
+我们在写react应用时，需要用到react-router-dom实现路由，但是我们会发现，当我们访问/list时，预期是要访问到/list路由，但浏览器会发送请求到/list，从而页面显示出错。
+
+要解决这个问题，就要用到devServer的historyApiFallback这个API了。
+
+当我们在devServer里配置`historyApiFallback:true`后，我们不管访问什么url，都会执行根目录（也就是/）下的代码，从而解决了单页路由的问题。
+
+更多内容，看[官网](https://www.webpackjs.com/configuration/dev-server/#devserver-historyapifallback)
+
+### eslint
+eslint 跟 webpack关系不大，很多编辑器是可以支持eslint插件，但可能我们为了调试方便，希望eslint的错误显示在浏览器上，这样即便我们编辑器没有eslint插件，也可以看到问题。
+
+操作起来也很简单，我们先在自己的工程里安装eslint跟eslint-loader.
+
+```js
+module.exports = {
+  devServer: {
+    overlay: true  // 必须配置
+  },
+  rules: [
+    {
+      test: /\.js$/,
+      exclude: /node_modules/,
+      use: ["babel-loader", "eslint-loader"],  // 使用 eslint-loader 
+    },
+  ]
+}
+```
+关于eslint-loader，可以看官网[资料](https://webpack.js.org/loaders/eslint-loader)
+
+
 ## 市场应用趋势
 
 
