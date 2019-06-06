@@ -1,5 +1,5 @@
 # 前言
-react 是目前前端最火的框架之义，学习react，我们照旧从应用维度跟设计维度进行学习。
+react 是数据驱动的框架，也是目前前端最火的框架之一，学习react，我们照旧从应用维度跟设计维度进行学习。
 
 <br/>
 
@@ -19,12 +19,157 @@ react 是目前前端最火的框架之义，学习react，我们照旧从应用
 
 <br/>
 
+### 生命周期函数
+
+生命周期函数指的是在某一个时刻组件会自动调用执行的函数
+
+![20a0d9d1be7109b66140dea6bcc979f7.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1794)
+
+注意下update阶段，触发组件update有两种情况，props或者state的修改。
+
+可以看到，这两种情况 生命周期函数是有重合的。唯一的不同就是props改变时，会先调用 componentWillReceiveProps .
+
+componentWillReceiveProps 的执行：
+
+1. 一个组件要从父组件接受参数
+2. 如果这个组件第一次存在于父组件中，不会执行
+3. 如果这个组件之前已经存在于父组件中，才会执行
+
+<br/>
+
 ### redux
 redux资料：
 1. [Redux 中文文档](http://cn.redux.js.org/)
 
+redux 注意点：
+1. store是唯一的
+2. 只有store能够改变自己的内容
+3. Reducer必须是纯函数
+
+reducer其实并没有直接修改store，他只是通过旧的state，返回新的state，然后将newstate传给store，store将newstate替换掉旧的state。
+
 <br/>
 
+### redux-thunk 发送异步请求获取数据
+首先，安装redux。可以使用`yarn add redux-thunk` 
+
+然后，引入redux-thunk。（按官方文档配置）
+![0b14b4ed1d83f03145a54f700886dea7.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1795)
+
+配置了redux-thunk后，他允许我们在action中写异步代码。
+
+![5ded0c80a2da5934e6fe5d103d5551fb.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1796)
+
+![03ad8613e8f550ee47fa4ec5a2ad2a50.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1797)
+
+没引入redux-thunk之前，action只能是一个js对象。现在，action可以是一个函数。如果没引入redux-thunk，那么action为函数时会报错。
+
+执行dispatch(action)时，默认会运行 action 返回的函数。
+
+action对应的其实是红框中的函数
+![c1994e17eff9651201154108cf6f7802.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1798)
+
+在这里，是可以拿到dispatch方法，等拿到异步请求回来的数据后，可以封装成最终的action对象，传给store。
+
+
+<br/>
+
+### 到底什么是redux中间件
+
+![841bef70d6be653b3565e85dd158fd8f.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1799)
+
+view会派发一个action，通过dispatch方法发送给store。
+
+store接收到action，然后会将action连同之前的state一起传给给reducer。
+
+reducer会返回一个新的数据给store，store拿到数据后，改变state。
+
+而redux中间件的“中间”，指的是action跟store中间。
+
+没引入redux-thunk之前，action只能是对象， 使用了redux-thunk后，action可以是函数。
+
+action跟store是靠dispatch方法连接，事实上中间件就是对dispatch方法的封装或者说升级。
+
+没有中间件的情况，dispatch方法接受一个对象，并把对象传递给store
+
+引入redux-thunk后，如果dispatch方法接受的是对象，则将对象传递给store。如果接收的是函数，则会执行函数，等函数执行完再调用store。也就是说dispatch方法会根据参数不同，执行不同操作。
+
+综上，中间件指的是action跟store的中间， 是对store的dispatch方法做了封装，或者说升级。
+
+类似的中间件还有redux-logger、redux-saga。
+
+redux-thunk 跟 redux-saga 非常类似，
+
+redux-thunk 采用的是把异步操作放到action中操作。而 redux-saga 的思想是单独把异步逻辑拆分到另一个文件中管理。
+
+
+为什么中间件会添加在action这个环节？我们可以站在框架作者的角度考虑：
+
+1. Reducer：纯函数，只承担计算 State 的功能，不合适承担其他功能，也承担不了，因为理论上，纯函数不能进行读写操作。
+2. View：与 State 一一对应，可以看作 State 的视觉层，也不合适承担其他功能。
+3. Action：存放数据的对象，即消息的载体，只能被别人操作，自己不能进行任何操作。
+
+想来想去，只有发送 Action 的这个步骤，即store.dispatch()方法，可以添加功能。
+
+
+<br/>
+
+### redux-saga 中间件的使用
+
+首先，安装saga。`yarn add redux-saga`
+
+然后，引入saga。（根据官方文档）
+![310162c990a02c42fb7472a4acd2b476.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1800)
+
+saga跟thunk的区别在于，saga把异步逻辑拆分到独立的文章执行，所以我们要新建saga 文件。
+
+saga文件内容如下：
+![094977fef3b9e3185f5a97fe90fbdda0.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1801)
+
+当组件dispatch的action是 GET_INIT_LIST 时，就会被 saga捕获，并去执行。
+
+执行完异步操作，生成最终的action，通过put方法传给reducer。
+![edfc5074a13a3805a165c0b8e78a8a9d.png](evernotecid://192FA615-0671-4801-9FB2-4DBDB1BBD806/appyinxiangcom/9007676/ENResource/p1802)
+
+有了中间件，就可以处理异步操作。
+
+同步操作只要发出一种 Action 即可，异步操作的差别是它要发出三种 Action。
+
+1. 操作发起时的 Action
+2. 操作成功时的 Action
+3. 操作失败时的 Action
+
+<br/>
+
+### react-redux 的使用
+
+Redux 的作者封装了一个 React 专用的库 React-Redux，这个库是可以选用的。实际项目中，你应该权衡一下，是直接使用 Redux，还是使用 React-Redux。后者虽然提供了便利，但是需要掌握额外的 API，并且要遵守它的组件拆分规范。
+
+一、React-Redux 将所有组件分成两大类：UI 组件和容器组件
+
+UI 组件有以下几个特征：
+
+1. 只负责 UI 的呈现，不带有任何业务逻辑
+2. 没有状态（即不使用this.state这个变量）
+3. 所有数据都由参数（this.props）提供
+4. 不使用任何 Redux 的 API
+
+容器组件的特征恰恰相反：
+
+1. 负责管理数据和业务逻辑，不负责 UI 的呈现
+2. 带有内部状态
+3. 使用 Redux 的 API
+
+总之，只要记住一句话就可以了：UI 组件负责 UI 的呈现，容器组件负责管理数据和逻辑。
+
+二、connect()
+
+三、<Provider> 组件
+
+参考资料：[Redux 入门教程（三）：React-Redux 的用法](http://www.ruanyifeng.com/blog/2016/09/redux_tutorial_part_three_react-redux.html)
+
+
+<br/>
 
 ### 组件测试
 jest
@@ -36,6 +181,10 @@ enzyme： https://airbnb.io/enzyme/
 > 最佳实践回答“怎么能用好”的问题，反映你实践经验的丰富程度。
 
 <br/>
+
+### 无状态组件
+
+一个组件只有render函数时，可以定义为无状态组件，无状态组件就是一个函数，相比普通组件性能更高，因为他没有其他声明周期的方法。UI组件一般都可以定义为无状态组件。
 
 ### 高阶组件
 
@@ -102,6 +251,13 @@ immutable学习资料：
 
 <br/>
 
+### render函数何时执行
+1. 当组件的state和props发生改变时，render函数就会重新执行
+2. 父组件render函数被执行时，它的子组件的render函数都将被重新运行一次
+
+<br/>
+
+
 ### this.setState
 
 this.setState 背后有一个队列的机制，每次调用 setState ，都会塞到队列里面，通过队列可以高效更新 state ，setState 对状态的更新是异步的
@@ -117,6 +273,53 @@ applyMiddleWare 的实现：
 
 <br/>
 
+
+### VDOM
+
+如果没有VDOM，state改变，如何渲染页面？
+
+最原始的做法：
+
+1. state 数据
+2. JSX 模板
+3. 数据 + 模板 结合，生成真实DOM，来显示
+4. state发生改变
+5. 数据 + 模板 结合，生成真实DOM，替换原来的DOM
+
+缺陷：
+第一次生成了完整的DOM片段
+第二次生成了完整的DOM片段
+第二次的DOM替换第一次的DOM，非常耗性能
+
+改进的做法：
+
+1. state 数据
+2. JSX 模板
+3. 数据 + 模板 结合，生成真实DOM，来显示
+4. state发生改变
+5. 数据 + 模板 结合，生成真实DOM，不直接替换原来的DOM
+6. 新的DOM（DocumentFragment） 和 原始的DOM 做对比，找差异
+7. 只替换有变动的DOM元素
+
+缺陷：性能提升不明显，因为对比DOM也消耗了性能
+
+react的做法
+
+1. state 数据
+2. JSX 模板
+3. 数据 + 模板结合，生成VDOM（VDOM就是一个JS对象，用他来描述真实DOM）
+4. 用VDOM，生成真实DOM，来显示
+5. state发生改变
+6. 生成新的VDOM （极大提升性能）
+7. 比较原始VDOM和新的VDOM的区别 （极大提升性能）
+8. 只替换有变动的DOM元素
+
+优点：
+
+1. 性能提升了
+2. 跨端应用得以实现
+
+<br/>
 
 ## 优劣局限
 
