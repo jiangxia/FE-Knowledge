@@ -38,13 +38,13 @@ react 将开发人员从细节中解放出来，它始终整体“刷新”页�
 传统的MVC架构难以扩展和维护，当应用程序出现问题，很难知道是model还是view出现问题。
 
 <br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/96.png' width='600'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/96.jpg' width='600'>
 <br/>
 
 facebook 推出react的同时，也推出了flux架构。flux架构的最大特点就是单向数据流，Flux建立在react始终以状态驱动视图的基础上，不需要关心细节。
 
 <br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/97.png' width='600'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/97.jpg' width='600'>
 <br/>
 
 flux只是一个架构，开发者也发现flux并不好用，所以就诞生了redux，当然还有Mobx、dva，这块内容太多了，为此我将他抽离出来，请看[这里](https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/数据管理学习笔记.md)。
