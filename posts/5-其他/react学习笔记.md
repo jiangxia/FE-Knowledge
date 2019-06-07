@@ -96,17 +96,76 @@ flux只是一个架构，开发者也发现flux并不好用，所以就诞生了
 
 ### 生命周期函数
 
-生命周期函数指的是在某一个时刻组件会自动调用执行的函数
+生命周期还可以看网上[这张图](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)。
+
+生命周期函数指的是在某一个时刻组件会自动调用执行的函数。
 
 <br/>
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/86.jpg' width='800'>
 <br/>
 
+这里简单介绍下：
+
+<br/>
+
+#### constructor
+
+1. 用于初始化内部状态，很少使用
+2. 唯一可以直接修改 state 的地方
+
+<br/>
+
+#### getDerivedStateFromProps
+
+1. 当 state 需要从 props 初始化时使用
+2. 尽量不要使用：维护两者状态一致性会增加复杂度
+3. 每次 render 都会调用
+4. 典型场景：表单控件获取默认值
+
+<br/>
+
+#### componentDidMount
+
+1. UI 渲染完成后调用
+2. 只执行一次
+3. 典型场景：获取外部资源
+
+<br/>
+
+#### componentWillUnmount
+
+1. 组件移除时被调用
+2. 典型场景：资源释放
+
+<br/>
+
+#### getSnapshotBeforeUpdate
+
+1. 在元素被渲染并写入 DOM 之前调用，这样，你在 DOM 更新前捕获 DOM 信息（例如：滚动位置）。
+2. 在页面 render t前调用，state 已更新
+3. 典型场景：获取 render 之前的 DOM 状态
+
+<br/>
+
+#### componentDididUpdate
+
+1. 每次 UI 更新时被调用
+2. 典型场景：页面需要根据 props 变化重新获取数据
+
+<br/>
+
+#### shouldComponentUpdate
+
+1. 决定 Virtual DOM 是否要重绘
+2. 一般可以由 PureComponent 自动实现
+3. 典型场景：性能优化
+
+<br/>
+
+#### componentWillReceiveProps
 注意下update阶段，触发组件update有两种情况，props或者state的修改。
 
-可以看到，这两种情况生命周期函数是有重合的。唯一的不同就是props改变时，会先调用 componentWillReceiveProps .
-
-componentWillReceiveProps 的执行：
+可以看到，这两种情况生命周期函数是有重合的。唯一的不同就是props改变时，会先调用 componentWillReceiveProps
 
 1. 一个组件要从父组件接受参数
 2. 如果这个组件第一次存在于父组件中，不会执行
@@ -124,6 +183,25 @@ enzyme： https://airbnb.io/enzyme/
 
 <br/>
 
+### JSX
+
+JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它允许我们在JavaScript代码中直接写HTML标记。
+
+**JSX的优点**
+
+1. 直观：声明式创建界面
+2. 灵活：代码动态创建界面
+3. 易上手：无需学习新的模板语言
+
+**约定**
+
+1. 自定义组件以大写字母开头
+2. react 认为小写的 tag 是原生 DOM 节点，如 div
+3. JSX标记可以直接使用属性语法，例如`<menu.Item />`
+
+<br/>
+
+
 ## 最佳实践
 > 最佳实践回答“怎么能用好”的问题，反映你实践经验的丰富程度。
 
@@ -133,7 +211,22 @@ enzyme： https://airbnb.io/enzyme/
 
 一个组件只有render函数时，可以定义为无状态组件，无状态组件就是一个函数，相比普通组件性能更高，因为他没有其他声明周期的方法。UI组件一般都可以定义为无状态组件。
 
-### 高阶组件
+### 组件设计模式
+
+高阶组件和函数子组件都是设计模式。
+
+#### 高阶组件（HOC）
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/100.jpg' width='800'>
+<br/>
+
+#### 函数子组件
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/101.jpg' width='800'>
+<br/>
+
 
 <br/>
 
@@ -175,6 +268,8 @@ render中使用到的函数，最好都在constructor中使用bind进行绑定�
 > 为了达到设计目标，该技术采用了什么原理和机制。实现原理层回答“怎么做到”的问题。把实现原理弄懂，并且讲清楚，是技术人员的基本功。
 
 <br/>
+
+
 
 ### render的执行
 1. 当组件的state和props发生改变时，render函数就会重新执行
@@ -244,6 +339,19 @@ applyMiddleWare 的实现：
 
 1. 性能提升了
 2. 跨端应用得以实现
+
+<br/>
+
+### VDOM原理
+
+JSX的运行基础就是VDOM。
+
+VDOM的运行机制是广度优先分层比较。
+
+VDOM 的两个假设：
+
+1. 组件的DOM结构是相对稳定的（很少发生跨层移动的场景）
+2. 类型相同的兄弟节点可以被唯一标识
 
 <br/>
 
