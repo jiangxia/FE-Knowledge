@@ -201,6 +201,104 @@ JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它�
 
 <br/>
 
+### React Router
+
+先说结论：路由不只是页面切换，更是代码组织方式
+
+**为什么需要路由?**
+
+1. 单页应用需要进行页面切换
+2. 通过URL可以定位到页面
+3. 更有语义的组织资源
+
+**路由实现的基本架构**
+
+原理：React Router 在一个组件容器中，根据URL来显示路由配置中的组件。
+
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/127.jpg' width='600'>
+<br/>
+
+**React Router的使用**
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/128.jpg' width='600'>
+<br/>
+
+**React Router的特性**
+
+1. 声明式路由定义：像使用react标记一样，可以在任何地方使用路由，而不需要特殊的路由表
+2. 动态路由：对比的是静态路由，传统的服务器端路由一旦配置了，就是一个静态的配置文件，而React Router只有在组件render时，才会实时去解析。
+
+**三种路由实现方式**
+
+1. URL路由
+2. hash路由
+3. 内存路由
+
+**React Router API**
+
+1. `<Link>` ：普通链接，不会触发浏览器刷新
+2. `<NavLink>`：类似`<Link>`但是会添加当前选中状态
+3. `<Prompt>`：满足条件时提示用户是否离开当前页面
+4. `<Redirect>`：重定向当前页面，例如登录判断
+5. `<Route>`：路由配置的核心标记，路径匹配时显示对应组件
+6. `<Switch>`：只现实第一个匹配路由
+
+**React Router可以通过URL传递参数**
+
+1. 如何通过URL传递参数：<Route path='/topic/:id'/>
+2. 如何获取参数：this.props.match.params
+3. 路由匹配进阶[资料](https://github.com/pillarjs/path-to-regexp)
+
+**何时需要URL参数**
+页面状态尽量通过URL参数定义
+
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/129.jpg' width='600'>
+<br/>
+
+### 前端项目的理想架构
+
+前端项目的理想架构：可维护，可扩展，可测试，易开发，易构建
+
+**易于开发**
+
+1. 开发工具是否完善
+2. 生态圈是否繁荣
+3. 社区是否活跃
+
+**易于扩展**
+
+1. 增加新功能是否容易
+2. 新功能是否会显著增加系统的复杂度
+
+**易于维护**
+
+1. 代码是否容易理解
+2. 文档是否健全
+
+**易于测试**
+1. 功能的分层是否清晰
+2. 副作用少
+3. 尽量使用纯函数
+
+**易于构建**
+
+1. 使用通用技术和架构
+2. 构建工具的选择
+
+<br/>
+
+### ref
+
+要获取真实的DOM节点有两种方式，一种是通过e.target，一种是ref。
+
+但能不使用ref尽量不用
+
+<br/>
 
 ## 最佳实践
 > 最佳实践回答“怎么能用好”的问题，反映你实践经验的丰富程度。
@@ -247,6 +345,29 @@ render中使用到的函数，最好都在constructor中使用bind进行绑定�
 <br/>
 
 
+### UI组件库对比
+目前热门的react UI框架有：Ant.Design、Material UI、Semantic UI
+
+选择UI库的考虑因素:
+
+1. 组件库是否齐全
+2. 样式风格是否符合业务需求
+3. API设计是否便捷和灵活
+4. 技术支持是否完善
+5. 开发是否活跃
+
+<br/>
+
+### 同构应用
+
+**什么是同构应用**
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/130.jpg' width='600'>
+<br/>
+
+
+<br/>
 
 ## 市场应用趋势
 > 随着技术生态的发展，和应用问题的变迁，技术的应用场景和流行趋势会受到影响。这层回答“谁用，用在哪”的问题，反映你对技术应用领域的认识宽度。
@@ -272,6 +393,7 @@ render中使用到的函数，最好都在constructor中使用bind进行绑定�
 
 
 ### render的执行
+
 1. 当组件的state和props发生改变时，render函数就会重新执行
 2. 父组件render函数被执行时，它的子组件的render函数都将被重新运行一次
 
