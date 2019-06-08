@@ -178,7 +178,8 @@ flux只是一个架构，开发者也发现flux并不好用，所以就诞生了
 <br/>
 
 ### 组件测试
-jest
+jest中文[教程](https://jestjs.io/docs/zh-Hans/getting-started)
+
 enzyme： https://airbnb.io/enzyme/
 
 <br/>
