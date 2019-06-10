@@ -340,8 +340,7 @@ JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它�
 
 #### 基本样式设置
 
-在 React 0.13 版本之前，React 官方提供 React.addons.classSet 插件来给组件动态设置 className，
-这在后续版本中被移除(为了精简 API )。我们可以使用 classnames 库来操作类。
+在 React 0.13 版本之前，React 官方提供 React.addons.classSet 插件来给组件动态设置 className，这在后续版本中被移除(为了精简 API )。我们可以使用 classnames 库来操作类。
 
 ```js
 // 如果不使用 classnames 库，就需要这样处理动态类名:
@@ -377,10 +376,12 @@ class Button1 extends Component {
 react开发中的CSS问题：全局污染、命名混乱、依赖管理不彻底、无法共享变量、代码压缩不彻底。这些问题只凭CSS自身是无法解决的，必须用JS来管理CSS。
 
 - 全局污染:CSS 使用全局选择器机制来设置样式，优点是方便重写样式。缺点是所有的 样式都是全局生效，样式可能被错误覆盖，因此产生了非常丑陋的 !important，甚至 inline !important 和复杂的选择器权重计数表1 ，提高犯错概率和使用成本。Web Components 标准中的 Shadow DOM 能彻底解决这个问题，但它把样式彻底局部化，造成 外部无法重写样式，损失了灵活性。
-- 命名混乱:由于全局污染的问题，多人协同开发时为了避免样式冲突，选择器越来越复 杂，容易形成不同的命名风格，很难统一。样式变多后，命名将更加混乱。
+- 命名混乱:由于全局污染的问题，多人协同开发时为了避免样式冲突，选择器越来越复杂，容易形成不同的命名风格，很难统一。样式变多后，命名将更加混乱。
 - 依赖管理不彻底:组件应该相互独立，引入一个组件时，应该只引入它所需要的 CSS 样 式。现在的做法是除了要引入 JavaScript，还要再引入它的 CSS，而且 Saas/Less 很难实现 对每个组件都编译出单独的 CSS，引入所有模块的 CSS 又造成浪费。JavaScript 的模块化 已经非常成熟，如果能让 JavaScript 来管理 CSS 依赖是很好的解决办法，而 webpack 的 css-loader 提供了这种能力。
 - 无法共享变量:复杂组件要使用 JavaScript 和 CSS 来共同处理样式，就会造成有些变量 在 JavaScript 和 CSS 中冗余，而预编译语言不能提供跨 JavaScript 和 CSS 共享变量的这种 能力。
 - 代码压缩不彻底:由于移动端网络的不确定性，现代工程项目对 CSS 压缩的要求已经到 了变态的程度。很多压缩工具为了节省一个字节,会把 16px 转成 1pc，但是这对非常长的 类名却无能为力。
+
+<br/>
 
 CSS 模块化要解决两个问题：CSS 样式的导入与导出。灵活按需导入以便复用 代码，导出时要能够隐藏内部作用域，以免造成全局污染。
 
@@ -389,43 +390,73 @@ CSS 模块化解决方案有两种：Inline Style、CSS Modules。
 - Inline Style。这种方案彻底抛弃 CSS，使用 JavaScript 或 JSON 来写样式，能给 CSS 提供 JavaScript 同样强大的模块化能力。但缺点同样明显，Inline Style 几乎不能利用 CSS 本身 的特性，比如级联、媒体查询(media query)等，:hover 和 :active 等伪类处理起来比较 复杂。另外，这种方案需要依赖框架实现，其中与 React 相关的有 Radium、jsxstyle 和 react-style。
 - CSS Modules。依旧使用 CSS，但使用 JavaScript 来管理样式依赖。CSS Modules 能最大 化地结合现有 CSS 生态和 JavaScript 模块化能力，其 API 非常简洁，学习成本几乎为零。 发布时依旧编译出单独的 JavaScript 和 CSS 文件。现在，webpack css-loader 内置 CSS Modules 功能。
 
-#### CSS Modules
+<br/>
 
-CSS Modules 的工作过程
+#### CSS Modules的优点
 
-- 启用 CSS Modules
+- 所有样式都是局部化的，解决了命名冲突和全局污染问题;
+- class 名的生成规则配置灵活，可以以此来压缩 class 名;
+- 只需引用组件的 JavaScript，就能搞定组件所有的 JavaScript 和 CSS;
+- 依然是 CSS，学习成本几乎为零。
 
-启用 CSS Modules 的代码如下:
+<br/>
 
-```js
-// webpack.config.js 
-css?modules&localIdentName=[name]__[local]-[hash:base64:5]
-```
+#### CSS Modules 注意事项
 
-加上 modules 即为启用，其中 localIdentName 是设置生成样式的命名规则。 下面我们直接看看怎么引用 CSS，webpack 又是怎么转化 class 名的:
+##### 样式默认局部
+
+使用了 CSS Modules 后，就相当于给每个 class 名外加了 :local，以此来实现样式的局部化。如果我们想切换到全局模式，可以使用 :global 包裹
+
+##### 使用 composes 来组合样式
 
 ```css
-/* components/Button.css */
-.normal { /* normal 相关的所有样式 */ } 
-.disabled { /* disabled 相关的所有样式 */ }
+/* components/Button.css */ 
+.base { /* 所有通用的样式 */ }
+.normal { 
+  composes: base; 
+  /* normal其他样式 */
+}
+
+.disabled {
+  composes:base; 
+  /* disabled 其他样式 */
+}
 ```
 
-将以上 CSS 保存好，然后用 import 的方法在 JavaScript 文件中引用:
-
-```js
-import styles from './Button.css';
-console.log (styles);
-// =>
-// Object {
-// normal: 'button--normal-abc5436',
-// disabled: 'button--disabled-def884', // }
-buttonElem.outerHTML = `<button class=${styles.normal}>Submit</button>`;
-```
-
-我们看到，最终生成的 HTML 是这样的:
-
+生成的 HTML 变为:
 ```html
-<button class="button--normal-abc5436"> Processing... </button>
+<button class="button--base-abc53 button--normal-abc53"> Processing... </button>
+```
+由于在 .normal 中组合了 .base，所以编译后的 normal 会变成两个 class。 此外，使用 composes 还可以组合外部文件中的样式:
+
+```css
+/* settings.css */
+.primary-color {
+  color: #f40; 
+}
+/* components/Button.css */ 
+.base { /* 所有通用的样式 */ }
+.primary {
+  composes: base;
+  composes: $primary-color from './settings.css'; /* primary 其他样式 */
+}
+```
+
+##### 实现 CSS 与 JavaScript 变量共享
+
+:export 关键字可以把 CSS 中的变量输出到 JavaScript 中
+
+```css
+/* config.scss */ 
+$primary-color: #f40;
+:export {
+  primaryColor: $primary-color;
+}
+```
+```js
+/* app.js */
+import style from 'config.scss';
+// 会输出 #F40 console.log(style.primaryColor);
 ```
 
 <br/>
