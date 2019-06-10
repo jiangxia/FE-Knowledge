@@ -47,14 +47,64 @@ facebook 推出react的同时，也推出了flux架构。flux架构的最大特�
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/97.jpg' width='600'>
 <br/>
 
-flux只是一个架构，开发者也发现flux并不好用，所以就诞生了redux，当然还有Mobx、dva，这块内容太多了，为此我将他抽离出来，请看[这里](https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/数据管理学习笔记.md)。
-
-<br/>
-
 
 ## 技术规范
 
 > 技术被研发出来，人们怎么用它才能解决问题呢？这就要看技术规范，可以理解为技术使用说明书。技术规范，回答“怎么用”的问题，反映你对该技术使用方法的理解深度。
+
+<br/>
+
+### MV* 与 Flux
+
+#### MVC/MVVM
+
+MVC/MVVM 简称 MC* 模式，其中 MVVM 是从 MVC 演进而来的。
+
+MVC 是一种架构设计模式，它通过关注数据界面分离，来鼓励改进应用程序结构。具体地 说，MVC 强制将业务数据(Model)与用户界面(View)隔离，用控制器(Controller)管理逻 辑和用户输入。
+
+Model 负责保存应用数据，和后端交互同步应用数据，或校验数据。
+
+View 是 Model 的可视化表示，表示当前状态的视图。
+
+Controller负责连接 View 和 Model，Model 的任何改变会应用到 View 中，View 的操作会通过 Controller应用到 Model 中。
+
+Controller 管理了应用程序中 Model 和 View 之间的逻辑和协调。
+
+MVC 的致命缺点：混乱的数据流动方式，此外，前端 MVC 模式的实现各有各的理解，千奇百怪。
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/165.jpg' width='600'>
+<br/>
+
+MVVM 出现于 2005 年，最大变化在于 VM(ViewModel)代替了 C(Controller)。其关键“改 进”是数据绑定(DataBinding)，也就是说，View 的数据状态发生变化可以直接影响 VM，反之 亦然。
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/164.jpg' width='600'>
+<br/>
+
+#### Flux 的解决方案
+
+Flux 的核心思想就是数据和逻辑永远单向流动
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/166.jpg' width='600'>
+<br/>
+
+Flux 核心思想，也就是中心化控制。中心化控制让所有的请求与改变都只能通过 action 发出，统一 由 dispatcher 来分配。这样View就可以保持高度简洁，发生问题时也便于定位。比起 MVC 架构下数据或逻 辑的改动可能来自多个完全不同的源头，Flux 架构追查问题的复杂度和困难度显然要小得多。
+
+Flux 的不足：冗余代码过多，每个应用中都需要手动创建一个 dispatcher 的示例，这还是让很多开发者觉得烦恼
+
+#### Redux
+
+Redux 三大原则：
+1. 单一数据源：一个应用永远只有唯一的数据源
+2. 状态是只读的：不能直接修改store，只能通过reducer返回一个全新的state。
+3. 状态修改均由纯函数完成
+
+Redux 是一个可预测的状态容器。简单地说，在摒弃了传统 MVC 的发布/订阅模式并通过 Redux 三大原则强化对状态 的修改后，使用 Redux 可以让你的应用状态管理变得可预测、可追溯。
+
+
+redux的相关知识繁多，还包含了Mobx、dva，为此我将他抽离出来，请看[这里](https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/数据管理学习笔记.md)。
 
 <br/>
 
@@ -130,9 +180,9 @@ react生命周期图如下：
 3. 在 componentWillUnmount 中调用 setState，是不会触发 re-render 的
 4. 无状态组件只是一个 render 方法，并没有组件类的实例化过程，也没有实例返回。无状态组件没有状态，没有生命周期，只是简单地接受 props 渲染生成 DOM 结构，是一个 纯粹为渲染而生的组件。
 
-这里简单介绍下各个生命周期函数：
-
 <br/>
+
+这里简单介绍下各个生命周期函数：
 
 #### constructor
 
@@ -246,7 +296,16 @@ JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它�
 
 ### React Router
 
-先说结论：路由不只是页面切换，更是代码组织方式
+路由的基本原理：保证 View 和 URL 同步。
+
+在 React 中，组件就是一个方法。 props 作为方法的参数，当它们发生变化时会触发方法执行，进而帮助我们重新绘制 View。在 React Router 中，我们同样可以把 Router 组件看成一个方法，location 作为参数，返回的结果同 样是 View。
+
+路由切换方式：hashChange （hashHistory） 或是history.pushState（browserHistory）
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/167.jpg' width='600'>
+<br/>
+
 
 **为什么需要路由?**
 
@@ -814,9 +873,9 @@ Prettier
 <br/>
 
 
-### this.setState
+### setState
 
-this.setState 背后有一个队列的机制，每次调用 setState ，都会塞到队列里面，通过队列可以高效更新 state ，setState 对状态的更新是异步的
+setState 通过一个队列机制实现 state 更新。当执行 setState 时，会将需要更新的 state 合并 后放入状态队列，而不会立刻更新 this.state，队列机制可以高效地批量更新 state。如果不通过 setState 而直接修改 this.state 的值，那么该 state 将不会被放入状态队列中，当下次调用 setState 并对状态队列进行合并时，将会忽略之前直接被修改的 state，而造成无法预知的错误。因此，应该使用 setState 方法来更新 state，同时 React 也正是利用状态队列机制实现了setState 的异步更新，避免频繁地重复更新 state。
 
 <br/>
 
