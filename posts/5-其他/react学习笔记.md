@@ -60,7 +60,15 @@ flux只是一个架构，开发者也发现flux并不好用，所以就诞生了
 
 ### react组件
 
-**react组件有四个特点：**
+React 组件基本上由 3 个部分组成——属性(props)、状态(state)以及生命周期方法。
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/160.jpg' width='600'>
+<br/>
+
+官方在 React 组件构建上提供了 3 种不同的方法:React.createClass、ES6 classes 和无状态函数(stateless function)。
+
+**react组件有四个特点**
 
 1. 由属性和状态得到一个view （ props + state = view ）
 2. React 组件一般不提供方法，而是某种状态机
@@ -96,9 +104,19 @@ flux只是一个架构，开发者也发现flux并不好用，所以就诞生了
 
 ### 生命周期函数
 
-生命周期还可以看网上[这张图](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)。
-
 生命周期函数指的是在某一个时刻组件会自动调用执行的函数。
+
+React 生命周期分成两类 ：
+
+- 当组件在挂载或卸载时 
+- 当组件接收新的数据时，即组件更新时 
+
+react生命周期图如下：
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/161.jpg' width='800'>
+<br/>
+
+也可以参考网上的[这张图](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)。
 
 <br/>
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/86.jpg' width='800'>
@@ -178,6 +196,20 @@ flux只是一个架构，开发者也发现flux并不好用，所以就诞生了
 <br/>
 
 ### 组件测试
+
+React 让前端单元测试变得容易:
+- React 应用很少需要访问浏览器API
+- 虚拟DOM可以在nodejs环境运行和测试
+- Redux隔离了状态管理，纯数据层单元测试
+
+单元测试涉及的工具：
+- Jest：Facebook 开源的JS单元测试框架
+- JS DOM：浏览器环境的nodejs模拟
+- Enzyme：React组件渲染和测试
+- nock：模拟HTTP请求
+- sinon：函数模拟和调用跟踪
+- istanbul：单元测试覆盖率
+
 jest中文[教程](https://jestjs.io/docs/zh-Hans/getting-started)
 
 enzyme： https://airbnb.io/enzyme/
@@ -187,6 +219,8 @@ enzyme： https://airbnb.io/enzyme/
 ### JSX
 
 JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它允许我们在JavaScript代码中直接写HTML标记。
+
+如果在 JSX 中往 DOM 元素中传入自定义属性，React 是不会渲染的。如果要使用 HTML 自定义属性，要使用 data- 前缀，这与 HTML 标准也是一致的。然而，在自定义标签中任意的属性都是被支持的，以 aria- 开头的网络无障碍属性同样可以正常使用。
 
 **JSX的优点**
 
@@ -370,7 +404,43 @@ render中使用到的函数，最好都在constructor中使用bind进行绑定�
 
 <br/>
 
+### 常用开发调试工具
+
+开发react应用最常用的调试工具有：ESLint，Prettier，React DevTool，Redux DevTool
+
+ESLint
+- 使用.eslintrc进行规则的配置
+- 使用airbnb的JavaScript代码风格
+
+Prettier
+- 代码格式化的神器
+- 保证更容易写出风格一致的代码
+
+<br/>
+
+### 命令式编程 VS 声明式编程
+
+#### 命令式编程
+
+命令“机器”如何去做事情(how)，这样不管你想要的是什么(what)，它都会按照你的命令实现。
+
+#### 声明式编程
+
+告诉“机器”你想要的是什么(what)，让机器想出如何去做(how)。
+
+在React中，每个组件通过render函数返回“这个组件应该长得什么样”，而不去描述“怎么样去让这个组件长成这个样子”。
+
+#### 声明式编程的好处
+
+- 让开发者的工作简化了
+- 减少了重复工作
+- 留下了改进的空间：比如React Fiber，虽然算法改头换面，但是组件却几乎不用改，因为组件只操心“显示什么”而不操心“如何显示”啊，当然不受影响了。
+- 提供了全局协调能力：在React的未来，每个组件还是只声明“想要画成什么样子”，但React却可以改进协调算法，让React组件根据不同优先级来渲染，提高用户感知性能，但是React组件的代码不需要改变
+
+<br/>
+
 ## 市场应用趋势
+
 > 随着技术生态的发展，和应用问题的变迁，技术的应用场景和流行趋势会受到影响。这层回答“谁用，用在哪”的问题，反映你对技术应用领域的认识宽度。
 
 <br/>
@@ -461,7 +531,7 @@ applyMiddleWare 的实现：
 优点：
 
 1. 性能提升了
-2. 跨端应用得以实现
+2. 方便与其他平台集成，跨端应用得以实现
 
 <br/>
 
@@ -475,6 +545,25 @@ VDOM 的两个假设：
 
 1. 组件的DOM结构是相对稳定的（很少发生跨层移动的场景）
 2. 类型相同的兄弟节点可以被唯一标识
+
+<br/>
+
+### React 数据流
+在 React 中，数据是自顶向下单向流动的，即从父组件到子组件。这条原则让组件之间的关系变得简单且可预测。
+
+把组件看成一个函数，那么它接受了 props 作为参数，内部由 state 作为函数的内部参数，返回一个 Virtual DOM 的实现。
+
+#### state
+
+setState 是一个异步方法，一个生命周期内所有的 setState 方法会合并操 作。 
+
+#### props
+
+- React 的单向数据流，主要的流动管 道就是 props。props 本身是不可变的。当我们试图改变 props 的原始值时，React 会报出类型错 误的警告 
+- props 可以配置默认值，使用defaultProps设置。
+- 子组件 prop ： children （ React.Children 是 React 官方提供的一系列操作children 的方法。它提供诸如 map、 forEach、count 等实用函数 ）
+- 组件 props ： 对于子组件而言，我们不仅可以直接使用 this.props.children 定义，也可以将子组件以 props 的形式传递。 
+- propTypes  ： 规范 props 的类型与必需的状态 
 
 <br/>
 
@@ -493,7 +582,7 @@ VDOM 的两个假设：
 
 ### react16
 
-react16新特性：
+#### react16新特性
 
 1. 新的核心算法Fiber
 2. Render 可以返回数据、字符串
@@ -504,3 +593,21 @@ react16新特性：
 1. Portals 组件
 2. 更好更快的服务端渲染
 3. 体积更小，MIT协议
+
+#### 下一代 React：异步渲染
+
+异步渲染的两个部分
+
+1. 时间分片：DOM操作的优先级低于浏览器原生行为，例如键盘和鼠标的输入，从而保证操作的流畅
+2. 渲染挂起：虚拟DOM节点可以等待某个异步操作的完成，并指定timeout，之后才完成真正的渲染。
+
+时间分片
+
+1. 虚拟DOM的diff操作可以分片进行
+2. React 新API：unstable_deferredUpdates
+3. Chome 新API：requestIdleCallback
+
+渲染挂起
+
+1. 新内置组件：Timeout
+2. unstable_deferUpdate
