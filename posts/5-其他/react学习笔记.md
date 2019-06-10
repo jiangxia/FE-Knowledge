@@ -448,7 +448,7 @@ CSS 模块化解决方案有两种：Inline Style、CSS Modules。
 
 ```css
 /* config.scss */ 
-$primary-color: #f40;
+$primary-color: ’#f40‘;
 :export {
   primaryColor: $primary-color;
 }
@@ -458,6 +458,20 @@ $primary-color: #f40;
 import style from 'config.scss';
 // 会输出 #F40 console.log(style.primaryColor);
 ```
+
+<br/>
+
+### 组件间通信
+
+通信种类：父组件向子组件通信、子组件向父组件通信和没有嵌套关系的组件之间通信。
+
+- 父组件向子组件通信：props
+- 子组件向父组件通信
+    + 利用回调函数
+    + 利用自定义事件机制
+- 跨级组件通信：context
+- 没有嵌套关系的组件通信：自定义事件机制
+
 
 <br/>
 
@@ -480,6 +494,51 @@ import style from 'config.scss';
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/100.jpg' width='800'>
 <br/>
 
+高阶函数：这种函数接受函数作为输入，或是输出一个函数。
+
+高阶组件：类似于高阶函数，它接受 React 组件作为输入，输出一 个新的 React 组件。
+
+实现高阶组件的方法有：
+1. 属性代理
+    - 定义：高阶组件通过被包裹的 React 组件来操作 props。
+    - <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/162.jpg' width='600'>
+    - 高阶组件的作用有：控制 props、通过 refs 使用引用、抽象 state 和使用其他元素包裹
+控制 props
+我们可以读取、增加、编辑或是移除从 WrappedComponent 传进来的 props，但需要小心删除与编辑重要的 props。我们应该尽可能对高阶组件的 props 作新的命名以防止混淆。
+
+通过 refs 使用引用
+在高阶组件中，我们可以接受 refs 使用WrappedComponent 的引用。例如:
+
+当 WrappedComponent 被渲染时，refs 回调函数就会被执行，这样就会拿到一份Wrapped-Component 实例的引用。这就可以方便地用于读取或增加实例的 props，并调用实例的方法。
+抽象 state
+我们可以通过 WrappedComponent 提供的 props 和回调函数抽象 state，高阶组件可以将原组件抽象为展示型组件，分离内部状态。
+
+
+我们把 input 组件中对 name prop 的 onChange 方法提取到高阶组件中，这样就有效地抽象了同样的 state 操作。可以这么来使用它
+使用其他元素包裹 WrappedComponent
+我们还可以使用其他元素来包裹 WrappedComponent，这既可以是为了加样式，也可 以是为了布局。
+
+反向继承
+定义：高阶组件继承于被包裹的 React 组件（从字面意思上看，它一定与继承特性相关）
+简单例子：高阶组件返回的组件继承于 WrappedComponent。因为被动地继承了 WrappedComponent，所有的调用都会反向，这也是这种方法的由来。
+
+在反向继承方法中，高阶组件可以使用 WrappedComponent 引用，这意味着它可以使用WrappedComponent 的 state、props 、生命周期和 render 方法。但它不能保证完整的子组件树被解析。
+反向继承两大特点
+渲染劫持
+渲染劫持指的就是高阶组件可以控制 WrappedComponent 的渲染过程，并渲染各种各样的结 果。我们可以在这个过程中在任何 React 元素输出的结果中读取、增加、修改、删除 props，或 读取或修改 React 元素树，或条件显示元素树，又或是用样式控制包裹元素树。
+正如之前说到的，反向继承不能保证完整的子组件树被解析，这意味着将限制渲染劫持功能。 渲染劫持的经验法则是我们可以操控 WrappedComponent 的元素树，并输出正确的结果。但如果 元素树中包括了函数类型的 React 组件，就不能操作组件的子组件。
+
+在这个例子中，WrappedComponent 的渲染结果中，顶层的 input 组件的 value 被改写为 may the force be with you。因此，我们可以做各种各样的事，甚至可以反转元素树，或是改变元素 树中的 props。
+
+控制 state
+高阶组件可以读取、修改或删除WrappedComponent 实例中的 state，如果需要的话，也可以 增加 state。但这样做，可能会让WrappedComponent 组件内部状态变得一团糟。大部分的高阶组 件都应该限制读取或增加 state，尤其是后者，可以通过重新命名 state，以防止混淆。
+
+组件参数
+我们调用高阶组件时需要传入一些参数，这可以用非常简单的方式来实现:
+
+高阶组件与mixin的不同之处：高阶组件符合函 数式编程思想。对于原组件来说，并不会感知到高阶组件的存在，只需要把功能套在它之上就可 以了，从而避免了使用 mixin 时产生的副作用。
+
+
 #### 函数子组件
 
 <br/>
@@ -489,7 +548,22 @@ import style from 'config.scss';
 
 <br/>
 
+#### mixin
 
+React 在使用 createClass 构建组件时提供了 mixin 属性。mixin有两个作用：
+
+- 共享工具方法。
+- 生命周期继承，props 与 state 合并。
+
+ES6 Classes 不支持 mixin。
+
+mixin 的问题:
+
+- 破坏了原有组件的封装：mixin 方法会混入方法，给原有组件带来新的特性，但它也可能带来了新的 state 和 props，这意味着组件有一 些“不可见”的状态需要我们去维护，但我们在使用的时候并不清楚。另外，mixin 也有可能去依赖其他的 mixin，这样会建立一个 mixin 的依赖链，当我们改动其 中一个 mixin 的状态时，很可能会直接影响其他的 mixin。
+- 命名冲突：尽管我们可以通过更改名字来解决，但遇到第三方引用，或已经引用了几个 mixin 的情况下， 总是要花一定的成本去解决冲突。
+- 增加复杂性
+
+<br/>
 
 ### react性能优化
 
@@ -674,7 +748,7 @@ VDOM 的两个假设：
 
 <br/>
 
-### React 数据流
+### React数据流
 在 React 中，数据是自顶向下单向流动的，即从父组件到子组件。这条原则让组件之间的关系变得简单且可预测。
 
 把组件看成一个函数，那么它接受了 props 作为参数，内部由 state 作为函数的内部参数，返回一个 Virtual DOM 的实现。
