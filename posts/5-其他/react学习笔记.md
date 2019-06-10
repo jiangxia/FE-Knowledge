@@ -112,15 +112,16 @@ React 生命周期分成两类 ：
 - 当组件接收新的数据时，即组件更新时 
 
 react生命周期图如下：
+
 <br/>
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/161.jpg' width='800'>
 <br/>
 
-也可以参考网上的[这张图](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)。
-
 <br/>
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/86.jpg' width='800'>
 <br/>
+
+也可以参考网上的[这张图](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)。
 
 这里简单介绍下：
 
@@ -333,6 +334,44 @@ JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它�
 
 但能不使用ref尽量不用
 
+<br/>
+
+### 样式处理
+
+#### 基本样式设置
+
+在 React 0.13 版本之前，React 官方提供 React.addons.classSet 插件来给组件动态设置 className，
+这在后续版本中被移除(为了精简 API )。我们可以使用 classnames 库来操作类。
+
+```js
+// 如果不使用 classnames 库，就需要这样处理动态类名:
+import React, {Component} from 'react';
+class Button extends Component {
+  render () {
+    let btnClass = 'btn';
+    if (this.state.isPressed) {
+      btnClass += ' btn-pressed';
+    } else if (this.state.isHovered) {
+      btnClass += ' btn-over';
+    }
+    return <button className={btnClass}>{this.props.label}</button>;
+  }
+}
+// 使用了 classnames 库代码后，就可以变得很简单: import React, { Component } from 'react';
+import classNames from 'classnames'; 
+class Button1 extends Component {
+  // ...
+  render () {
+    const btnClass = classNames ({
+      btn: true,
+      'btn-pressed': this.state.isPressed,
+      'btn-over': !this.state.isPressed && this.state.isHovered,
+    });
+    return <button className={btnClass}>{this.props.label}</button>;
+  }
+}
+
+```
 <br/>
 
 ## 最佳实践
@@ -564,6 +603,74 @@ setState 是一个异步方法，一个生命周期内所有的 setState 方法�
 - 子组件 prop ： children （ React.Children 是 React 官方提供的一系列操作children 的方法。它提供诸如 map、 forEach、count 等实用函数 ）
 - 组件 props ： 对于子组件而言，我们不仅可以直接使用 this.props.children 定义，也可以将子组件以 props 的形式传递。 
 - propTypes  ： 规范 props 的类型与必需的状态 
+
+<br/>
+
+### 事件系统
+
+VDOM 在内存中是以对象的形式存在的，如果想要在这些对象上添加事件，就会非常简单。React 基于 VDOM 实现了一个SyntheticEvent (合成事件)层，我们所定义的事件处理器会接收到一个 SyntheticEvent 对象的实例，它完全符合 W3C 标准，不会存在任何 IE 标 准的兼容性问题。并且与原生的浏览器事件一样拥有同样的接口，同样支持事件的冒泡机制，我们可以使用 stopPropagation() 和preventDefault() 来中断它。所有事件都自动绑定到最外层上。如果需要访问原生事件对象，可以使用 nativeEvent 属性。
+
+#### 合成事件的实现机制
+
+在 React 底层，主要对合成事件做了两件事:事件委派和自动绑定
+
+##### 事件委派
+
+- react并不会把事件处理函数直接绑定到 真实的节点上，而是把所有事件绑定到结构的最外层，使用一个统一的事件监听器，
+- 事件监听器上维持了一个映射来保存所有组件内部的事件监听和处理函数。
+- 当组件挂载或卸载时，只是在这个统一的事件监听器上插入或删除一些对象
+- 当事件发生时，首先被这个统一的事件监听器 处理，然后在映射里找到真正的事件处理函数并调用。
+- 这样做简化了事件处理和回收机制，效率 也有很大提升。 
+
+##### 自动绑定
+
+在 React 组件中，每个方法的上下文都会指向该组件的实例，即自动绑定 this 为当前组件。 而且 React 还会对这种引用进行缓存，以达到 CPU 和内存的最优化。在使用 ES6 classes 或者纯函数时，这种自动绑定就不复存在了，我们需要手动实现 this 的绑定。
+
+常见的绑定方法有：
+
+- 双冒号语法：`<button onClick={::this.handleClick}>Test</button>`
+- 构造器内使用bind绑定
+- 箭头函数
+
+##### 原生事件
+
+componentDidMount 会在组件已经完成安装并且在浏览器中存在真实的 DOM 后调用，此时我们就可以完成原生事件的绑定。
+
+在 React 中使用 DOM 原生事件时，一定要在组件卸载时手动移除，否则很 可能出现内存泄漏的问题。而使用合成事件系统时则不需要，因为 React 内部已经帮你妥善地处理了。
+
+<br/>
+
+#### 合成事件与原生事件混用
+
+尽量避免在 React 中混用合成事件和原生 DOM 事件。
+
+阻止 React 事件冒泡的行为只能用于 React 合成事件系统 中，且没办法阻止原生事件的冒泡。反之，在原生事件中的阻止冒泡行为，却可以阻止 React 合成事件的传播。
+
+React 的合成事件系统只是原生 DOM 事件系统的一个子集。它仅仅实现了 DOM Level 3 的事件接口，并且统一了浏览器间的兼容问题。有些事件 React 并没有实现，或者受某些限制没办法去实现，比如 window 的 resize 事件。
+
+<br/>
+
+#### 对比React合成事件与JavaScript原生事件
+
+##### 事件对象
+原生 DOM 事件对象在 W3C 标准和 IE 标准下存在着差异。在低版本的 IE 浏览器中，只能使用 window.event 来获取事件对象。而在 React 合成事件系统中，不存在这种兼容性问题，在事件处理函数中可以得到一个合成事件对象。
+
+##### 事件类型
+React 合成事件的事件类型是 JavaScript 原生事件类型的一个子集
+
+##### 事件传播与阻止事件传播
+事件传播分为捕获阶段、目标阶段、冒泡阶段。事件捕获在程序开发中的意义不大，还有兼容性问题。所以，React 的合成事件则并没有实现事件捕获，仅仅支持了事件冒泡机制。
+阻止事件传播：阻止原生事件传播需要使用 e.preventDefault()，不过对于不支持该方法的浏览器(IE9 以 下)，只能使用 e.cancelBubble = true 来阻止。而在 React 合成事件中，只需要使用 e.prevent- Default() 即可。
+
+##### 事件绑定方式
+
+原生事件有三种方式:
+- 直接在DOM元素中绑定: `<button onclick="alert(1)">Test</button>`
+- 在JS中，通过为元素的事件属性赋值的方式实现绑定：`el.onclick = e => {console.log(e)} `
+- 通过事件监听函数来实现绑定：`el.addEventListener("click", ()=>{},false); el.attachEvent("onclick", ()=>{})`
+
+React 合成事件的绑定方式则简单得多:`<button onClick={this.handleClick}>Test</button>`
+
 
 <br/>
 
