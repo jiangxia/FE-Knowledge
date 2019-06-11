@@ -48,6 +48,16 @@ facebook 推出react的同时，也推出了flux架构。flux架构的最大特�
 <br/>
 
 
+### react的好处
+1. 代码组织以模块化和组件化为主，有利于团队协作
+2. 函数式编程，提高生产力
+3. DOM操作不需要开发人员考虑，不关注细节，只关注数据
+
+### react的理念
+1. 以数据为中心，数据驱动视图，而不是操作dom（只负责显示成什么样子，而不是怎么显示）
+2. 函数式编程
+3. UI=render(data)
+
 ## 技术规范
 
 > 技术被研发出来，人们怎么用它才能解决问题呢？这就要看技术规范，可以理解为技术使用说明书。技术规范，回答“怎么用”的问题，反映你对该技术使用方法的理解深度。
@@ -79,7 +89,7 @@ MVC 的致命缺点：混乱的数据流动方式，此外，前端 MVC 模式�
 MVVM 出现于 2005 年，最大变化在于 VM(ViewModel)代替了 C(Controller)。其关键“改 进”是数据绑定(DataBinding)，也就是说，View 的数据状态发生变化可以直接影响 VM，反之 亦然。
 
 <br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/164.jpg' width='600'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/164.jpg' width='800'>
 <br/>
 
 #### Flux 的解决方案
@@ -93,6 +103,8 @@ Flux 的核心思想就是数据和逻辑永远单向流动
 Flux 核心思想，也就是中心化控制。中心化控制让所有的请求与改变都只能通过 action 发出，统一 由 dispatcher 来分配。这样View就可以保持高度简洁，发生问题时也便于定位。比起 MVC 架构下数据或逻 辑的改动可能来自多个完全不同的源头，Flux 架构追查问题的复杂度和困难度显然要小得多。
 
 Flux 的不足：冗余代码过多，每个应用中都需要手动创建一个 dispatcher 的示例，这还是让很多开发者觉得烦恼
+
+如果非要把Flux 和MVC 做一个结构对比，那么， Flux 的Dispatcher 相当于MVC 的Controller, Flux 的Store 相当于MVC 的Model, Flux 的View 当然就对应MVC 的View了，至于多出来的这个Action ，可以理解为对应给MVC 框架的用户请求
 
 #### Redux
 
@@ -175,10 +187,15 @@ react生命周期图如下：
 
 一些注意点：
 
-1. 不管是挂载阶段还是更新阶段，都要到render时才能获取到更新后的this.state。在componentWillMount、 componentWillReceiveProps、 shouldComponentUpdate 和 componentWillUpdate 中也还是无法获取到更新后的 this.state。
-2. mountComponent 本质上是通过递归渲染内容的，由于递归的特性，父组件的 componentWillMount 在其子组件的 componentWillMount 之前调用，而父组件的 componentDidMount 在其子组件的 componentDidMount 之后调用。
-3. 在 componentWillUnmount 中调用 setState，是不会触发 re-render 的
-4. 无状态组件只是一个 render 方法，并没有组件类的实例化过程，也没有实例返回。无状态组件没有状态，没有生命周期，只是简单地接受 props 渲染生成 DOM 结构，是一个 纯粹为渲染而生的组件。
+不管是挂载阶段还是更新阶段，都要到render时才能获取到更新后的this.state。在componentWillMount、 componentWillReceiveProps、 shouldComponentUpdate 和 componentWillUpdate 中也还是无法获取到更新后的 this.state。
+
+mountComponent 本质上是通过递归渲染内容的，由于递归的特性，父组件的 componentWillMount 在其子组件的 componentWillMount 之前调用，而父组件的 componentDidMount 在其子组件的 componentDidMount 之后调用。
+
+updateComponent 负责管理生命周期中的 componentWillReceiveProps、shouldComponentUpdate、componentWillUpdate、render 和 componentDidUpdate。若存在 componentWillReceiveProps，则执行。如果此时在 componentWillReceiveProps 中调用 setState，是不会触发 re-render 的，而是会进行 state 合并。且在 componentWillReceiveProps、shouldComponentUpdate 和 componentWillUpdate 中也还是无法获取到更新后的 this.state，即此时访问的 this.state 仍然是未更新的数据，需要设置 inst.state = nextState 后才可以，因此只有在 render 和 componentDidUpdate 中才能获取到更新后的 this.state。调用 shouldComponentUpdate 判断是否需要进行组件更新，如果存在 componentWillUpdate，则执行。updateComponent 本质上也是通过递归渲染内容的，由于递归的特性，父组件的 componentWillUpdate 是在其子组件的 componentWillUpdate 之前调用的，而父组件的 componentDidUpdate也是在其子组件的 componentDidUpdate 之后调用的。禁止在 shouldComponentUpdate 和 componentWillUpdate 中调用 setState，这会造成循环调用，直至耗光浏览器内存后崩溃。
+
+在 componentWillUnmount 中调用 setState，是不会触发 re-render 的
+
+无状态组件只是一个 render 方法，并没有组件类的实例化过程，也没有实例返回。无状态组件没有状态，没有生命周期，只是简单地接受 props 渲染生成 DOM 结构，是一个 纯粹为渲染而生的组件。
 
 <br/>
 
@@ -276,7 +293,7 @@ enzyme： https://airbnb.io/enzyme/
 
 ### JSX
 
-JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它允许我们在JavaScript代码中直接写HTML标记。
+JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它允许我们在JavaScript代码中直接写HTML标记。最终生成的代码就是React.CreateElement
 
 如果在 JSX 中往 DOM 元素中传入自定义属性，React 是不会渲染的。如果要使用 HTML 自定义属性，要使用 data- 前缀，这与 HTML 标准也是一致的。然而，在自定义标签中任意的属性都是被支持的，以 aria- 开头的网络无障碍属性同样可以正常使用。
 
@@ -769,15 +786,30 @@ mixin 的问题:
 
 ### react性能优化
 
+问题：浏览器重绘，重排是影响性能的第一要素
+
+解决：React render 会更新虚拟DOM，虚拟DOM会去渲染真实DOM，尽可能减少render的次数是关键所在
+
+优化原则：减少渲染
+- 纯函数
+    - 相同的输入总是有相同的输出
+    - 过程没有副作用，不改变外部状态
+    - 没有额外的状态依赖，方法内部的状态只在方法生命周期内存活
+- React组件与纯函数的关系
+    - React组件本身就是纯函数，传入相同的props和state总是得到相同的virtualDom
+    - 从而引申出PureRender
+- shouldComponentUpdate
+    - PureRender
+        - 重新实现shouldComponentUpdate方法，对props和state作浅比较
+        - 少为组件绑定箭头函数
+        - 不直接设置props为数组或者对象
+    - 使用redux connect函数优化
+        - 实现了shouldComponentUpdate函数的实现,会进行浅层比较​
+        - 父组件尽量不传无意义的参数,特别是箭头函数,不然会导致子组件无意义render，浪费性能
+
 **如何检测react性能**
 
 在Chrome中监测react性能：在URL后加?react_perf，比如：localhost:3000/?react_perf
-
-<br/>
-
-**函数传递优化**
-
-render中使用到的函数，最好都在constructor中使用bind进行绑定，这样可以提高性能。
 
 <br/>
 
