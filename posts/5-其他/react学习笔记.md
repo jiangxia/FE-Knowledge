@@ -15,48 +15,21 @@ react 是数据驱动的框架，也是目前前端最火的框架之一，学�
 
 react 的诞生其实是要解决两个问题。UI细节问题问题 和 数据模型的问题。
 
-### UI细节问题问题 
+传统UI操作关注太多细节，jQuery虽然可以给我们提供了便捷的API，以及良好的浏览器兼容，但开发人员还是要手动去操作DOM，关注太多细节，不仅降低了开发效率，还容易引入BUG。
 
-传统UI操作关注太多细节，jQuery虽然可以给我们提供了便捷的API，以及良好的浏览器兼容，但开发人员还是要手动去操作DOM，关注太多细节，不仅降低了开发效率，还可能引入BUG。
+react以数据为中心，数据驱动视图，而不直接操作dom，也就是只负责描述界面应该显示成什么样子，而不关心实现细节。
 
-react 将开发人员从细节中解放出来，它始终整体“刷新”页面，无需关心细节。
-
-举个例子：假设开发一个聊天的应用，​当有一条新消息到的时候，需要把新消息显示在页面上。
-
-如果是局部刷新，首先我们要知道哪条是新消息，并为这条新消息创建一个节点，并把节点更新到页面的特定位置上
-
-如果是整体刷新，只需要关心前后的状态，一个是两条消息，一个是三条消息，不需要关心哪条消息是新的，只需要把消息展示在UI上，不需要关心细节。
-
-<br/>
-
-### 数据模型的问题
-
-前端开发，不可避免要面临数据管理的问题。
-
-在react之前，前端管理数据的模型是MVC架构。
-
-传统的MVC架构难以扩展和维护，当应用程序出现问题，很难知道是model还是view出现问题。
+在react之前，前端管理数据的模型是MVC架构。传统的MVC架构难以扩展和维护，当应用程序出现问题，很难知道是model还是view出现问题。
 
 <br/>
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/96.jpg' width='600'>
 <br/>
 
-facebook 推出react的同时，也推出了flux架构。flux架构的最大特点就是单向数据流，Flux建立在react始终以状态驱动视图的基础上，不需要关心细节。
+facebook 推出react的同时，也推出了flux架构。flux架构的最大特点就是单向数据流，前端应用状态管理变得可预测、可追溯。
 
 <br/>
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/97.jpg' width='600'>
 <br/>
-
-
-### react的好处
-1. 代码组织以模块化和组件化为主，有利于团队协作
-2. 函数式编程，提高生产力
-3. DOM操作不需要开发人员考虑，不关注细节，只关注数据
-
-### react的理念
-1. 以数据为中心，数据驱动视图，而不是操作dom（只负责显示成什么样子，而不是怎么显示）
-2. 函数式编程
-3. UI=render(data)
 
 ## 技术规范
 
@@ -64,61 +37,6 @@ facebook 推出react的同时，也推出了flux架构。flux架构的最大特�
 
 <br/>
 
-### MV* 与 Flux
-
-#### MVC/MVVM
-
-MVC/MVVM 简称 MC* 模式，其中 MVVM 是从 MVC 演进而来的。
-
-MVC 是一种架构设计模式，它通过关注数据界面分离，来鼓励改进应用程序结构。具体地 说，MVC 强制将业务数据(Model)与用户界面(View)隔离，用控制器(Controller)管理逻 辑和用户输入。
-
-Model 负责保存应用数据，和后端交互同步应用数据，或校验数据。
-
-View 是 Model 的可视化表示，表示当前状态的视图。
-
-Controller负责连接 View 和 Model，Model 的任何改变会应用到 View 中，View 的操作会通过 Controller应用到 Model 中。
-
-Controller 管理了应用程序中 Model 和 View 之间的逻辑和协调。
-
-MVC 的致命缺点：混乱的数据流动方式，此外，前端 MVC 模式的实现各有各的理解，千奇百怪。
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/165.jpg' width='600'>
-<br/>
-
-MVVM 出现于 2005 年，最大变化在于 VM(ViewModel)代替了 C(Controller)。其关键“改 进”是数据绑定(DataBinding)，也就是说，View 的数据状态发生变化可以直接影响 VM，反之 亦然。
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/164.jpg' width='800'>
-<br/>
-
-#### Flux 的解决方案
-
-Flux 的核心思想就是数据和逻辑永远单向流动
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/166.jpg' width='600'>
-<br/>
-
-Flux 核心思想，也就是中心化控制。中心化控制让所有的请求与改变都只能通过 action 发出，统一 由 dispatcher 来分配。这样View就可以保持高度简洁，发生问题时也便于定位。比起 MVC 架构下数据或逻 辑的改动可能来自多个完全不同的源头，Flux 架构追查问题的复杂度和困难度显然要小得多。
-
-Flux 的不足：冗余代码过多，每个应用中都需要手动创建一个 dispatcher 的示例，这还是让很多开发者觉得烦恼
-
-如果非要把Flux 和MVC 做一个结构对比，那么， Flux 的Dispatcher 相当于MVC 的Controller, Flux 的Store 相当于MVC 的Model, Flux 的View 当然就对应MVC 的View了，至于多出来的这个Action ，可以理解为对应给MVC 框架的用户请求
-
-#### Redux
-
-Redux 三大原则：
-1. 单一数据源：一个应用永远只有唯一的数据源
-2. 状态是只读的：不能直接修改store，只能通过reducer返回一个全新的state。
-3. 状态修改均由纯函数完成
-
-Redux 是一个可预测的状态容器。简单地说，在摒弃了传统 MVC 的发布/订阅模式并通过 Redux 三大原则强化对状态 的修改后，使用 Redux 可以让你的应用状态管理变得可预测、可追溯。
-
-
-redux的相关知识繁多，还包含了Mobx、dva，为此我将他抽离出来，请看[这里](https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/数据管理学习笔记.md)。
-
-<br/>
 
 ### react组件
 
@@ -158,11 +76,6 @@ React 组件基本上由 3 个部分组成——属性(props)、状态(state)以
 
 <br/>
 
-### 受控组件 VS 非受控组件
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/98.jpg' width='800'>
-<br/>
 
 ### 生命周期函数
 
@@ -895,6 +808,56 @@ Prettier
 
 <br/>
 
+### MV* 与 Flux
+
+#### MVC/MVVM
+
+MVC/MVVM 简称 MC* 模式，其中 MVVM 是从 MVC 演进而来的。
+
+MVC 是一种架构设计模式，它通过关注数据界面分离，来鼓励改进应用程序结构。具体地 说，MVC 强制将业务数据(Model)与用户界面(View)隔离，用控制器(Controller)管理逻 辑和用户输入。
+
+Model 负责保存应用数据，和后端交互同步应用数据，或校验数据。
+
+View 是 Model 的可视化表示，表示当前状态的视图。
+
+Controller负责连接 View 和 Model，Model 的任何改变会应用到 View 中，View 的操作会通过 Controller应用到 Model 中。
+
+Controller 管理了应用程序中 Model 和 View 之间的逻辑和协调。
+
+MVC 的致命缺点：混乱的数据流动方式，此外，前端 MVC 模式的实现各有各的理解，千奇百怪。
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/165.jpg' width='600'>
+<br/>
+
+MVVM 出现于 2005 年，最大变化在于 VM(ViewModel)代替了 C(Controller)。其关键“改 进”是数据绑定(DataBinding)，也就是说，View 的数据状态发生变化可以直接影响 VM，反之 亦然。
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/164.jpg' width='800'>
+<br/>
+
+#### Flux 的解决方案
+
+Flux 的核心思想就是数据和逻辑永远单向流动
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/166.jpg' width='600'>
+<br/>
+
+Flux 核心思想，也就是中心化控制。中心化控制让所有的请求与改变都只能通过 action 发出，统一 由 dispatcher 来分配。这样View就可以保持高度简洁，发生问题时也便于定位。比起 MVC 架构下数据或逻 辑的改动可能来自多个完全不同的源头，Flux 架构追查问题的复杂度和困难度显然要小得多。
+
+Flux 的不足：冗余代码过多，每个应用中都需要手动创建一个 dispatcher 的示例，这还是让很多开发者觉得烦恼
+
+如果非要把Flux 和MVC 做一个结构对比，那么， Flux 的Dispatcher 相当于MVC 的Controller, Flux 的Store 相当于MVC 的Model, Flux 的View 当然就对应MVC 的View了，至于多出来的这个Action ，可以理解为对应给MVC 框架的用户请求
+
+#### Redux
+
+Redux 是一个可预测的状态容器。简单地说，在摒弃了传统 MVC 的发布/订阅模式并通过 Redux 三大原则强化对状态 的修改后，使用 Redux 可以让你的应用状态管理变得可预测、可追溯。
+
+
+redux的相关知识繁多，还包含了Mobx、dva，为此我将他抽离出来，请看[这里](https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/数据管理学习笔记.md)。
+
+<br/>
 
 
 ### render的执行
