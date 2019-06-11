@@ -37,7 +37,6 @@ facebook 推出react的同时，也推出了flux架构。flux架构的最大特�
 
 <br/>
 
-
 ### react组件
 
 React 组件基本上由 3 个部分组成——属性(props)、状态(state)以及生命周期方法。
@@ -139,7 +138,7 @@ updateComponent 负责管理生命周期中的 componentWillReceiveProps、shoul
 
 #### shouldComponentUpdate
 
-1. 决定 Virtual DOM 是否要重绘
+1. 决定 VDOM 是否要重绘
 2. 一般可以由 PureComponent 自动实现
 3. 典型场景：性能优化
 
@@ -154,26 +153,6 @@ updateComponent 负责管理生命周期中的 componentWillReceiveProps、shoul
 
 <br/>
 
-### 组件测试
-
-React 让前端单元测试变得容易:
-- React 应用很少需要访问浏览器API
-- 虚拟DOM可以在nodejs环境运行和测试
-- Redux隔离了状态管理，纯数据层单元测试
-
-单元测试涉及的工具：
-- Jest：Facebook 开源的JS单元测试框架
-- JS DOM：浏览器环境的nodejs模拟
-- Enzyme：React组件渲染和测试
-- nock：模拟HTTP请求
-- sinon：函数模拟和调用跟踪
-- istanbul：单元测试覆盖率
-
-jest中文[教程](https://jestjs.io/docs/zh-Hans/getting-started)
-
-enzyme： https://airbnb.io/enzyme/
-
-<br/>
 
 ### JSX
 
@@ -256,6 +235,7 @@ JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它�
 3. 路由匹配进阶[资料](https://github.com/pillarjs/path-to-regexp)
 
 **何时需要URL参数**
+
 页面状态尽量通过URL参数定义
 
 
@@ -263,39 +243,7 @@ JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它�
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/129.jpg' width='600'>
 <br/>
 
-### 前端项目的理想架构
-
-前端项目的理想架构：可维护，可扩展，可测试，易开发，易构建
-
-**易于开发**
-
-1. 开发工具是否完善
-2. 生态圈是否繁荣
-3. 社区是否活跃
-
-**易于扩展**
-
-1. 增加新功能是否容易
-2. 新功能是否会显著增加系统的复杂度
-
-**易于维护**
-
-1. 代码是否容易理解
-2. 文档是否健全
-
-**易于测试**
-1. 功能的分层是否清晰
-2. 副作用少
-3. 尽量使用纯函数
-
-**易于构建**
-
-1. 使用通用技术和架构
-2. 构建工具的选择
-
-<br/>
-
-### ref
+### 获取真实DOM的方式
 
 要获取真实的DOM节点有两种方式，一种是通过e.target，一种是ref。
 
@@ -307,7 +255,7 @@ JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它�
 
 #### 基本样式设置
 
-在 React 0.13 版本之前，React 官方提供 React.addons.classSet 插件来给组件动态设置 className，这在后续版本中被移除(为了精简 API )。我们可以使用 classnames 库来操作类。
+我们可以使用 classnames 库来操作类。
 
 ```js
 // 如果不使用 classnames 库，就需要这样处理动态类名:
@@ -339,32 +287,19 @@ class Button1 extends Component {
 }
 ```
 
-#### CSS问题及CSS模块
-react开发中的CSS问题：全局污染、命名混乱、依赖管理不彻底、无法共享变量、代码压缩不彻底。这些问题只凭CSS自身是无法解决的，必须用JS来管理CSS。
+#### CSS模块
 
-- 全局污染:CSS 使用全局选择器机制来设置样式，优点是方便重写样式。缺点是所有的 样式都是全局生效，样式可能被错误覆盖，因此产生了非常丑陋的 !important，甚至 inline !important 和复杂的选择器权重计数表1 ，提高犯错概率和使用成本。Web Components 标准中的 Shadow DOM 能彻底解决这个问题，但它把样式彻底局部化，造成 外部无法重写样式，损失了灵活性。
-- 命名混乱:由于全局污染的问题，多人协同开发时为了避免样式冲突，选择器越来越复杂，容易形成不同的命名风格，很难统一。样式变多后，命名将更加混乱。
-- 依赖管理不彻底:组件应该相互独立，引入一个组件时，应该只引入它所需要的 CSS 样 式。现在的做法是除了要引入 JavaScript，还要再引入它的 CSS，而且 Saas/Less 很难实现 对每个组件都编译出单独的 CSS，引入所有模块的 CSS 又造成浪费。JavaScript 的模块化 已经非常成熟，如果能让 JavaScript 来管理 CSS 依赖是很好的解决办法，而 webpack 的 css-loader 提供了这种能力。
-- 无法共享变量:复杂组件要使用 JavaScript 和 CSS 来共同处理样式，就会造成有些变量 在 JavaScript 和 CSS 中冗余，而预编译语言不能提供跨 JavaScript 和 CSS 共享变量的这种 能力。
-- 代码压缩不彻底:由于移动端网络的不确定性，现代工程项目对 CSS 压缩的要求已经到 了变态的程度。很多压缩工具为了节省一个字节,会把 16px 转成 1pc，但是这对非常长的 类名却无能为力。
-
-<br/>
-
-CSS 模块化要解决两个问题：CSS 样式的导入与导出。灵活按需导入以便复用 代码，导出时要能够隐藏内部作用域，以免造成全局污染。
+CSS 模块化要解决两个问题：CSS 样式的导入与导出。灵活按需导入以便复用代码，导出时要能够隐藏内部作用域，以免造成全局污染。
 
 CSS 模块化解决方案有两种：Inline Style、CSS Modules。
 
-- Inline Style。这种方案彻底抛弃 CSS，使用 JavaScript 或 JSON 来写样式，能给 CSS 提供 JavaScript 同样强大的模块化能力。但缺点同样明显，Inline Style 几乎不能利用 CSS 本身 的特性，比如级联、媒体查询(media query)等，:hover 和 :active 等伪类处理起来比较 复杂。另外，这种方案需要依赖框架实现，其中与 React 相关的有 Radium、jsxstyle 和 react-style。
-- CSS Modules。依旧使用 CSS，但使用 JavaScript 来管理样式依赖。CSS Modules 能最大 化地结合现有 CSS 生态和 JavaScript 模块化能力，其 API 非常简洁，学习成本几乎为零。 发布时依旧编译出单独的 JavaScript 和 CSS 文件。现在，webpack css-loader 内置 CSS Modules 功能。
+Inline Style
 
-<br/>
+这种方案彻底抛弃 CSS，使用 JavaScript 或 JSON 来写样式，能给 CSS 提供 JavaScript 同样强大的模块化能力。但缺点同样明显，Inline Style 几乎不能利用 CSS 本身 的特性，比如级联、媒体查询(media query)等，:hover 和 :active 等伪类处理起来比较 复杂。另外，这种方案需要依赖框架实现，其中与 React 相关的有 Radium、jsxstyle 和 react-style。
 
-#### CSS Modules的优点
+CSS Modules
 
-- 所有样式都是局部化的，解决了命名冲突和全局污染问题;
-- class 名的生成规则配置灵活，可以以此来压缩 class 名;
-- 只需引用组件的 JavaScript，就能搞定组件所有的 JavaScript 和 CSS;
-- 依然是 CSS，学习成本几乎为零。
+依旧使用 CSS，但使用 JavaScript 来管理样式依赖。CSS Modules 能最大化地结合现有 CSS 生态和 JS 模块化能力，其 API 非常简洁，学习成本几乎为零。 发布时依旧编译出单独的 JS 和 CSS 文件。webpack css-loader 内置 CSS Modules 功能。
 
 <br/>
 
@@ -451,14 +386,11 @@ import style from 'config.scss';
 
 一个组件只有render函数时，可以定义为无状态组件，无状态组件就是一个函数，相比普通组件性能更高，因为他没有其他声明周期的方法。UI组件一般都可以定义为无状态组件。
 
+<br/>
 
 ### 高阶组件（HOC）
 
-高阶组件、mixin和函数子组件都是设计模式。
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/100.jpg' width='800'>
-<br/>
+高阶组件、mixin都是设计模式。
 
 高阶函数：这种函数接受函数作为输入，或是输出一个函数。
 
@@ -470,7 +402,17 @@ import style from 'config.scss';
 
 定义：高阶组件通过被包裹的 React 组件来操作 props。
 
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/162.jpg' width='500'>
+```js
+import React from 'react';
+
+const MyContainer = WrapComponent =>
+  class extends React.Component {
+    render () {
+      return <WrapComponent {...this.props} />;
+    }
+  };
+
+```
 
 高阶组件的作用有：控制 props、通过 refs 使用引用、抽象 state 和使用其他元素包裹。
 
@@ -506,7 +448,7 @@ const MyContainer = WrappedComponent =>
 
 ```js
 import React, {Component} from 'React';
-const MyContainer = WrappedComponent => {
+const MyContainer = WrappedComponent =>
   class extends Component {
     constructor (props) {
       super (props);
@@ -530,14 +472,16 @@ const MyContainer = WrappedComponent => {
       return <WrappedComponent {...this.props} {...newProps} />;
     }
   };
-}
+
 ```
+
 我们把 input 组件中对 name prop 的 onChange 方法提取到高阶组件中，这样就有效地抽象了同样的 state 操作。可以这么来使用它
 
 ```js
 import React, {Component} from 'React';
 
-@MyContainer class MyComponent extends Component {
+@MyContainer 
+class MyComponent extends Component {
   render () {
     return <input name="name" {...this.props.name} />;
   }
@@ -605,7 +549,6 @@ const MyContainer = WrappedComponent =>
   };
 ```
 
-在这个例子中，WrappedComponent 的渲染结果中，顶层的 input 组件的 value 被改写为 may the force be with you。因此，我们可以做各种各样的事，甚至可以反转元素树，或是改变元素 树中的 props。
 
 ##### 控制 state
 
@@ -631,15 +574,6 @@ const MyContainer = WrappedComponent =>
     }
   };
 ```
-
-### 函数子组件
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/101.jpg' width='800'>
-<br/>
-
-
-<br/>
 
 ### mixin
 
@@ -668,6 +602,8 @@ mixin 的问题:
 
 高阶组件符合函数式编程思想。对于原组件来说，并不会感知到高阶组件的存在，只需要把功能套在它之上就可 以了，从而避免了使用 mixin 时产生的副作用。
 
+<br/>
+
 ### react性能优化
 
 问题：浏览器重绘，重排是影响性能的第一要素
@@ -675,21 +611,24 @@ mixin 的问题:
 解决：React render 会更新虚拟DOM，虚拟DOM会去渲染真实DOM，尽可能减少render的次数是关键所在
 
 优化原则：减少渲染
-- 纯函数
-    - 相同的输入总是有相同的输出
-    - 过程没有副作用，不改变外部状态
-    - 没有额外的状态依赖，方法内部的状态只在方法生命周期内存活
-- React组件与纯函数的关系
-    - React组件本身就是纯函数，传入相同的props和state总是得到相同的virtualDom
-    - 从而引申出PureRender
-- shouldComponentUpdate
-    - PureRender
-        - 重新实现shouldComponentUpdate方法，对props和state作浅比较
-        - 少为组件绑定箭头函数
-        - 不直接设置props为数组或者对象
-    - 使用redux connect函数优化
-        - 实现了shouldComponentUpdate函数的实现,会进行浅层比较​
-        - 父组件尽量不传无意义的参数,特别是箭头函数,不然会导致子组件无意义render，浪费性能
+
+纯函数
+- 相同的输入总是有相同的输出
+- 过程没有副作用，不改变外部状态
+- 没有额外的状态依赖，方法内部的状态只在方法生命周期内存活
+
+React组件与纯函数的关系
+- React组件本身就是纯函数，传入相同的props和state总是得到相同的virtualDom
+- 从而引申出PureRender
+
+shouldComponentUpdate
+- PureRender
+    - 重新实现shouldComponentUpdate方法，对props和state作浅比较
+    - 少为组件绑定箭头函数
+    - 不直接设置props为数组或者对象
+- 使用redux connect函数优化
+    - 实现了shouldComponentUpdate函数的实现,会进行浅层比较​
+    - 父组件尽量不传无意义的参数,特别是箭头函数,不然会导致子组件无意义render，浪费性能
 
 **如何检测react性能**
 
@@ -736,6 +675,44 @@ Prettier
 
 <br/>
 
+
+### 组件测试
+
+React 让前端单元测试变得容易:
+- React 应用很少需要访问浏览器API
+- 虚拟DOM可以在nodejs环境运行和测试
+- Redux隔离了状态管理，纯数据层单元测试
+
+单元测试涉及的工具：
+- Jest：Facebook 开源的JS单元测试框架
+- JS DOM：浏览器环境的nodejs模拟
+- Enzyme：React组件渲染和测试
+- nock：模拟HTTP请求
+- sinon：函数模拟和调用跟踪
+- istanbul：单元测试覆盖率
+
+jest中文[教程](https://jestjs.io/docs/zh-Hans/getting-started)
+
+enzyme： https://airbnb.io/enzyme/
+
+<br/>
+
+## 市场应用趋势
+
+> 随着技术生态的发展，和应用问题的变迁，技术的应用场景和流行趋势会受到影响。这层回答“谁用，用在哪”的问题，反映你对技术应用领域的认识宽度。
+
+<br/>
+
+# 设计维度
+
+<br/>
+
+## 目标
+
+> 为了解决用户的问题，技术本身要达成什么目标。这层定义“做到什么”。
+
+<br/>
+
 ### 命令式编程 VS 声明式编程
 
 #### 命令式编程
@@ -755,21 +732,7 @@ Prettier
 - 留下了改进的空间：比如React Fiber，虽然算法改头换面，但是组件却几乎不用改，因为组件只操心“显示什么”而不操心“如何显示”啊，当然不受影响了。
 - 提供了全局协调能力：在React的未来，每个组件还是只声明“想要画成什么样子”，但React却可以改进协调算法，让React组件根据不同优先级来渲染，提高用户感知性能，但是React组件的代码不需要改变
 
-<br/>
-
-## 市场应用趋势
-
-> 随着技术生态的发展，和应用问题的变迁，技术的应用场景和流行趋势会受到影响。这层回答“谁用，用在哪”的问题，反映你对技术应用领域的认识宽度。
-
-<br/>
-
-# 设计维度
-
-<br/>
-
-## 目标
-
-> 为了解决用户的问题，技术本身要达成什么目标。这层定义“做到什么”。
+react的核心理念之一就是函数式编程。
 
 <br/>
 
@@ -841,7 +804,15 @@ redux的相关知识繁多，还包含了Mobx、dva，为此我将他抽离出�
 
 ### setState
 
-setState 通过一个队列机制实现 state 更新。当执行 setState 时，会将需要更新的 state 合并 后放入状态队列，而不会立刻更新 this.state，队列机制可以高效地批量更新 state。如果不通过 setState 而直接修改 this.state 的值，那么该 state 将不会被放入状态队列中，当下次调用 setState 并对状态队列进行合并时，将会忽略之前直接被修改的 state，而造成无法预知的错误。因此，应该使用 setState 方法来更新 state，同时 React 也正是利用状态队列机制实现了setState 的异步更新，避免频繁地重复更新 state。
+setState 通过一个队列机制实现 state 更新。
+
+当执行 setState 时，会将需要更新的 state 合并 后放入状态队列，而不会立刻更新 this.state。
+
+队列机制可以高效地批量更新 state。
+
+如果不通过 setState 而直接修改 this.state 的值，那么该 state 将不会被放入状态队列中，当下次调用 setState 并对状态队列进行合并时，将会忽略之前直接被修改的 state，而造成无法预知的错误。
+
+因此，应该使用 setState 方法来更新 state，同时 React 也正是利用状态队列机制实现了setState 的异步更新，避免频繁地重复更新 state。
 
 <br/>
 
@@ -919,7 +890,7 @@ VDOM 的两个假设：
 ### React数据流
 在 React 中，数据是自顶向下单向流动的，即从父组件到子组件。这条原则让组件之间的关系变得简单且可预测。
 
-把组件看成一个函数，那么它接受了 props 作为参数，内部由 state 作为函数的内部参数，返回一个 Virtual DOM 的实现。
+把组件看成一个函数，那么它接受了 props 作为参数，内部由 state 作为函数的内部参数，返回一个 VDOM 的实现。
 
 #### state
 
@@ -937,7 +908,9 @@ setState 是一个异步方法，一个生命周期内所有的 setState 方法�
 
 ### 事件系统
 
-VDOM 在内存中是以对象的形式存在的，如果想要在这些对象上添加事件，就会非常简单。React 基于 VDOM 实现了一个SyntheticEvent (合成事件)层，我们所定义的事件处理器会接收到一个 SyntheticEvent 对象的实例，它完全符合 W3C 标准，不会存在任何 IE 标 准的兼容性问题。并且与原生的浏览器事件一样拥有同样的接口，同样支持事件的冒泡机制，我们可以使用 stopPropagation() 和preventDefault() 来中断它。所有事件都自动绑定到最外层上。如果需要访问原生事件对象，可以使用 nativeEvent 属性。
+VDOM 在内存中是以对象的形式存在的，如果想要在这些对象上添加事件，就会非常简单。
+
+React 基于 VDOM 实现了一个SyntheticEvent (合成事件)层，我们所定义的事件处理器会接收到一个 SyntheticEvent 对象的实例，它完全符合 W3C 标准，不会存在任何 IE 标 准的兼容性问题。并且与原生的浏览器事件一样拥有同样的接口，同样支持事件的冒泡机制，我们可以使用 stopPropagation() 和preventDefault() 来中断它。所有事件都自动绑定到最外层上。如果需要访问原生事件对象，可以使用 nativeEvent 属性。
 
 #### 合成事件的实现机制
 
@@ -988,8 +961,12 @@ React 的合成事件系统只是原生 DOM 事件系统的一个子集。它仅
 React 合成事件的事件类型是 JavaScript 原生事件类型的一个子集
 
 ##### 事件传播与阻止事件传播
-事件传播分为捕获阶段、目标阶段、冒泡阶段。事件捕获在程序开发中的意义不大，还有兼容性问题。所以，React 的合成事件则并没有实现事件捕获，仅仅支持了事件冒泡机制。
-阻止事件传播：阻止原生事件传播需要使用 e.preventDefault()，不过对于不支持该方法的浏览器(IE9 以 下)，只能使用 e.cancelBubble = true 来阻止。而在 React 合成事件中，只需要使用 e.prevent- Default() 即可。
+
+事件传播分为捕获阶段、目标阶段、冒泡阶段。
+
+事件捕获在程序开发中的意义不大，还有兼容性问题。所以，React 的合成事件则并没有实现事件捕获，仅仅支持了事件冒泡机制。
+
+阻止事件传播：阻止原生事件传播需要使用 e.preventDefault()，不过对于不支持该方法的浏览器(IE9 以 下)，只能使用 e.cancelBubble = true 来阻止。而在 React 合成事件中，只需要使用 e.preventDefault() 即可。
 
 ##### 事件绑定方式
 
@@ -1016,9 +993,8 @@ React 合成事件的绑定方式则简单得多:`<button onClick={this.handleCl
 
 <br/>
 
-### react16
 
-#### react16新特性
+### react16新特性
 
 1. 新的核心算法Fiber
 2. Render 可以返回数据、字符串
@@ -1030,7 +1006,7 @@ React 合成事件的绑定方式则简单得多:`<button onClick={this.handleCl
 2. 更好更快的服务端渲染
 3. 体积更小，MIT协议
 
-#### 下一代 React：异步渲染
+异步渲染
 
 异步渲染的两个部分
 
