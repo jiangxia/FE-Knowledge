@@ -43,10 +43,10 @@ facebook 推出react的同时，也推出了flux架构。flux架构的最大特�
 React 组件基本上由 3 个部分组成——属性(props)、状态(state)以及生命周期方法。
 
 <br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/160.jpg' width='600'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/160.png' width='600'>
 <br/>
 
-官方在 React 组件构建上提供了 3 种不同的方法:React.createClass、ES6 classes 和无状态函数(stateless function)。
+官方在 React 组件构建上提供了 3 种不同的方法：React.createClass、ES6 classes 和无状态函数(stateless function)。
 
 **react组件有四个特点**
 
@@ -81,17 +81,6 @@ React 组件基本上由 3 个部分组成——属性(props)、状态(state)以
 
 生命周期函数指的是在某一个时刻组件会自动调用执行的函数。
 
-React 生命周期分成两类 ：
-
-- 当组件在挂载或卸载时 
-- 当组件接收新的数据时，即组件更新时 
-
-react生命周期图如下：
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/161.jpg' width='800'>
-<br/>
-
 <br/>
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/86.jpg' width='800'>
 <br/>
@@ -102,13 +91,13 @@ react生命周期图如下：
 
 不管是挂载阶段还是更新阶段，都要到render时才能获取到更新后的this.state。在componentWillMount、 componentWillReceiveProps、 shouldComponentUpdate 和 componentWillUpdate 中也还是无法获取到更新后的 this.state。
 
-mountComponent 本质上是通过递归渲染内容的，由于递归的特性，父组件的 componentWillMount 在其子组件的 componentWillMount 之前调用，而父组件的 componentDidMount 在其子组件的 componentDidMount 之后调用。
+mountComponent 本质上是通过递归渲染内容的，由于递归的特性，父组件的 componentWillMount 在其子组件的 componentWillMount 之前调用，而父组件的 componentDidMount 在其子组件的 componentDidMount 之后调用。updateComponent同理。
 
-updateComponent 负责管理生命周期中的 componentWillReceiveProps、shouldComponentUpdate、componentWillUpdate、render 和 componentDidUpdate。若存在 componentWillReceiveProps，则执行。如果此时在 componentWillReceiveProps 中调用 setState，是不会触发 re-render 的，而是会进行 state 合并。且在 componentWillReceiveProps、shouldComponentUpdate 和 componentWillUpdate 中也还是无法获取到更新后的 this.state，即此时访问的 this.state 仍然是未更新的数据，需要设置 inst.state = nextState 后才可以，因此只有在 render 和 componentDidUpdate 中才能获取到更新后的 this.state。调用 shouldComponentUpdate 判断是否需要进行组件更新，如果存在 componentWillUpdate，则执行。updateComponent 本质上也是通过递归渲染内容的，由于递归的特性，父组件的 componentWillUpdate 是在其子组件的 componentWillUpdate 之前调用的，而父组件的 componentDidUpdate也是在其子组件的 componentDidUpdate 之后调用的。禁止在 shouldComponentUpdate 和 componentWillUpdate 中调用 setState，这会造成循环调用，直至耗光浏览器内存后崩溃。
+updateComponent 负责管理生命周期中的 componentWillReceiveProps、shouldComponentUpdate、componentWillUpdate、render 和 componentDidUpdate。在 componentWillReceiveProps 中调用 setState，是不会触发 re-render 的，而是会进行 state 合并。禁止在 shouldComponentUpdate 和 componentWillUpdate 中调用 setState，这会造成循环调用，直至耗光浏览器内存后崩溃。
 
-在 componentWillUnmount 中调用 setState，是不会触发 re-render 的
+在 componentWillUnmount 中调用 setState，是不会触发 re-render 的。
 
-无状态组件只是一个 render 方法，并没有组件类的实例化过程，也没有实例返回。无状态组件没有状态，没有生命周期，只是简单地接受 props 渲染生成 DOM 结构，是一个 纯粹为渲染而生的组件。
+无状态组件只是一个 render 方法，并没有组件类的实例化过程，也没有实例返回。无状态组件没有状态，没有生命周期，只是简单地接受 props 渲染生成 DOM 结构，是一个纯粹为渲染而生的组件。
 
 <br/>
 
