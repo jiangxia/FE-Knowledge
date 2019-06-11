@@ -82,7 +82,7 @@ React 组件基本上由 3 个部分组成——属性(props)、状态(state)以
 生命周期函数指的是在某一个时刻组件会自动调用执行的函数。
 
 <br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/86.jpeg' width='800'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/86.jpg' width='800'>
 <br/>
 
 也可以参考网上的[这张图](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)。
@@ -108,8 +108,6 @@ updateComponent 负责管理生命周期中的 componentWillReceiveProps、shoul
 1. 用于初始化内部状态，很少使用
 2. 唯一可以直接修改 state 的地方
 
-<br/>
-
 #### getDerivedStateFromProps
 
 1. 当 state 需要从 props 初始化时使用
@@ -117,22 +115,16 @@ updateComponent 负责管理生命周期中的 componentWillReceiveProps、shoul
 3. 每次 render 都会调用
 4. 典型场景：表单控件获取默认值
 
-<br/>
-
 #### componentDidMount
 
 1. UI 渲染完成后调用
 2. 只执行一次
 3. 典型场景：获取外部资源
 
-<br/>
-
 #### componentWillUnmount
 
 1. 组件移除时被调用
 2. 典型场景：资源释放
-
-<br/>
 
 #### getSnapshotBeforeUpdate
 
@@ -140,22 +132,16 @@ updateComponent 负责管理生命周期中的 componentWillReceiveProps、shoul
 2. 在页面 render t前调用，state 已更新
 3. 典型场景：获取 render 之前的 DOM 状态
 
-<br/>
-
 #### componentDididUpdate
 
 1. 每次 UI 更新时被调用
 2. 典型场景：页面需要根据 props 变化重新获取数据
-
-<br/>
 
 #### shouldComponentUpdate
 
 1. 决定 Virtual DOM 是否要重绘
 2. 一般可以由 PureComponent 自动实现
 3. 典型场景：性能优化
-
-<br/>
 
 #### componentWillReceiveProps
 注意下update阶段，触发组件update有两种情况，props或者state的修改。
@@ -165,10 +151,6 @@ updateComponent 负责管理生命周期中的 componentWillReceiveProps、shoul
 1. 一个组件要从父组件接受参数
 2. 如果这个组件第一次存在于父组件中，不会执行
 3. 如果这个组件之前已经存在于父组件中，才会执行
-
-<br/>
-
-
 
 <br/>
 
