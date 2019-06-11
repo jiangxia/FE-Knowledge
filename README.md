@@ -181,7 +181,7 @@ winter大神说得好：
 [406]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/前端架构.md
 [407]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/监控.md
 [408]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/设计模式.md
-[409]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/webpack4学习笔记.md
+[409]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/webpack4学习笔记.md
 
 
 [501]: https://www.yuque.com/mingyi-8nuow/rm3h54/gdf9cq
