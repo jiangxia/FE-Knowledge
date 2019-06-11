@@ -82,7 +82,7 @@ React 组件基本上由 3 个部分组成——属性(props)、状态(state)以
 生命周期函数指的是在某一个时刻组件会自动调用执行的函数。
 
 <br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/86.jpg' width='800'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/86.jpeg' width='800'>
 <br/>
 
 也可以参考网上的[这张图](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)。
