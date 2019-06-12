@@ -15,9 +15,13 @@ react 是数据驱动的框架，也是目前前端最火的框架之一，学�
 
 react 的诞生其实是要解决两个问题。UI细节问题问题 和 数据模型的问题。
 
+**UI细节问题问题**
+
 传统UI操作关注太多细节，jQuery虽然可以给我们提供了便捷的API，以及良好的浏览器兼容，但开发人员还是要手动去操作DOM，关注太多细节，不仅降低了开发效率，还容易引入BUG。
 
 react以数据为中心，数据驱动视图，而不直接操作dom，也就是只负责描述界面应该显示成什么样子，而不关心实现细节。
+
+**数据模型的问题**
 
 在react之前，前端管理数据的模型是MVC架构。传统的MVC架构难以扩展和维护，当应用程序出现问题，很难知道是model还是view出现问题。
 
@@ -25,15 +29,43 @@ react以数据为中心，数据驱动视图，而不直接操作dom，也就是
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/96.jpg' width='600'>
 <br/>
 
-facebook 推出react的同时，也推出了flux架构。flux架构的最大特点就是单向数据流，前端应用状态管理变得可预测、可追溯。
+react采用的是单向数据流，可以很好的避免类似的问题。
+
+<br/>
+
+> 笔者认为：学习框架，关键是要关注框架本身解决了什么问题，以及如何解决，这些才是框架最核心的部分，如果胡子眉毛一把抓，很容易就迷失在知识的海洋中。
+> 
+> react解决的问题就两个，其中UI细节问题，react的解决方案是数据驱动、JSX、事件系统、组件化等等，而数据模型问题，react的解决方案是单向数据流，对于这部分知识点，要善于联系。
+
+<!-- facebook 推出react的同时，也推出了flux架构。flux架构的最大特点就是单向数据流，前端应用状态管理变得可预测、可追溯。
 
 <br/>
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/97.jpg' width='600'>
-<br/>
+<br/> -->
 
 ## 技术规范
 
 > 技术被研发出来，人们怎么用它才能解决问题呢？这就要看技术规范，可以理解为技术使用说明书。技术规范，回答“怎么用”的问题，反映你对该技术使用方法的理解深度。
+
+<br/>
+
+### JSX
+
+JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它允许我们在JS代码中直接写HTML标记。最终生成的代码就是React.CreateElement
+
+如果在 JSX 中往 DOM 元素中传入自定义属性，React 是不会渲染的。如果要使用 HTML 自定义属性，要使用 data- 前缀，这与 HTML 标准也是一致的。然而，在自定义标签中任意的属性都是被支持的，以 aria- 开头的网络无障碍属性同样可以正常使用。
+
+**JSX的优点**
+
+1. 直观：声明式创建界面
+2. 灵活：代码动态创建界面
+3. 易上手：无需学习新的模板语言
+
+**约定**
+
+1. 自定义组件以大写字母开头
+2. react 认为小写的 tag 是原生 DOM 节点，如 div
+3. JSX标记可以直接使用属性语法，例如`<menu.Item />`
 
 <br/>
 
@@ -51,7 +83,7 @@ React 组件基本上由 3 个部分组成——属性(props)、状态(state)以
 
 1. 由属性和状态得到一个view （ props + state = view ）
 2. React 组件一般不提供方法，而是某种状态机
-3. React组件可以理解为一个纯函数
+3. React 组件可以理解为一个纯函数
 4. 单向数据绑定
 
 <br/>
@@ -75,174 +107,6 @@ React 组件基本上由 3 个部分组成——属性(props)、状态(state)以
 
 <br/>
 
-
-### 生命周期函数
-
-生命周期函数指的是在某一个时刻组件会自动调用执行的函数。
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/86.jpg' width='800'>
-<br/>
-
-也可以参考网上的[这张图](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)。
-
-一些注意点：
-
-不管是挂载阶段还是更新阶段，都要到render时才能获取到更新后的this.state。在componentWillMount、 componentWillReceiveProps、 shouldComponentUpdate 和 componentWillUpdate 中也还是无法获取到更新后的 this.state。
-
-mountComponent 本质上是通过递归渲染内容的，由于递归的特性，父组件的 componentWillMount 在其子组件的 componentWillMount 之前调用，而父组件的 componentDidMount 在其子组件的 componentDidMount 之后调用。updateComponent同理。
-
-updateComponent 负责管理生命周期中的 componentWillReceiveProps、shouldComponentUpdate、componentWillUpdate、render 和 componentDidUpdate。在 componentWillReceiveProps 中调用 setState，是不会触发 re-render 的，而是会进行 state 合并。禁止在 shouldComponentUpdate 和 componentWillUpdate 中调用 setState，这会造成循环调用，直至耗光浏览器内存后崩溃。
-
-在 componentWillUnmount 中调用 setState，是不会触发 re-render 的。
-
-无状态组件只是一个 render 方法，并没有组件类的实例化过程，也没有实例返回。无状态组件没有状态，没有生命周期，只是简单地接受 props 渲染生成 DOM 结构，是一个纯粹为渲染而生的组件。
-
-<br/>
-
-这里简单介绍下各个生命周期函数：
-
-#### constructor
-
-1. 用于初始化内部状态，很少使用
-2. 唯一可以直接修改 state 的地方
-
-#### getDerivedStateFromProps
-
-1. 当 state 需要从 props 初始化时使用
-2. 尽量不要使用：维护两者状态一致性会增加复杂度
-3. 每次 render 都会调用
-4. 典型场景：表单控件获取默认值
-
-#### componentDidMount
-
-1. UI 渲染完成后调用
-2. 只执行一次
-3. 典型场景：获取外部资源
-
-#### componentWillUnmount
-
-1. 组件移除时被调用
-2. 典型场景：资源释放
-
-#### getSnapshotBeforeUpdate
-
-1. 在元素被渲染并写入 DOM 之前调用，这样，你在 DOM 更新前捕获 DOM 信息（例如：滚动位置）。
-2. 在页面 render t前调用，state 已更新
-3. 典型场景：获取 render 之前的 DOM 状态
-
-#### componentDididUpdate
-
-1. 每次 UI 更新时被调用
-2. 典型场景：页面需要根据 props 变化重新获取数据
-
-#### shouldComponentUpdate
-
-1. 决定 VDOM 是否要重绘
-2. 一般可以由 PureComponent 自动实现
-3. 典型场景：性能优化
-
-#### componentWillReceiveProps
-注意下update阶段，触发组件update有两种情况，props或者state的修改。
-
-可以看到，这两种情况生命周期函数是有重合的。唯一的不同就是props改变时，会先调用 componentWillReceiveProps
-
-1. 一个组件要从父组件接受参数
-2. 如果这个组件第一次存在于父组件中，不会执行
-3. 如果这个组件之前已经存在于父组件中，才会执行
-
-<br/>
-
-
-### JSX
-
-JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它允许我们在JS代码中直接写HTML标记。最终生成的代码就是React.CreateElement
-
-如果在 JSX 中往 DOM 元素中传入自定义属性，React 是不会渲染的。如果要使用 HTML 自定义属性，要使用 data- 前缀，这与 HTML 标准也是一致的。然而，在自定义标签中任意的属性都是被支持的，以 aria- 开头的网络无障碍属性同样可以正常使用。
-
-**JSX的优点**
-
-1. 直观：声明式创建界面
-2. 灵活：代码动态创建界面
-3. 易上手：无需学习新的模板语言
-
-**约定**
-
-1. 自定义组件以大写字母开头
-2. react 认为小写的 tag 是原生 DOM 节点，如 div
-3. JSX标记可以直接使用属性语法，例如`<menu.Item />`
-
-<br/>
-
-### React Router
-
-路由的基本原理：保证 View 和 URL 同步。
-
-在 React 中，组件就是一个方法。 props 作为方法的参数，当它们发生变化时会触发方法执行，进而帮助我们重新绘制 View。在 React Router 中，我们同样可以把 Router 组件看成一个方法，location 作为参数，返回的结果同 样是 View。
-
-路由切换方式：hashChange （hashHistory） 或是history.pushState（browserHistory）
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/167.jpg' width='600'>
-<br/>
-
-
-**为什么需要路由?**
-
-1. 单页应用需要进行页面切换
-2. 通过URL可以定位到页面
-3. 更有语义的组织资源
-
-**路由实现的基本架构**
-
-原理：React Router 在一个组件容器中，根据URL来显示路由配置中的组件。
-
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/127.jpg' width='600'>
-<br/>
-
-**React Router的使用**
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/128.jpg' width='600'>
-<br/>
-
-**React Router的特性**
-
-1. 声明式路由定义：像使用react标记一样，可以在任何地方使用路由，而不需要特殊的路由表
-2. 动态路由：对比的是静态路由，传统的服务器端路由一旦配置了，就是一个静态的配置文件，而React Router只有在组件render时，才会实时去解析。
-
-**三种路由实现方式**
-
-1. URL路由
-2. hash路由
-3. 内存路由
-
-**React Router API**
-
-1. `<Link>` ：普通链接，不会触发浏览器刷新
-2. `<NavLink>`：类似`<Link>`但是会添加当前选中状态
-3. `<Prompt>`：满足条件时提示用户是否离开当前页面
-4. `<Redirect>`：重定向当前页面，例如登录判断
-5. `<Route>`：路由配置的核心标记，路径匹配时显示对应组件
-6. `<Switch>`：只现实第一个匹配路由
-
-**React Router可以通过URL传递参数**
-
-1. 如何通过URL传递参数：<Route path='/topic/:id'/>
-2. 如何获取参数：this.props.match.params
-3. 路由匹配进阶[资料](https://github.com/pillarjs/path-to-regexp)
-
-**何时需要URL参数**
-
-页面状态尽量通过URL参数定义
-
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/129.jpg' width='600'>
-<br/>
-
 ### 获取真实DOM的方式
 
 要获取真实的DOM节点有两种方式，一种是通过e.target，一种是ref。
@@ -250,6 +114,109 @@ JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它�
 但能不使用ref尽量不用
 
 <br/>
+
+### 事件系统
+
+VDOM 在内存中是以对象的形式存在的，如果想要在这些对象上添加事件，就会非常简单。
+
+React 基于 VDOM 实现了一个 SyntheticEvent (合成事件)层，我们所定义的事件处理器会接收到一个 SyntheticEvent 对象的实例，它完全符合 W3C 标准，不会存在任何 IE 标准的兼容性问题。并且与原生的浏览器事件一样拥有同样的接口，同样支持事件的冒泡机制，我们可以使用 stopPropagation() 和 preventDefault() 来中断它。所有事件都自动绑定到最外层上。如果需要访问原生事件对象，可以使用 nativeEvent 属性。
+
+#### 合成事件的实现机制
+
+在 React 底层，主要对合成事件做了两件事:事件委派和自动绑定
+
+##### 事件委派
+
+react 并不会把事件处理函数直接绑定到真实的节点上，而是把所有事件绑定到结构的最外层，使用一个统一的事件监听器。
+
+事件监听器上维持了一个映射来保存所有组件内部的事件监听和处理函数。
+
+当组件挂载或卸载时，只是在这个统一的事件监听器上插入或删除一些对象
+
+当事件发生时，首先被这个统一的事件监听器处理，然后在映射里找到真正的事件处理函数并调用。
+
+这样做简化了事件处理和回收机制，效率也有很大提升。 
+
+##### 自动绑定
+
+在 React 组件中，每个方法的上下文都会指向该组件的实例，即自动绑定 this 为当前组件。 而且 React 还会对这种引用进行缓存，以达到 CPU 和内存的最优化。在使用 ES6 classes 或者纯函数时，这种自动绑定就不复存在了，我们需要手动实现 this 的绑定。
+
+常见的绑定方法有：
+
+- 双冒号语法：`<button onClick={::this.handleClick}>Test</button>`
+- 构造器内使用bind绑定
+- 箭头函数
+
+<br/>
+
+#### 合成事件与原生事件对比
+
+##### 事件对象
+
+原生 DOM 事件对象在 W3C 标准和 IE 标准下存在着差异。在低版本的 IE 浏览器中，只能使用 window.event 来获取事件对象。
+
+而在 React 合成事件系统中，不存在这种兼容性问题，在事件处理函数中可以得到一个合成事件对象。
+
+##### 事件类型
+
+React 合成事件的事件类型是 JS 原生事件类型的一个子集
+
+##### 事件传播与阻止事件传播
+
+事件传播分为捕获阶段、目标阶段、冒泡阶段。
+
+事件捕获在程序开发中的意义不大，还有兼容性问题。所以，React 的合成事件则并没有实现事件捕获，仅仅支持了事件冒泡机制。
+
+阻止事件传播：阻止原生事件传播需要使用 e.preventDefault()，不过对于不支持该方法的浏览器(IE9 以 下)，只能使用 e.cancelBubble = true 来阻止。而在 React 合成事件中，只需要使用 e.preventDefault() 即可。
+
+##### 事件绑定方式
+
+原生事件有三种方式:
+
+- 直接在DOM元素中绑定: `<button onclick="alert(1)">Test</button>`
+- 在JS中，通过为元素的事件属性赋值的方式实现绑定：`el.onclick = e => {console.log(e)} `
+- 通过事件监听函数来实现绑定：`el.addEventListener("click", ()=>{},false); el.attachEvent("onclick", ()=>{})`
+
+React 合成事件的绑定方式则简单得多:`<button onClick={this.handleClick}>Test</button>`
+
+<br/>
+
+#### 注意事项
+
+一、原生事件
+
+componentDidMount 会在组件已经完成安装并且在浏览器中存在真实的 DOM 后调用，此时我们就可以完成原生事件的绑定。
+
+在 React 中使用 DOM 原生事件时，一定要在组件卸载时手动移除，否则很 可能出现内存泄漏的问题。而使用合成事件系统时则不需要，因为 React 内部已经帮你妥善地处理了。
+
+二、合成事件与原生事件混用
+
+尽量避免在 React 中混用合成事件和原生 DOM 事件。
+
+阻止 React 事件冒泡的行为只能用于 React 合成事件系统 中，且没办法阻止原生事件的冒泡。反之，在原生事件中的阻止冒泡行为，却可以阻止 React 合成事件的传播。
+
+React 的合成事件系统只是原生 DOM 事件系统的一个子集。它仅仅实现了 DOM Level 3 的事件接口，并且统一了浏览器间的兼容问题。有些事件 React 并没有实现，或者受某些限制没办法去实现，比如 window 的 resize 事件。
+
+<br/>
+
+### 组件间通信
+
+通信种类：父组件向子组件通信、子组件向父组件通信和没有嵌套关系的组件之间通信。
+
+- 父组件向子组件通信：props
+- 子组件向父组件通信
+    + 利用回调函数
+    + 利用自定义事件机制
+- 跨级组件通信：context
+- 没有嵌套关系的组件通信：自定义事件机制
+
+<br/>
+
+## 最佳实践
+> 最佳实践回答“怎么能用好”的问题，反映你实践经验的丰富程度。
+
+<br/>
+
 
 ### 样式处理
 
@@ -326,9 +293,11 @@ CSS Modules
 ```
 
 生成的 HTML 变为:
+
 ```html
 <button class="button--base-abc53 button--normal-abc53"> Processing... </button>
 ```
+
 由于在 .normal 中组合了 .base，所以编译后的 normal 会变成两个 class。 此外，使用 composes 还可以组合外部文件中的样式:
 
 ```css
@@ -355,6 +324,7 @@ $primary-color: '#f40';
   primaryColor: $primary-color;
 }
 ```
+
 ```js
 /* app.js */
 import style from 'config.scss';
@@ -363,23 +333,73 @@ import style from 'config.scss';
 
 <br/>
 
-### 组件间通信
 
-通信种类：父组件向子组件通信、子组件向父组件通信和没有嵌套关系的组件之间通信。
+### React Router
 
-- 父组件向子组件通信：props
-- 子组件向父组件通信
-    + 利用回调函数
-    + 利用自定义事件机制
-- 跨级组件通信：context
-- 没有嵌套关系的组件通信：自定义事件机制
+路由的基本原理：保证 View 和 URL 同步。
+
+在 React 中，组件就是一个方法。 props 作为方法的参数，当它们发生变化时会触发方法执行，进而帮助我们重新绘制 View。在 React Router 中，我们同样可以把 Router 组件看成一个方法，location 作为参数，返回的结果同 样是 View。
+
+路由切换方式：hashChange （hashHistory） 或是history.pushState（browserHistory）
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/167.jpg' width='600'>
+<br/>
+
+
+**为什么需要路由?**
+
+1. 单页应用需要进行页面切换
+2. 通过URL可以定位到页面
+3. 更有语义的组织资源
+
+**路由实现的基本架构**
+
+原理：React Router 在一个组件容器中，根据URL来显示路由配置中的组件。
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/127.jpg' width='600'>
+<br/>
+
+**React Router的使用**
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/128.jpg' width='600'>
+<br/>
+
+**React Router的特性**
+
+1. 声明式路由定义：像使用react标记一样，可以在任何地方使用路由，而不需要特殊的路由表
+2. 动态路由：对比的是静态路由，传统的服务器端路由一旦配置了，就是一个静态的配置文件，而React Router只有在组件render时，才会实时去解析。
+
+**三种路由实现方式**
+
+1. URL路由
+2. hash路由
+3. 内存路由
+
+**React Router API**
+
+1. `<Link>` ：普通链接，不会触发浏览器刷新
+2. `<NavLink>`：类似`<Link>`但是会添加当前选中状态
+3. `<Prompt>`：满足条件时提示用户是否离开当前页面
+4. `<Redirect>`：重定向当前页面，例如登录判断
+5. `<Route>`：路由配置的核心标记，路径匹配时显示对应组件
+6. `<Switch>`：只现实第一个匹配路由
+
+**React Router可以通过URL传递参数**
+
+1. 如何通过URL传递参数：<Route path='/topic/:id'/>
+2. 如何获取参数：this.props.match.params
+3. 路由匹配进阶[资料](https://github.com/pillarjs/path-to-regexp)
+
+**何时需要URL参数**
+
+页面状态尽量通过URL参数定义
 
 
 <br/>
-
-## 最佳实践
-> 最佳实践回答“怎么能用好”的问题，反映你实践经验的丰富程度。
-
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/129.jpg' width='600'>
 <br/>
 
 ### 无状态组件
@@ -742,6 +762,84 @@ react的核心理念之一就是函数式编程。
 
 <br/>
 
+### 生命周期函数
+
+生命周期函数指的是在某一个时刻组件会自动调用执行的函数。
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/86.jpg' width='800'>
+<br/>
+
+也可以参考网上的[这张图](http://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/)。
+
+一些注意点：
+
+不管是挂载阶段还是更新阶段，都要到render时才能获取到更新后的this.state。在componentWillMount、 componentWillReceiveProps、 shouldComponentUpdate 和 componentWillUpdate 中也还是无法获取到更新后的 this.state。
+
+mountComponent 本质上是通过递归渲染内容的，由于递归的特性，父组件的 componentWillMount 在其子组件的 componentWillMount 之前调用，而父组件的 componentDidMount 在其子组件的 componentDidMount 之后调用。updateComponent同理。
+
+updateComponent 负责管理生命周期中的 componentWillReceiveProps、shouldComponentUpdate、componentWillUpdate、render 和 componentDidUpdate。在 componentWillReceiveProps 中调用 setState，是不会触发 re-render 的，而是会进行 state 合并。禁止在 shouldComponentUpdate 和 componentWillUpdate 中调用 setState，这会造成循环调用，直至耗光浏览器内存后崩溃。
+
+在 componentWillUnmount 中调用 setState，是不会触发 re-render 的。
+
+无状态组件只是一个 render 方法，并没有组件类的实例化过程，也没有实例返回。无状态组件没有状态，没有生命周期，只是简单地接受 props 渲染生成 DOM 结构，是一个纯粹为渲染而生的组件。
+
+<br/>
+
+这里简单介绍下各个生命周期函数：
+
+#### constructor
+
+1. 用于初始化内部状态，很少使用
+2. 唯一可以直接修改 state 的地方
+
+#### getDerivedStateFromProps
+
+1. 当 state 需要从 props 初始化时使用
+2. 尽量不要使用：维护两者状态一致性会增加复杂度
+3. 每次 render 都会调用
+4. 典型场景：表单控件获取默认值
+
+#### componentDidMount
+
+1. UI 渲染完成后调用
+2. 只执行一次
+3. 典型场景：获取外部资源
+
+#### componentWillUnmount
+
+1. 组件移除时被调用
+2. 典型场景：资源释放
+
+#### getSnapshotBeforeUpdate
+
+1. 在元素被渲染并写入 DOM 之前调用，这样，你在 DOM 更新前捕获 DOM 信息（例如：滚动位置）。
+2. 在页面 render t前调用，state 已更新
+3. 典型场景：获取 render 之前的 DOM 状态
+
+#### componentDididUpdate
+
+1. 每次 UI 更新时被调用
+2. 典型场景：页面需要根据 props 变化重新获取数据
+
+#### shouldComponentUpdate
+
+1. 决定 VDOM 是否要重绘
+2. 一般可以由 PureComponent 自动实现
+3. 典型场景：性能优化
+
+#### componentWillReceiveProps
+注意下update阶段，触发组件update有两种情况，props或者state的修改。
+
+可以看到，这两种情况生命周期函数是有重合的。唯一的不同就是props改变时，会先调用 componentWillReceiveProps
+
+1. 一个组件要从父组件接受参数
+2. 如果这个组件第一次存在于父组件中，不会执行
+3. 如果这个组件之前已经存在于父组件中，才会执行
+
+<br/>
+
+
 ### MV* 与 Flux
 
 #### MVC/MVVM
@@ -906,79 +1004,6 @@ setState 是一个异步方法，一个生命周期内所有的 setState 方法�
 
 <br/>
 
-### 事件系统
-
-VDOM 在内存中是以对象的形式存在的，如果想要在这些对象上添加事件，就会非常简单。
-
-React 基于 VDOM 实现了一个SyntheticEvent (合成事件)层，我们所定义的事件处理器会接收到一个 SyntheticEvent 对象的实例，它完全符合 W3C 标准，不会存在任何 IE 标 准的兼容性问题。并且与原生的浏览器事件一样拥有同样的接口，同样支持事件的冒泡机制，我们可以使用 stopPropagation() 和preventDefault() 来中断它。所有事件都自动绑定到最外层上。如果需要访问原生事件对象，可以使用 nativeEvent 属性。
-
-#### 合成事件的实现机制
-
-在 React 底层，主要对合成事件做了两件事:事件委派和自动绑定
-
-##### 事件委派
-
-- react并不会把事件处理函数直接绑定到 真实的节点上，而是把所有事件绑定到结构的最外层，使用一个统一的事件监听器，
-- 事件监听器上维持了一个映射来保存所有组件内部的事件监听和处理函数。
-- 当组件挂载或卸载时，只是在这个统一的事件监听器上插入或删除一些对象
-- 当事件发生时，首先被这个统一的事件监听器 处理，然后在映射里找到真正的事件处理函数并调用。
-- 这样做简化了事件处理和回收机制，效率 也有很大提升。 
-
-##### 自动绑定
-
-在 React 组件中，每个方法的上下文都会指向该组件的实例，即自动绑定 this 为当前组件。 而且 React 还会对这种引用进行缓存，以达到 CPU 和内存的最优化。在使用 ES6 classes 或者纯函数时，这种自动绑定就不复存在了，我们需要手动实现 this 的绑定。
-
-常见的绑定方法有：
-
-- 双冒号语法：`<button onClick={::this.handleClick}>Test</button>`
-- 构造器内使用bind绑定
-- 箭头函数
-
-##### 原生事件
-
-componentDidMount 会在组件已经完成安装并且在浏览器中存在真实的 DOM 后调用，此时我们就可以完成原生事件的绑定。
-
-在 React 中使用 DOM 原生事件时，一定要在组件卸载时手动移除，否则很 可能出现内存泄漏的问题。而使用合成事件系统时则不需要，因为 React 内部已经帮你妥善地处理了。
-
-<br/>
-
-#### 合成事件与原生事件混用
-
-尽量避免在 React 中混用合成事件和原生 DOM 事件。
-
-阻止 React 事件冒泡的行为只能用于 React 合成事件系统 中，且没办法阻止原生事件的冒泡。反之，在原生事件中的阻止冒泡行为，却可以阻止 React 合成事件的传播。
-
-React 的合成事件系统只是原生 DOM 事件系统的一个子集。它仅仅实现了 DOM Level 3 的事件接口，并且统一了浏览器间的兼容问题。有些事件 React 并没有实现，或者受某些限制没办法去实现，比如 window 的 resize 事件。
-
-<br/>
-
-#### 对比React合成事件与JS原生事件
-
-##### 事件对象
-原生 DOM 事件对象在 W3C 标准和 IE 标准下存在着差异。在低版本的 IE 浏览器中，只能使用 window.event 来获取事件对象。而在 React 合成事件系统中，不存在这种兼容性问题，在事件处理函数中可以得到一个合成事件对象。
-
-##### 事件类型
-React 合成事件的事件类型是 JS 原生事件类型的一个子集
-
-##### 事件传播与阻止事件传播
-
-事件传播分为捕获阶段、目标阶段、冒泡阶段。
-
-事件捕获在程序开发中的意义不大，还有兼容性问题。所以，React 的合成事件则并没有实现事件捕获，仅仅支持了事件冒泡机制。
-
-阻止事件传播：阻止原生事件传播需要使用 e.preventDefault()，不过对于不支持该方法的浏览器(IE9 以 下)，只能使用 e.cancelBubble = true 来阻止。而在 React 合成事件中，只需要使用 e.preventDefault() 即可。
-
-##### 事件绑定方式
-
-原生事件有三种方式:
-- 直接在DOM元素中绑定: `<button onclick="alert(1)">Test</button>`
-- 在JS中，通过为元素的事件属性赋值的方式实现绑定：`el.onclick = e => {console.log(e)} `
-- 通过事件监听函数来实现绑定：`el.addEventListener("click", ()=>{},false); el.attachEvent("onclick", ()=>{})`
-
-React 合成事件的绑定方式则简单得多:`<button onClick={this.handleClick}>Test</button>`
-
-
-<br/>
 
 ## 优劣局限
 
