@@ -105,11 +105,11 @@ winter大神说得好：
     - [监控][407]
     - [设计模式][408]
     - [webpack4][409]
+    - [react学习笔记][410]
 6. 其他
     - [VS Code使用手册][501]
     - [《程序员进阶攻略》学习笔记][502]
     - [《面试现场》学习笔记][505]
-    <!-- - [react学习笔记][503] -->
     
 
 
@@ -182,9 +182,9 @@ winter大神说得好：
 [407]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/监控.md
 [408]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/设计模式.md
 [409]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/webpack4学习笔记.md
+[410]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/react学习笔记.md
 
 
 [501]: https://www.yuque.com/mingyi-8nuow/rm3h54/gdf9cq
 [502]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/《程序员进阶攻略》学习笔记.md
-[503]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/react学习笔记.md
 [505]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/《面试现场》学习笔记.md

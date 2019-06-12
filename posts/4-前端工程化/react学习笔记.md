@@ -156,7 +156,7 @@ updateComponent 负责管理生命周期中的 componentWillReceiveProps、shoul
 
 ### JSX
 
-JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它允许我们在JavaScript代码中直接写HTML标记。最终生成的代码就是React.CreateElement
+JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它允许我们在JS代码中直接写HTML标记。最终生成的代码就是React.CreateElement
 
 如果在 JSX 中往 DOM 元素中传入自定义属性，React 是不会渲染的。如果要使用 HTML 自定义属性，要使用 data- 前缀，这与 HTML 标准也是一致的。然而，在自定义标签中任意的属性都是被支持的，以 aria- 开头的网络无障碍属性同样可以正常使用。
 
@@ -295,11 +295,11 @@ CSS 模块化解决方案有两种：Inline Style、CSS Modules。
 
 Inline Style
 
-这种方案彻底抛弃 CSS，使用 JavaScript 或 JSON 来写样式，能给 CSS 提供 JavaScript 同样强大的模块化能力。但缺点同样明显，Inline Style 几乎不能利用 CSS 本身 的特性，比如级联、媒体查询(media query)等，:hover 和 :active 等伪类处理起来比较 复杂。另外，这种方案需要依赖框架实现，其中与 React 相关的有 Radium、jsxstyle 和 react-style。
+这种方案彻底抛弃 CSS，使用 JS 或 JSON 来写样式，能给 CSS 提供 JS 同样强大的模块化能力。但缺点同样明显，Inline Style 几乎不能利用 CSS 本身 的特性，比如级联、媒体查询(media query)等，:hover 和 :active 等伪类处理起来比较 复杂。另外，这种方案需要依赖框架实现，其中与 React 相关的有 Radium、jsxstyle 和 react-style。
 
 CSS Modules
 
-依旧使用 CSS，但使用 JavaScript 来管理样式依赖。CSS Modules 能最大化地结合现有 CSS 生态和 JS 模块化能力，其 API 非常简洁，学习成本几乎为零。 发布时依旧编译出单独的 JS 和 CSS 文件。webpack css-loader 内置 CSS Modules 功能。
+依旧使用 CSS，但使用 JS 来管理样式依赖。CSS Modules 能最大化地结合现有 CSS 生态和 JS 模块化能力，其 API 非常简洁，学习成本几乎为零。 发布时依旧编译出单独的 JS 和 CSS 文件。webpack css-loader 内置 CSS Modules 功能。
 
 <br/>
 
@@ -344,9 +344,9 @@ CSS Modules
 }
 ```
 
-##### 实现 CSS 与 JavaScript 变量共享
+##### 实现 CSS 与 JS 变量共享
 
-:export 关键字可以把 CSS 中的变量输出到 JavaScript 中
+:export 关键字可以把 CSS 中的变量输出到 JS 中
 
 ```css
 /* config.scss */ 
@@ -667,7 +667,7 @@ shouldComponentUpdate
 
 ESLint
 - 使用.eslintrc进行规则的配置
-- 使用airbnb的JavaScript代码风格
+- 使用airbnb的JS代码风格
 
 Prettier
 - 代码格式化的神器
@@ -789,7 +789,7 @@ Flux 的不足：冗余代码过多，每个应用中都需要手动创建一个
 Redux 是一个可预测的状态容器。简单地说，在摒弃了传统 MVC 的发布/订阅模式并通过 Redux 三大原则强化对状态 的修改后，使用 Redux 可以让你的应用状态管理变得可预测、可追溯。
 
 
-redux的相关知识繁多，还包含了Mobx、dva，为此我将他抽离出来，请看[这里](https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/数据管理学习笔记.md)。
+redux的相关知识繁多，还包含了Mobx、dva，为此我将他抽离出来，请看[这里](https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/数据管理学习笔记.md)。
 
 <br/>
 
@@ -952,13 +952,13 @@ React 的合成事件系统只是原生 DOM 事件系统的一个子集。它仅
 
 <br/>
 
-#### 对比React合成事件与JavaScript原生事件
+#### 对比React合成事件与JS原生事件
 
 ##### 事件对象
 原生 DOM 事件对象在 W3C 标准和 IE 标准下存在着差异。在低版本的 IE 浏览器中，只能使用 window.event 来获取事件对象。而在 React 合成事件系统中，不存在这种兼容性问题，在事件处理函数中可以得到一个合成事件对象。
 
 ##### 事件类型
-React 合成事件的事件类型是 JavaScript 原生事件类型的一个子集
+React 合成事件的事件类型是 JS 原生事件类型的一个子集
 
 ##### 事件传播与阻止事件传播
 
