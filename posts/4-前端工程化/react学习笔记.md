@@ -229,7 +229,9 @@ import "./ControlButtons.css";
 
 ### JSX
 
-JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它允许我们在JS代码中直接写HTML标记。最终生成的代码就是React.CreateElement
+在JS中写HTML标记，这体现了高内聚。要达到这种效果，就必须依赖JSX。 
+
+JSX 的本质不是模板引擎，而是动态创建组件的语法糖，它允许我们在JS代码中直接写HTML标记。最终生成的代码就是React.CreateElement。
 
 如果在 JSX 中往 DOM 元素中传入自定义属性，React 是不会渲染的。如果要使用 HTML 自定义属性，要使用 data- 前缀，这与 HTML 标准也是一致的。然而，在自定义标签中任意的属性都是被支持的，以 aria- 开头的网络无障碍属性同样可以正常使用。
 
@@ -244,99 +246,6 @@ JSX 的本质  不是模板引擎，而是动态创建组件的语法糖，它�
 1. 自定义组件以大写字母开头
 2. react 认为小写的 tag 是原生 DOM 节点，如 div
 3. JSX标记可以直接使用属性语法，例如`<menu.Item />`
-
-<br/>
-
-
-### 获取真实DOM的方式
-
-要获取真实的DOM节点有两种方式，一种是通过e.target，一种是ref。
-
-但能不使用ref尽量不用
-
-<br/>
-
-### 事件系统
-
-VDOM 在内存中是以对象的形式存在的，如果想要在这些对象上添加事件，就会非常简单。
-
-React 基于 VDOM 实现了一个 SyntheticEvent (合成事件)层，我们所定义的事件处理器会接收到一个 SyntheticEvent 对象的实例，它完全符合 W3C 标准，不会存在任何 IE 标准的兼容性问题。并且与原生的浏览器事件一样拥有同样的接口，同样支持事件的冒泡机制，我们可以使用 stopPropagation() 和 preventDefault() 来中断它。所有事件都自动绑定到最外层上。如果需要访问原生事件对象，可以使用 nativeEvent 属性。
-
-#### 合成事件的实现机制
-
-在 React 底层，主要对合成事件做了两件事:事件委派和自动绑定
-
-##### 事件委派
-
-react 并不会把事件处理函数直接绑定到真实的节点上，而是把所有事件绑定到结构的最外层，使用一个统一的事件监听器。
-
-事件监听器上维持了一个映射来保存所有组件内部的事件监听和处理函数。
-
-当组件挂载或卸载时，只是在这个统一的事件监听器上插入或删除一些对象
-
-当事件发生时，首先被这个统一的事件监听器处理，然后在映射里找到真正的事件处理函数并调用。
-
-这样做简化了事件处理和回收机制，效率也有很大提升。 
-
-##### 自动绑定
-
-在 React 组件中，每个方法的上下文都会指向该组件的实例，即自动绑定 this 为当前组件。 而且 React 还会对这种引用进行缓存，以达到 CPU 和内存的最优化。在使用 ES6 classes 或者纯函数时，这种自动绑定就不复存在了，我们需要手动实现 this 的绑定。
-
-常见的绑定方法有：
-
-- 双冒号语法：`<button onClick={::this.handleClick}>Test</button>`
-- 构造器内使用bind绑定
-- 箭头函数
-
-<br/>
-
-#### 合成事件与原生事件对比
-
-##### 事件对象
-
-原生 DOM 事件对象在 W3C 标准和 IE 标准下存在着差异。在低版本的 IE 浏览器中，只能使用 window.event 来获取事件对象。
-
-而在 React 合成事件系统中，不存在这种兼容性问题，在事件处理函数中可以得到一个合成事件对象。
-
-##### 事件类型
-
-React 合成事件的事件类型是 JS 原生事件类型的一个子集
-
-##### 事件传播与阻止事件传播
-
-事件传播分为捕获阶段、目标阶段、冒泡阶段。
-
-事件捕获在程序开发中的意义不大，还有兼容性问题。所以，React 的合成事件则并没有实现事件捕获，仅仅支持了事件冒泡机制。
-
-阻止事件传播：阻止原生事件传播需要使用 e.preventDefault()，不过对于不支持该方法的浏览器(IE9 以 下)，只能使用 e.cancelBubble = true 来阻止。而在 React 合成事件中，只需要使用 e.preventDefault() 即可。
-
-##### 事件绑定方式
-
-原生事件有三种方式:
-
-- 直接在DOM元素中绑定: `<button onclick="alert(1)">Test</button>`
-- 在JS中，通过为元素的事件属性赋值的方式实现绑定：`el.onclick = e => {console.log(e)} `
-- 通过事件监听函数来实现绑定：`el.addEventListener("click", ()=>{},false); el.attachEvent("onclick", ()=>{})`
-
-React 合成事件的绑定方式则简单得多:`<button onClick={this.handleClick}>Test</button>`
-
-<br/>
-
-#### 注意事项
-
-一、原生事件
-
-componentDidMount 会在组件已经完成安装并且在浏览器中存在真实的 DOM 后调用，此时我们就可以完成原生事件的绑定。
-
-在 React 中使用 DOM 原生事件时，一定要在组件卸载时手动移除，否则很 可能出现内存泄漏的问题。而使用合成事件系统时则不需要，因为 React 内部已经帮你妥善地处理了。
-
-二、合成事件与原生事件混用
-
-尽量避免在 React 中混用合成事件和原生 DOM 事件。
-
-阻止 React 事件冒泡的行为只能用于 React 合成事件系统 中，且没办法阻止原生事件的冒泡。反之，在原生事件中的阻止冒泡行为，却可以阻止 React 合成事件的传播。
-
-React 的合成事件系统只是原生 DOM 事件系统的一个子集。它仅仅实现了 DOM Level 3 的事件接口，并且统一了浏览器间的兼容问题。有些事件 React 并没有实现，或者受某些限制没办法去实现，比如 window 的 resize 事件。
 
 <br/>
 
@@ -360,6 +269,350 @@ React 的合成事件系统只是原生 DOM 事件系统的一个子集。它仅
 
 ### 组件设计模式
 
+#### 聪明组件和傻瓜组件
+
+在 React 应用中，最简单也是最常用的一种组件模式，就是“聪明组件和傻瓜组件”。
+
+软件设计中有一个原则，叫做“责任分离”，简单说就是让一个模块的责任尽量少，如果发现一个模块功能过多，就应该拆分为多个模块，让一个模块都专注于一个功能，这样更利于代码的维护。
+
+使用 React 来做界面，无外乎就是获得驱动界面的数据，然后利用这些数据来渲染界面。
+
+把获取和管理数据的逻辑放在父组件，也就是聪明组件；把渲染界面的逻辑放在子组件，也就是傻瓜组件。
+
+这么做的好处，是可以灵活地修改数据状态管理方式，比如，最初你可能用 Redux 来管理数据，然后你想要修改为用 Mobx，如果按照这种模式分割组件，那么，你需要改的只有聪明组件，傻瓜组件可以保持原状。
+
+因为傻瓜组件一般没有自己的状态，我们可以利用 PureComponent 来提高傻瓜组件的性能。
+
+PureComponent 帮我们处理了shouldComponentUpdate。
+
+值得一提的是，PureComponent 中 shouldComponentUpdate 对 props 做得只是浅层比较，不是深层比较，如果 props 是一个深层对象，就容易产生问题。
+
+比如，两次渲染传入的某个 props 都是同一个对象，但是对象中某个属性的值不同，这在 PureComponent 眼里，props 没有变化，不会重新渲染，但是这明显不是我们想要的结果。
+
+虽然 PureComponent 可以提高组件渲染性能，但是它也不是没有代价的，它逼迫我们必须把组件实现为 class，不能用纯函数来实现组件。
+
+如果你使用 React v16.6.0 之后的版本，可以使用一个新功能 React.memo 来完美实现 React 组件，比如：
+
+```js
+const Joke = React.memo(() => (
+    <div>
+        <img src={SmileFace} />
+        {this.props.value || 'loading...' }
+    </div>
+));
+```
+
+<br/>
+
+#### 高阶组件
+
+在开发 React 组件过程中，很容易发现这样一种现象，某些功能是多个组件通用的，如果每个组件都重复实现这样的逻辑，肯定十分浪费，而且违反了“不要重复自己”（DRY，Don't Repeat Yourself)的编码原则，我们肯定想要把这部分共用逻辑提取出来重用。
+
+我们说过，在 React 的世界里，组件是第一公民，首先想到的是当然是把共用逻辑提取为一个 React 组件。不过，有些情况下，这些共用逻辑还没法成为一个独立组件，换句话说，这些共用逻辑单独无法使用，它们只是对其他组件的功能加强。
+
+举个例子，对于很多网站应用，有些模块都需要在用户已经登录的情况下才显示。比如，对于一个电商类网站，“退出登录”按钮、“购物车”这些模块，就只有用户登录之后才显示，对应这些模块的 React 组件如果连“只有在登录时才显示”的功能都重复实现，那就浪费了。
+
+这时候，我们就可以利用“高阶组件（HoC）”这种模式来解决问题。
+
+##### 高阶组件的基本形式
+
+高阶组件，其实并不是一个组件，而是一个函数，只不过这个函数比较特殊，它接受至少一个 React 组件为参数，并且能够返回一个全新的 React 组件作为结果，当然，这个新产生的 React 组件是对作为参数的组件的包装，所以，有机会赋予新组件一些增强的“神力”。
+
+一个最简单的高阶组件是这样的形式：
+
+```js
+const withDoNothing = (Component) => {
+  const NewComponent = (props) => {
+    return <Component {...props} />;
+  };
+  return NewComponent;
+};
+```
+
+上面的函数 withDoNothing 就是一个高阶组件，作为一项业界通用的代码规范，高阶组件的命名一般都带 with 前缀，命名中后面的部分代表这个高阶组件的功能。
+
+就如同 withDoNothing 这个名字所说的一样，这个高阶组件什么都没做，但是从中可以看出高阶组件的基本代码套路。
+
+- 高阶组件不能去修改作为参数的组件，高阶组件必须是一个纯函数，不应该有任何副作用。
+- 高阶组件返回的结果必须是一个新的 React 组件，这个新的组件的 JSX 部分肯定会包含作为参数的组件。
+- 高阶组件一般需要把传给自己的 props 转手传递给作为参数的组件。
+
+有了高阶组件，我们就可以用它来抽取共同逻辑。
+
+##### 高阶组件的高级用法
+
+高阶组件只需要返回一个 React 组件即可，没人规定高阶组件只能接受一个 React 组件作为参数，完全可以传入多个 React 组件给高阶组件。
+
+我们可以用高阶组件封装登录与登出的逻辑，如下：
+
+```js
+const withLoginAndLogout = (ComponentForLogin, ComponentForLogout) => {
+  const NewComponent = (props) => {
+    if (getUserId()) {
+      return <ComponentForLogin {...props} />;
+    } else {
+      return <ComponentForLogout{...props} />;
+    }
+  }
+  return NewComponent;
+};
+```
+
+##### 链式调用高阶组件
+
+高阶组件最巧妙的一点，是可以链式调用。
+
+假设，你有三个高阶组件分别是 withOne、withTwo 和 withThree，那么，如果要赋予一个组件 X 三个高阶组件的超能力，可以连续调用高阶组件，如下：
+
+```js
+const SuperX = withThree(withTwo(withOne(X)));
+```
+
+高阶组件本身就是一个纯函数，纯函数是可以组合使用的，所以，我们其实可以把多个高阶组件组合为一个高阶组件，然后用这一个高阶组件去包装X，代码如下：
+
+```js
+const hoc = compose(withThree, withTwo, withOne);
+const SuperX = hoc(X);
+```
+
+在上面代码中使用的 compose，是函数式编程中很基础的一种方法，作用就是把多个函数组合为一个函数。
+
+React 组件可以当做积木一样组合使用，现在有了 compose，我们就可以把高阶组件也当做积木一样组合，进一步重用代码。
+
+假如一个应用中多个组件都需要同样的多个高阶组件包装，那就可以用 compose 组合这些高阶组件为一个高阶组件，这样在使用多个高阶组件的地方实际上就只需要使用一个高阶组件了。
+
+##### 不要滥用高阶组件
+
+高阶组件虽然可以用一种可重用的方式扩充现有 React 组件的功能，但高阶组件并不是绝对完美的。
+
+首先，高阶组件不得不处理 displayName，不然 debug 会很痛苦。当 React 渲染出错的时候，靠组件的 displayName 静态属性来判断出错的组件类，而高阶组件总是创造一个新的 React 组件类，所以，每个高阶组件都需要处理一下 displayName。
+
+如果要做一个最简单的什么增强功能都没有的高阶组件，也必须要写下面这样的代码：
+
+```js
+const withExample = (Component) => {
+  const NewComponent = (props) => {
+    return <Component {...props} />;
+  }
+  
+  NewComponent.displayName = `withExample(${Component.displayName || Component.name || 'Component'})`;
+  
+  return NewCompoennt;
+};
+```
+
+对于 React 生命周期函数，高阶组件不用怎么特殊处理，但是，如果内层组件包含定制的静态函数，这些静态函数的调用在 React 生命周期之外，那么高阶组件就必须要在新产生的组件中增加这些静态函数的支持，这更加麻烦。关于这点，请参考[这里](https://zhuanlan.zhihu.com/p/36178509)
+
+其次，高阶组件支持嵌套调用，这是它的优势。但是如果真的一大长串高阶组件被应用的话，当组件出错，你看到的会是一个超深的 stack trace，十分痛苦。
+
+最后，使用高阶组件，一定要非常小心，要避免重复产生 React 组件，比如，下面的代码是有问题的：
+
+```js
+const Example = () => {
+  const EnhancedFoo = withExample(Foo);
+  return <EnhancedFoo />
+}
+```
+
+像上面这样写，每一次渲染 Example，都会用高阶组件产生一个新的组件，虽然都叫做 EnhancedFoo，但是对 React 来说是一个全新的东西，在重新渲染的时候不会重用之前的虚拟 DOM，会造成极大的浪费。
+
+正确的写法是下面这样，自始至终只有一个 EnhancedFoo 组件类被创建：
+
+```js
+const EnhancedFoo = withExample(Foo);
+
+const Example = () => {
+  return <EnhancedFoo />
+}
+```
+
+关于高阶组件的进阶内容，请参考[高阶组件实现方法](#高阶组件实现方法)
+
+<br/>
+
+### 高阶组件实现方法
+
+实现高阶组件的方法有：
+
+#### 属性代理
+
+定义：高阶组件通过被包裹的 React 组件来操作 props。
+
+```js
+import React from 'react';
+
+const MyContainer = WrapComponent =>
+  class extends React.Component {
+    render () {
+      return <WrapComponent {...this.props} />;
+    }
+  };
+
+```
+
+高阶组件的作用有：控制 props、通过 refs 使用引用、抽象 state 和使用其他元素包裹。
+
+##### 控制 props
+
+我们可以读取、增加、编辑或是移除从 WrappedComponent 传进来的 props，但需要小心删除与编辑重要的 props。我们应该尽可能对高阶组件的 props 作新的命名以防止混淆。
+
+##### 通过 refs 使用引用
+
+在高阶组件中，我们可以接受 refs 使用WrappedComponent 的引用。
+
+```js
+import React, {Component} from 'React';
+const MyContainer = WrappedComponent =>
+  class extends Component {
+    proc (wrappedComponentInstance) {
+      wrappedComponentInstance.method ();
+    }
+    render () {
+      const props = Object.assign ({}, this.props, {
+        ref: this.proc.bind (this),
+      });
+      return <WrappedComponent {...props} />;
+    }
+  };
+```
+
+当 WrappedComponent 被渲染时，refs 回调函数就会被执行，这样就会拿到一份Wrapped-Component 实例的引用。这就可以方便地用于读取或增加实例的 props，并调用实例的方法。
+
+##### 抽象 state
+
+我们可以通过 WrappedComponent 提供的 props 和回调函数抽象 state，高阶组件可以将原组件抽象为展示型组件，分离内部状态。
+
+```js
+import React, {Component} from 'React';
+const MyContainer = WrappedComponent =>
+  class extends Component {
+    constructor (props) {
+      super (props);
+      this.state = {
+        name: '',
+      };
+      this.onNameChange = this.onNameChange.bind (this);
+    }
+    onNameChange (event) {
+      this.setState ({
+        name: event.target.value,
+      });
+    }
+    render () {
+      const newProps = {
+        name: {
+          value: this.state.name,
+          onChange: this.onNameChange,
+        },
+      };
+      return <WrappedComponent {...this.props} {...newProps} />;
+    }
+  };
+
+```
+
+我们把 input 组件中对 name prop 的 onChange 方法提取到高阶组件中，这样就有效地抽象了同样的 state 操作。可以这么来使用它
+
+```js
+import React, {Component} from 'React';
+
+@MyContainer 
+class MyComponent extends Component {
+  render () {
+    return <input name="name" {...this.props.name} />;
+  }
+}
+```
+
+通过这样的封装，我们就得到了一个被控制的 input 组件。
+
+##### 使用其他元素包裹 WrappedComponent
+
+我们还可以使用其他元素来包裹 WrappedComponent，这既可以是为了加样式，也可 以是为了布局。
+
+```js
+import React, {Component} from 'React';
+const MyContainer = WrappedComponent =>
+  class extends Component {
+    render () {
+      return (
+        <div style={{display: 'block'}}>
+          {' '}<WrappedComponent {...this.props} />
+        </div>
+      );
+    }
+  };
+```
+
+<br/>
+
+
+#### 反向继承
+
+定义：高阶组件继承于被包裹的 React 组件（从字面意思上看，它一定与继承特性相关）
+
+
+简单例子：高阶组件返回的组件继承于 WrappedComponent。因为被动地继承了 WrappedComponent，所有的调用都会反向，这也是这种方法的由来。
+
+```js
+const MyContainer = WrappedComponent =>
+  class extends WrappedComponent {
+    render () {
+      return super.render ();
+    }
+  };
+```
+
+在反向继承方法中，高阶组件可以使用 WrappedComponent 引用，这意味着它可以使用WrappedComponent 的 state、props 、生命周期和 render 方法。但它不能保证完整的子组件树被解析。
+
+反向继承两大特点:
+
+##### 渲染劫持
+
+渲染劫持指的就是高阶组件可以控制 WrappedComponent 的渲染过程，并渲染各种各样的结 果。我们可以在这个过程中在任何 React 元素输出的结果中读取、增加、修改、删除 props，或 读取或修改 React 元素树，或条件显示元素树，又或是用样式控制包裹元素树。
+
+正如之前说到的，反向继承不能保证完整的子组件树被解析，这意味着将限制渲染劫持功能。 渲染劫持的经验法则是我们可以操控 WrappedComponent 的元素树，并输出正确的结果。但如果 元素树中包括了函数类型的 React 组件，就不能操作组件的子组件。
+
+```js
+const MyContainer = WrappedComponent =>
+  class extends WrappedComponent {
+    render () {
+      if (this.props.loggedIn) {
+        return super.render ();
+      } else {
+        return null;
+      }
+    }
+  };
+```
+
+
+##### 控制 state
+
+高阶组件可以读取、修改或删除WrappedComponent 实例中的 state，如果需要的话，也可以 增加 state。但这样做，可能会让WrappedComponent 组件内部状态变得一团糟。大部分的高阶组 件都应该限制读取或增加 state，尤其是后者，可以通过重新命名 state，以防止混淆。
+
+```js
+const MyContainer = WrappedComponent =>
+  class extends WrappedComponent {
+    render () {
+      return (
+        <div>
+          <h2>HOC Debugger Component</h2>
+          <p>Props</p>
+          {' '}
+          <pre>{JSON.stringify (this.props, null, 2)}</pre>
+          {' '}
+          <p>State</p>
+          <pre>{JSON.stringify (this.state, null, 2)}</pre>
+          {' '}
+          {super.render ()}
+        </div>
+      );
+    }
+  };
+```
+
+<br/>
 
 ### 样式处理
 
@@ -551,192 +804,6 @@ import style from 'config.scss';
 
 <br/>
 
-### 高阶组件（HOC）
-
-高阶组件、mixin都是设计模式。
-
-高阶函数：这种函数接受函数作为输入，或是输出一个函数。
-
-高阶组件：类似于高阶函数，它接受 React 组件作为输入，输出一 个新的 React 组件。
-
-实现高阶组件的方法有：
-
-#### 属性代理
-
-定义：高阶组件通过被包裹的 React 组件来操作 props。
-
-```js
-import React from 'react';
-
-const MyContainer = WrapComponent =>
-  class extends React.Component {
-    render () {
-      return <WrapComponent {...this.props} />;
-    }
-  };
-
-```
-
-高阶组件的作用有：控制 props、通过 refs 使用引用、抽象 state 和使用其他元素包裹。
-
-##### 控制 props
-
-我们可以读取、增加、编辑或是移除从 WrappedComponent 传进来的 props，但需要小心删除与编辑重要的 props。我们应该尽可能对高阶组件的 props 作新的命名以防止混淆。
-
-##### 通过 refs 使用引用
-
-在高阶组件中，我们可以接受 refs 使用WrappedComponent 的引用。
-
-```js
-import React, {Component} from 'React';
-const MyContainer = WrappedComponent =>
-  class extends Component {
-    proc (wrappedComponentInstance) {
-      wrappedComponentInstance.method ();
-    }
-    render () {
-      const props = Object.assign ({}, this.props, {
-        ref: this.proc.bind (this),
-      });
-      return <WrappedComponent {...props} />;
-    }
-  };
-```
-
-当 WrappedComponent 被渲染时，refs 回调函数就会被执行，这样就会拿到一份Wrapped-Component 实例的引用。这就可以方便地用于读取或增加实例的 props，并调用实例的方法。
-
-##### 抽象 state
-
-我们可以通过 WrappedComponent 提供的 props 和回调函数抽象 state，高阶组件可以将原组件抽象为展示型组件，分离内部状态。
-
-```js
-import React, {Component} from 'React';
-const MyContainer = WrappedComponent =>
-  class extends Component {
-    constructor (props) {
-      super (props);
-      this.state = {
-        name: '',
-      };
-      this.onNameChange = this.onNameChange.bind (this);
-    }
-    onNameChange (event) {
-      this.setState ({
-        name: event.target.value,
-      });
-    }
-    render () {
-      const newProps = {
-        name: {
-          value: this.state.name,
-          onChange: this.onNameChange,
-        },
-      };
-      return <WrappedComponent {...this.props} {...newProps} />;
-    }
-  };
-
-```
-
-我们把 input 组件中对 name prop 的 onChange 方法提取到高阶组件中，这样就有效地抽象了同样的 state 操作。可以这么来使用它
-
-```js
-import React, {Component} from 'React';
-
-@MyContainer 
-class MyComponent extends Component {
-  render () {
-    return <input name="name" {...this.props.name} />;
-  }
-}
-```
-
-通过这样的封装，我们就得到了一个被控制的 input 组件。
-
-##### 使用其他元素包裹 WrappedComponent
-
-我们还可以使用其他元素来包裹 WrappedComponent，这既可以是为了加样式，也可 以是为了布局。
-
-```js
-import React, {Component} from 'React';
-const MyContainer = WrappedComponent =>
-  class extends Component {
-    render () {
-      return (
-        <div style={{display: 'block'}}>
-          {' '}<WrappedComponent {...this.props} />
-        </div>
-      );
-    }
-  };
-```
-
-<br/>
-
-
-#### 反向继承
-
-定义：高阶组件继承于被包裹的 React 组件（从字面意思上看，它一定与继承特性相关）
-
-
-简单例子：高阶组件返回的组件继承于 WrappedComponent。因为被动地继承了 WrappedComponent，所有的调用都会反向，这也是这种方法的由来。
-
-```js
-const MyContainer = WrappedComponent =>
-  class extends WrappedComponent {
-    render () {
-      return super.render ();
-    }
-  };
-```
-
-在反向继承方法中，高阶组件可以使用 WrappedComponent 引用，这意味着它可以使用WrappedComponent 的 state、props 、生命周期和 render 方法。但它不能保证完整的子组件树被解析。
-
-反向继承两大特点:
-
-##### 渲染劫持
-渲染劫持指的就是高阶组件可以控制 WrappedComponent 的渲染过程，并渲染各种各样的结 果。我们可以在这个过程中在任何 React 元素输出的结果中读取、增加、修改、删除 props，或 读取或修改 React 元素树，或条件显示元素树，又或是用样式控制包裹元素树。
-
-正如之前说到的，反向继承不能保证完整的子组件树被解析，这意味着将限制渲染劫持功能。 渲染劫持的经验法则是我们可以操控 WrappedComponent 的元素树，并输出正确的结果。但如果 元素树中包括了函数类型的 React 组件，就不能操作组件的子组件。
-
-```js
-const MyContainer = WrappedComponent =>
-  class extends WrappedComponent {
-    render () {
-      if (this.props.loggedIn) {
-        return super.render ();
-      } else {
-        return null;
-      }
-    }
-  };
-```
-
-
-##### 控制 state
-
-高阶组件可以读取、修改或删除WrappedComponent 实例中的 state，如果需要的话，也可以 增加 state。但这样做，可能会让WrappedComponent 组件内部状态变得一团糟。大部分的高阶组 件都应该限制读取或增加 state，尤其是后者，可以通过重新命名 state，以防止混淆。
-
-```js
-const MyContainer = WrappedComponent =>
-  class extends WrappedComponent {
-    render () {
-      return (
-        <div>
-          <h2>HOC Debugger Component</h2>
-          <p>Props</p>
-          {' '}
-          <pre>{JSON.stringify (this.props, null, 2)}</pre>
-          {' '}
-          <p>State</p>
-          <pre>{JSON.stringify (this.state, null, 2)}</pre>
-          {' '}
-          {super.render ()}
-        </div>
-      );
-    }
-  };
-```
 
 ### mixin
 
@@ -1128,6 +1195,98 @@ VDOM 的两个假设：
 
 <br/>
 
+### 事件系统
+
+VDOM 在内存中是以对象的形式存在的，如果想要在这些对象上添加事件，就会非常简单。
+
+React 基于 VDOM 实现了一个 SyntheticEvent (合成事件)层，我们所定义的事件处理器会接收到一个 SyntheticEvent 对象的实例，它完全符合 W3C 标准，不会存在任何 IE 标准的兼容性问题。并且与原生的浏览器事件一样拥有同样的接口，同样支持事件的冒泡机制，我们可以使用 stopPropagation() 和 preventDefault() 来中断它。所有事件都自动绑定到最外层上。如果需要访问原生事件对象，可以使用 nativeEvent 属性。
+
+#### 合成事件的实现机制
+
+在 React 底层，主要对合成事件做了两件事:事件委派和自动绑定
+
+##### 事件委派
+
+react 并不会把事件处理函数直接绑定到真实的节点上，而是把所有事件绑定到结构的最外层，使用一个统一的事件监听器。
+
+事件监听器上维持了一个映射来保存所有组件内部的事件监听和处理函数。
+
+当组件挂载或卸载时，只是在这个统一的事件监听器上插入或删除一些对象
+
+当事件发生时，首先被这个统一的事件监听器处理，然后在映射里找到真正的事件处理函数并调用。
+
+这样做简化了事件处理和回收机制，效率也有很大提升。 
+
+##### 自动绑定
+
+在 React 组件中，每个方法的上下文都会指向该组件的实例，即自动绑定 this 为当前组件。 而且 React 还会对这种引用进行缓存，以达到 CPU 和内存的最优化。在使用 ES6 classes 或者纯函数时，这种自动绑定就不复存在了，我们需要手动实现 this 的绑定。
+
+常见的绑定方法有：
+
+- 双冒号语法：`<button onClick={::this.handleClick}>Test</button>`
+- 构造器内使用bind绑定
+- 箭头函数
+
+<br/>
+
+#### 合成事件与原生事件对比
+
+##### 事件对象
+
+原生 DOM 事件对象在 W3C 标准和 IE 标准下存在着差异。在低版本的 IE 浏览器中，只能使用 window.event 来获取事件对象。
+
+而在 React 合成事件系统中，不存在这种兼容性问题，在事件处理函数中可以得到一个合成事件对象。
+
+##### 事件类型
+
+React 合成事件的事件类型是 JS 原生事件类型的一个子集
+
+##### 事件传播与阻止事件传播
+
+事件传播分为捕获阶段、目标阶段、冒泡阶段。
+
+事件捕获在程序开发中的意义不大，还有兼容性问题。所以，React 的合成事件则并没有实现事件捕获，仅仅支持了事件冒泡机制。
+
+阻止事件传播：阻止原生事件传播需要使用 e.preventDefault()，不过对于不支持该方法的浏览器(IE9 以 下)，只能使用 e.cancelBubble = true 来阻止。而在 React 合成事件中，只需要使用 e.preventDefault() 即可。
+
+##### 事件绑定方式
+
+原生事件有三种方式:
+
+- 直接在DOM元素中绑定: `<button onclick="alert(1)">Test</button>`
+- 在JS中，通过为元素的事件属性赋值的方式实现绑定：`el.onclick = e => {console.log(e)} `
+- 通过事件监听函数来实现绑定：`el.addEventListener("click", ()=>{},false); el.attachEvent("onclick", ()=>{})`
+
+React 合成事件的绑定方式则简单得多:`<button onClick={this.handleClick}>Test</button>`
+
+<br/>
+
+#### 获取真实DOM的方式
+
+要获取真实的DOM节点有两种方式，一种是通过e.target，一种是ref。
+
+但能不使用ref尽量不用
+
+<br/>
+
+#### 注意事项
+
+一、原生事件
+
+componentDidMount 会在组件已经完成安装并且在浏览器中存在真实的 DOM 后调用，此时我们就可以完成原生事件的绑定。
+
+在 React 中使用 DOM 原生事件时，一定要在组件卸载时手动移除，否则很 可能出现内存泄漏的问题。而使用合成事件系统时则不需要，因为 React 内部已经帮你妥善地处理了。
+
+二、合成事件与原生事件混用
+
+尽量避免在 React 中混用合成事件和原生 DOM 事件。
+
+阻止 React 事件冒泡的行为只能用于 React 合成事件系统 中，且没办法阻止原生事件的冒泡。反之，在原生事件中的阻止冒泡行为，却可以阻止 React 合成事件的传播。
+
+React 的合成事件系统只是原生 DOM 事件系统的一个子集。它仅仅实现了 DOM Level 3 的事件接口，并且统一了浏览器间的兼容问题。有些事件 React 并没有实现，或者受某些限制没办法去实现，比如 window 的 resize 事件。
+
+<br/>
+
 ### React数据流
 在 React 中，数据是自顶向下单向流动的，即从父组件到子组件。这条原则让组件之间的关系变得简单且可预测。
 
@@ -1195,13 +1354,3 @@ setState 是一个异步方法，一个生命周期内所有的 setState 方法�
 
 
 
-# 一些记录
-
-
-小册：
-组件设计模式（2）：高阶组件
-
-对于 React 生命周期函数，高阶组件不用怎么特殊处理，但是，如果内层组件包含定制的静态函数，这些静态函数的调用在 React 生命周期之外，那么高阶组件就必须要在新产生的组件中增加这些静态函数的支持，这更加麻烦。
-
-资料：
-https://zhuanlan.zhihu.com/p/36178509
