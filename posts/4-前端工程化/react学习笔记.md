@@ -458,7 +458,7 @@ const RenderAll = (props) => {
 </RenderAll>
 ```
 
-可以看到，RenderAll 的子组件，也就是夹在 RenderAll 标签之间的部分，其实是一个函数。这个函数渲染出 <h1>hello world</h1>，这就是上面使用 RenderAll 渲染出来的结果。
+可以看到，RenderAll 的子组件，也就是夹在 RenderAll 标签之间的部分，其实是一个函数。这个函数渲染出 `<h1>hello world</h1>`，这就是上面使用 RenderAll 渲染出来的结果。
 
 当然，这个 RenderAll 没做任何实际工作，接下来我们看 render props 真正强悍的使用方法。
 
