@@ -131,8 +131,16 @@ UI 就是把 data 作为参数传递给 f 运算出来的结果。这个公式�
 
 其实，不依赖于第三方工具，React 也提供了自己的跨组件通讯方式，这种方式叫 Context，后面会介绍。
 
-<br/>
+小结：
 
+- 父组件向子组件通信：props
+- 子组件向父组件通信
+    + 利用回调函数
+    + 利用自定义事件机制
+- 跨级组件通信：context
+- 没有嵌套关系的组件通信：自定义事件机制
+
+<br/>
 
 ### 组件设计
 
@@ -249,18 +257,6 @@ JSX 的本质不是模板引擎，而是动态创建组件的语法糖，它允�
 
 <br/>
 
-### 组件间通信
-
-通信种类：父组件向子组件通信、子组件向父组件通信和没有嵌套关系的组件之间通信。
-
-- 父组件向子组件通信：props
-- 子组件向父组件通信
-    + 利用回调函数
-    + 利用自定义事件机制
-- 跨级组件通信：context
-- 没有嵌套关系的组件通信：自定义事件机制
-
-<br/>
 
 ## 最佳实践
 > 最佳实践回答“怎么能用好”的问题，反映你实践经验的丰富程度。
@@ -316,7 +312,7 @@ const Joke = React.memo(() => (
 
 ##### 高阶组件的基本形式
 
-高阶组件，其实并不是一个组件，而是一个函数，只不过这个函数比较特殊，它接受至少一个 React 组件为参数，并且能够返回一个全新的 React 组件作为结果，当然，这个新产生的 React 组件是对作为参数的组件的包装，所以，有机会赋予新组件一些增强的“神力”。
+高阶组件，本质是一个函数，它接受至少一个 React 组件为参数，并且能够返回一个全新的 React 组件作为结果，当然，这个新产生的 React 组件是对作为参数的组件的包装，所以，有机会赋予新组件一些增强的“神力”。
 
 一个最简单的高阶组件是这样的形式：
 
@@ -328,14 +324,6 @@ const withDoNothing = (Component) => {
   return NewComponent;
 };
 ```
-
-上面的函数 withDoNothing 就是一个高阶组件，作为一项业界通用的代码规范，高阶组件的命名一般都带 with 前缀，命名中后面的部分代表这个高阶组件的功能。
-
-就如同 withDoNothing 这个名字所说的一样，这个高阶组件什么都没做，但是从中可以看出高阶组件的基本代码套路。
-
-- 高阶组件不能去修改作为参数的组件，高阶组件必须是一个纯函数，不应该有任何副作用。
-- 高阶组件返回的结果必须是一个新的 React 组件，这个新的组件的 JSX 部分肯定会包含作为参数的组件。
-- 高阶组件一般需要把传给自己的 props 转手传递给作为参数的组件。
 
 有了高阶组件，我们就可以用它来抽取共同逻辑。
 
@@ -404,27 +392,6 @@ const withExample = (Component) => {
 对于 React 生命周期函数，高阶组件不用怎么特殊处理，但是，如果内层组件包含定制的静态函数，这些静态函数的调用在 React 生命周期之外，那么高阶组件就必须要在新产生的组件中增加这些静态函数的支持，这更加麻烦。关于这点，请参考[这里](https://zhuanlan.zhihu.com/p/36178509)
 
 其次，高阶组件支持嵌套调用，这是它的优势。但是如果真的一大长串高阶组件被应用的话，当组件出错，你看到的会是一个超深的 stack trace，十分痛苦。
-
-最后，使用高阶组件，一定要非常小心，要避免重复产生 React 组件，比如，下面的代码是有问题的：
-
-```js
-const Example = () => {
-  const EnhancedFoo = withExample(Foo);
-  return <EnhancedFoo />
-}
-```
-
-像上面这样写，每一次渲染 Example，都会用高阶组件产生一个新的组件，虽然都叫做 EnhancedFoo，但是对 React 来说是一个全新的东西，在重新渲染的时候不会重用之前的虚拟 DOM，会造成极大的浪费。
-
-正确的写法是下面这样，自始至终只有一个 EnhancedFoo 组件类被创建：
-
-```js
-const EnhancedFoo = withExample(Foo);
-
-const Example = () => {
-  return <EnhancedFoo />
-}
-```
 
 关于高阶组件的进阶内容，请参考[高阶组件实现方法](#高阶组件实现方法)
 
@@ -495,7 +462,7 @@ const Login = (props) => {
 </Login>
 ```
 
-#### 不局限于 children
+##### 不局限于 children
 
 render props 这个模式不必局限于 children 这一个 props，任何一个 props 都可以作为函数，也可以利用多个 props 来作为函数。
 
@@ -543,12 +510,206 @@ render props 其实就是 React 世界中的“依赖注入”。
 
 render props 不像高阶组件有那么多毛病，如果说 render props 有什么缺点，那就是 render props 不能像高阶组件那样链式调用，当然，这并不是一个致命缺点。
 
-render props 相对于高阶组件还有一个显著优势，就是对于新增的 props 更加灵活。
+render props 相对于高阶组件还有一个显著优势，就是 props 传递更加灵活。
 
-总结：当需要重用 React 组件的逻辑时，建议首先看这个功能是否可以抽象为一个简单的组件；如果行不通的话，考虑是否可以应用 render props 模式；再不行的话，才考虑应用高阶组件模式。
+总结：**当需要重用 React 组件的逻辑时，建议首先看这个功能是否可以抽象为一个简单的组件；如果行不通的话，考虑是否可以应用 render props 模式；再不行的话，才考虑应用高阶组件模式**。
 
 <br/>
 
+#### 提供者模式
+
+在 React 中，props 是组件之间通讯的主要手段，但是，有一种场景单纯靠 props 来通讯是不恰当的，那就是两个组件之间间隔着多层其他组件，下面是一个简单的组件树示例图图：
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/169.png' width='600'>
+<br/>
+
+在上图中，组件 A 需要传递信息给组件 X，如果通过 props 的话，那么从顶部的组件 A 开始，要把 props 传递给组件 B，然后组件 B 传递给组件 D，最后组件 D 再传递给组件 X。
+
+其实组件 B 和组件 D 完全用不上这些 props，但是又被迫传递这些 props，这明显不合理，要知道组件树的结构会变化的，将来如果组件 B 和组件 D 之间再插入一层新的组件，这个组件也需要传递这个 props，这就麻烦无比。
+
+可见，对于跨级的信息传递，我们需要一个更好的方法。
+
+在 React 中，解决这个问题应用的就是“提供者模式”。
+
+##### 提供者模式
+
+提供者模式有两个角色，一个叫“提供者”（Provider），另一个叫“消费者”（Consumer）。在上面的组件树中，组件 A 可以作为提供者，组件 X 就是消费者。
+
+既然名为“提供者”，它可以提供一些信息，而且这些信息在它之下的所有组件，无论隔了多少层，都可以直接访问到，而不需要通过 props 层层传递。
+
+避免 props 逐级传递，即是提供者的用途。
+
+##### 如何实现提供者模式
+
+实现提供者模式，需要 React 的 Context 功能，可以说，提供者模式只不过是让 Context 功能更好用一些而已。
+
+所谓 Context 功能，就是能够创造一个“上下文”，在这个上下文笼罩之下的所有组件都可以访问同样的数据。
+
+提供者模式的一个典型用例就是实现“样式主题”（Theme），由顶层的提供者确定一个主题，下面的样式就可以直接使用对应主题里的样式。这样，当需要切换样式时，只需要修改提供者就行，其他组件不用修改。
+
+##### React v16.3.0 之前的提供者模式
+
+在 React v16.3.0 之前，要实现提供者，就要实现一个 React 组件，不过这个组件要做两个特殊处理。
+
+- 需要实现 getChildContext 方法，用于返回“上下文”的数据；
+- 需要定义 childContextTypes 属性，声明“上下文”的结构。
+
+下面就是一个实现“提供者”的例子，组件名为 ThemeProvider：
+
+```js
+class ThemeProvider extends React.Component {
+  getChildContext() {
+    return {
+      theme: this.props.value
+    };
+  }
+
+  render() {
+    return (
+      <React.Fragment>
+        {this.props.children}
+      </React.Fragment>
+    );
+  }
+}
+
+ThemeProvider.childContextTypes = {
+  theme: PropTypes.object
+};
+```
+
+对于 ThemeProvider，我们创造了一个上下文，这个上下文就是一个对象，结构是这样：
+
+```
+{
+  theme: {
+    //一个对象
+  }
+}
+```
+
+接下来，就是使用这个“上下文”的组件。这里有两种方式：
+
+使用类的方式：
+
+```js
+class Subject extends React.Component {
+  render() {
+    const {mainColor} = this.context.theme;
+    return (
+      <h1 style={{color: mainColor}}>
+        {this.props.children}
+      </h1>
+    );
+  }
+}
+
+Subject.contextTypes = {
+  theme: PropTypes.object
+}
+```
+
+使用纯函数组件：
+
+```js
+const Paragraph = (props, context) => {
+  const {textColor} = context.theme;
+  return (
+    <p style={{color: textColor}}>
+      {props.children}
+    </p>
+  );
+};
+
+Paragraph.contextTypes = {
+  theme: PropTypes.object
+};
+```
+
+这两种方式访问“上下文”的方式有些不同，都必须增加 contextTypes 属性，必须和 ThemeProvider 的 childContextTypes 属性一致，不然，this.context 就不会得到任何值。
+
+最后，我们看如何结合”提供者“和”消费者“。
+
+我们做一个组件来使用 Subject 和 Paragraph，这个组件不需要帮助传递任何 props，代码如下：
+
+```js
+const Page = () => (
+  <div>
+    <Subject>这是标题</Subject>
+    <Paragraph>
+      这是正文
+    </Paragraph>
+  </div>
+);
+```
+
+上面的组件 Page 使用了 Subject 和 Paragraph，现在我们想要定制样式主题，只需要在 Page 或者任何需要应用这个主题的组件外面包上 ThemeProvider，对应的 JSX 代码如下：
+
+```js
+<ThemeProvider value={{mainColor: 'green', textColor: 'red'}} >
+  <Page />
+</ThemeProvider>
+```
+
+当我们需要改变一个样式主题的时候，改变传给 ThemeProvider的 value 值就搞定了。
+
+##### React v16.3.0 之后的提供者模式
+
+首先，要用新提供的 `createContext` 函数创造一个“上下文”对象。
+
+```js
+const ThemeContext = React.createContext();
+```
+
+这个“上下文”对象 `ThemeContext` 有两个属性，分别就是——对，你没猜错——Provider 和 Consumer。
+
+```js
+const ThemeProvider = ThemeContext.Provider;
+const ThemeConsumer = ThemeContext.Consumer;
+```
+
+使用“消费者”如下：
+
+```js
+const Paragraph = (props, context) => {
+  return (
+    <ThemeConsumer>
+      {
+        (theme) => (
+          <p style={{color: theme.textColor}}>
+            {props.children}
+          </p>
+          )
+      }
+    </ThemeConsumer>
+  );
+};
+```
+
+实现 Page 的方式并没有变化:
+```js
+<ThemeProvider value={{mainColor: 'green', textColor: 'red'}} >
+  <Page />
+</ThemeProvider>
+```
+
+##### 两种提供者模式实现方式的比较
+
+在老版 Context API 中，“上下文”只是一个概念，并不对应一个代码，两个组件之间达成一个协议，就诞生了“上下文”。
+
+在新版 Context API 中，需要一个“上下文”对象（上面的例子中就是 ThemeContext)，使用“提供者”的代码和“消费者”的代码往往分布在不同的代码文件中，那么，这个 ThemeContext 对象放在哪个代码文件中呢？
+
+最好是放在一个独立的文件中，这么一来，就多出一个代码文件，而且所有和这个“上下文”相关的代码，都要依赖于这个“上下文”代码文件，虽然这没什么大不了的，但是的确多了一层依赖关系。
+
+为了避免依赖关系复杂，每个应用都不要滥用“上下文”，应该限制“上下文”的使用个数。
+
+<br/>
+
+#### 组合组件
+
+
+<br/>
 
 ### 高阶组件实现方法
 
