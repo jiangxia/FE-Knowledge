@@ -235,28 +235,6 @@ import "./ControlButtons.css";
 
 <br/>
 
-### JSX
-
-在JS中写HTML标记，这体现了高内聚。要达到这种效果，就必须依赖JSX。 
-
-JSX 的本质不是模板引擎，而是动态创建组件的语法糖，它允许我们在JS代码中直接写HTML标记。最终生成的代码就是React.CreateElement。
-
-如果在 JSX 中往 DOM 元素中传入自定义属性，React 是不会渲染的。如果要使用 HTML 自定义属性，要使用 data- 前缀，这与 HTML 标准也是一致的。然而，在自定义标签中任意的属性都是被支持的，以 aria- 开头的网络无障碍属性同样可以正常使用。
-
-**JSX的优点**
-
-1. 直观：声明式创建界面
-2. 灵活：代码动态创建界面
-3. 易上手：无需学习新的模板语言
-
-**约定**
-
-1. 自定义组件以大写字母开头
-2. react 认为小写的 tag 是原生 DOM 节点，如 div
-3. JSX标记可以直接使用属性语法，例如`<menu.Item />`
-
-<br/>
-
 
 ## 最佳实践
 > 最佳实践回答“怎么能用好”的问题，反映你实践经验的丰富程度。
@@ -528,6 +506,37 @@ render props 相对于高阶组件还有一个显著优势，就是 props 传递
 
 <br/>
 
+#### mixin
+
+> mixin：一样可以抽象公共逻辑，但现在已经不提倡使用。这里只做简单介绍。
+
+<br/>
+
+React 在使用 createClass 构建组件时提供了 mixin 属性。mixin有两个作用：
+
+- 共享工具方法。
+- 生命周期继承，props 与 state 合并。
+
+ES6 Classes 不支持 mixin。
+
+mixin 的问题:
+
+- 破坏了原有组件的封装：mixin 方法会混入方法，给原有组件带来新的特性，但它也可能带来了新的 state 和 props，这意味着组件有一 些“不可见”的状态需要我们去维护，但我们在使用的时候并不清楚。另外，mixin 也有可能去依赖其他的 mixin，这样会建立一个 mixin 的依赖链，当我们改动其 中一个 mixin 的状态时，很可能会直接影响其他的 mixin。
+- 命名冲突：尽管我们可以通过更改名字来解决，但遇到第三方引用，或已经引用了几个 mixin 的情况下， 总是要花一定的成本去解决冲突。
+- 增加复杂性
+
+##### 高阶组件与mixin的比较
+
+高阶组件与 mixin 的不同之处
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/163.png' width='600'>
+<br/>
+
+高阶组件符合函数式编程思想。对于原组件来说，并不会感知到高阶组件的存在，只需要把功能套在它之上就可以了，从而避免了使用 mixin 时产生的副作用。
+
+<br/>
+
 #### 提供者模式
 
 > 提供者模式：让我们更好的跨层级传递数据
@@ -724,6 +733,129 @@ const Paragraph = (props, context) => {
 
 #### 组合组件
 
+> 组合组件：简化父组件向子组件传递props的方式
+
+组合组件模式要解决的是这样一类问题：父组件想要传递一些信息给子组件，但是，如果用 props 传递又显得十分麻烦。
+
+利用 Context 可以解决问题，但非常繁琐，组合组件让我们可以用更简洁的方式去实现。
+
+##### 问题描述
+
+很多界面都有 Tab 这样的元件，我们需要一个 Tabs 组件和 TabItem 组件，Tabs 是容器，TabItem 是一个一个单独的 Tab，因为一个时刻只有一个 TabItem 被选中，很自然希望被选中的 TabItem 样式会和其他 TabItem 不同。
+
+这并不是一个很难的功能，首先我们想到的就是，用 Tabs 中一个 state 记录当前被选中的 Tabitem 序号，然后根据这个 state 传递 props 给 TabItem，当然，还要传递一个 onClick 事件进去，捕获点击选择事件。
+
+按照这样的设计，Tabs 中如果要显示 One、Two、Three 三个 TabItem，JSX 代码大致这么写：
+
+```js
+<TabItem active={true} onClick={this.onClick}>One</TabItem>
+<TabItem active={false} onClick={this.onClick}>Two</TabItem>
+<TabItem active={false} onClick={this.onClick}>Three</TabItem> 
+```
+
+这样写可以实现功能，但未免过于繁琐，且不利于维护。我们希望可以简单点，最好代码就这样：
+
+```js
+<Tabs>
+  <TabItem>One</TabItem>
+  <TabItem>Two</TabItem>
+  <TabItem>Three</TabItem>
+</Tabs>
+```
+
+类似这种场景，父子组件不通过 props 传递，二者之间有某种神秘的“组合”，就是我们所说的“组合组件”。
+
+##### 实现方式
+
+我们先写出 TabItem 的代码，如下：
+
+```js
+const TabItem = (props) => {
+  const {active, onClick} = props;
+  const tabStyle = {
+    'max-width': '150px',
+    color: active ? 'red' : 'green',
+    border: active ? '1px red solid' : '0px',
+  };
+  return (
+    <h1 style={tabStyle} onClick={onClick}>
+      {props.children}
+    </h1>
+  );
+};
+```
+
+有了 TabItem ，我们再看下 TabItem 的调用方式。
+
+```js
+<Tabs>
+  <TabItem>One</TabItem>
+  <TabItem>Two</TabItem>
+  <TabItem>Three</TabItem>
+</Tabs>
+```
+
+没有 props 传递，怎么悄无声息地把 active 和 onClick 传递给 TabItem ？
+
+我们可以把 props.children 拷贝一份，这样就有机会去篡改这份拷贝，最后渲染这份拷贝就好了。
+
+我们来看 Tabs 的实现代码：
+
+```js
+class Tabs extends React.Component {
+  state = {
+    activeIndex:  0
+  }
+
+  render() {
+    const newChildren = React.Children.map(this.props.children, (child, index) => {
+      if (child.type) {
+        return React.cloneElement(child, {
+          active: this.state.activeIndex === index,
+          onClick: () => this.setState({activeIndex: index})
+        });
+      } else {
+        return child;
+      }
+    });
+
+    return (
+      <Fragment>
+        {newChildren}
+      </Fragment>
+    );
+  }
+}
+```
+
+在 render 函数中，我们用了 React 中不常用的两个 API：
+
+- React.Children.map
+- React.cloneElement
+
+使用 React.Children.map，可以遍历 children 中所有的元素，因为 children 可能是一个数组嘛。
+
+使用 React.cloneElement 可以复制某个元素。这个函数第一个参数就是被复制的元素，第二个参数可以增加新产生元素的 props，我们就是利用这个机会，把 active 和 onClick 添加了进去。
+
+这两个 API 双剑合璧，就能实现不通过表面的 props 传递，完成两个组件的“组合”。
+
+##### 实际应用
+
+应用组合组件的往往是共享组件库，把一些常用的功能封装在组件里，让应用层直接用就行。在 antd 和 bootstrap 这样的共享库中，都使用了组合组件这种模式。
+
+<br/>
+
+#### 模式总结
+
+所谓模式，就是特定于一种问题场景的解决办法。
+
+> 模式(Pattern) = 问题场景(Context) + 解决办法(Solution)
+
+<br/>
+
+如果不搞清楚场景，单纯知道有这么一个办法，就好比拿到了一杆枪却不知道这杆枪用于打什么目标，是没有任何意义的。并不是所有的枪都是一样的，有的枪擅长狙击，有的枪适合近战，有的枪只是发个信号。
+
+模式就是我们的武器，我们一定要搞清楚一件武器应用的场合，才能真正发挥这件武器的威力。
 
 <br/>
 
@@ -1095,41 +1227,7 @@ import style from 'config.scss';
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/129.jpg' width='600'>
 <br/>
 
-### 无状态组件
 
-一个组件只有render函数时，可以定义为无状态组件，无状态组件就是一个函数，相比普通组件性能更高，因为他没有其他声明周期的方法。UI组件一般都可以定义为无状态组件。
-
-<br/>
-
-
-### mixin
-
-React 在使用 createClass 构建组件时提供了 mixin 属性。mixin有两个作用：
-
-- 共享工具方法。
-- 生命周期继承，props 与 state 合并。
-
-ES6 Classes 不支持 mixin。
-
-mixin 的问题:
-
-- 破坏了原有组件的封装：mixin 方法会混入方法，给原有组件带来新的特性，但它也可能带来了新的 state 和 props，这意味着组件有一 些“不可见”的状态需要我们去维护，但我们在使用的时候并不清楚。另外，mixin 也有可能去依赖其他的 mixin，这样会建立一个 mixin 的依赖链，当我们改动其 中一个 mixin 的状态时，很可能会直接影响其他的 mixin。
-- 命名冲突：尽管我们可以通过更改名字来解决，但遇到第三方引用，或已经引用了几个 mixin 的情况下， 总是要花一定的成本去解决冲突。
-- 增加复杂性
-
-<br/>
-
-### 高阶组件与mixin的比较
-
-高阶组件与 mixin 的不同之处
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/163.png' width='600'>
-<br/>
-
-高阶组件符合函数式编程思想。对于原组件来说，并不会感知到高阶组件的存在，只需要把功能套在它之上就可 以了，从而避免了使用 mixin 时产生的副作用。
-
-<br/>
 
 ### react性能优化
 
@@ -1262,6 +1360,29 @@ enzyme： https://airbnb.io/enzyme/
 react的核心理念之一就是函数式编程。
 
 <br/>
+
+### JSX
+
+在JS中写HTML标记，这体现了高内聚。要达到这种效果，就必须依赖JSX。 
+
+JSX 的本质不是模板引擎，而是动态创建组件的语法糖，它允许我们在JS代码中直接写HTML标记。最终生成的代码就是React.CreateElement。
+
+如果在 JSX 中往 DOM 元素中传入自定义属性，React 是不会渲染的。如果要使用 HTML 自定义属性，要使用 data- 前缀，这与 HTML 标准也是一致的。然而，在自定义标签中任意的属性都是被支持的，以 aria- 开头的网络无障碍属性同样可以正常使用。
+
+**JSX的优点**
+
+1. 直观：声明式创建界面
+2. 灵活：代码动态创建界面
+3. 易上手：无需学习新的模板语言
+
+**约定**
+
+1. 自定义组件以大写字母开头
+2. react 认为小写的 tag 是原生 DOM 节点，如 div
+3. JSX标记可以直接使用属性语法，例如`<menu.Item />`
+
+<br/>
+
 
 ## 实现原理
 
