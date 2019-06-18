@@ -144,19 +144,13 @@ UI 就是把 data 作为参数传递给 f 运算出来的结果。这个公式�
 
 ### 组件设计
 
-React 组件基本上由 3 个部分组成——属性(props)、状态(state)以及生命周期方法。
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/160.png' width='600'>
-<br/>
-
-官方在 React 组件构建上提供了 3 种不同的方法：React.createClass、ES6 classes 和无状态函数。
-
-**创建组件的一般步骤：**
+我们日常创建组件的一般步骤，是这样的：
 
 1. 创建静态 UI
 2. 考虑组件的状态组成：状态（state） 及 状态的改变（effect、reducer）
 3. 考虑组件的交互方式：状态的触发（dispatch）
+
+如果要设计出更优雅的组件，我们还要了解组件设计原则。
 
 React 组件设计原则，简单说来，就是高内聚、低耦合。
 
@@ -1618,7 +1612,68 @@ react-router 的工作方式，是在组件树顶层放一个 Router 组件，�
 1. 缩短首屏渲染时间
 2. 更好的搜索引擎优化
 
+#### 大体流程
 
+React v16 之前的版本，代码是这样：
+
+```js
+import React from 'react';
+import ReactDOMServer from 'react-dom/server';
+
+// 把产生html返回给浏览器端
+const html = ReactDOMServer.renderToString(<Hello />);
+```
+
+从 React v16 开始，上面的服务器端代码依然可以使用，但是也可以把 renderToString 替换为 renderToNodeStream，代码如下：
+
+```js
+import React from 'react';
+import ReactDOMServer from 'react-dom/server';
+
+// 把渲染内容以流的形式塞给response
+ReactDOMServer.renderToNodeStream(<Hello />).pipe(response);
+```
+
+此外，浏览器端代码也有一点变化，ReactDOM.render 依然可以使用，但是官方建议替换为 ReactDOM.hydrate，原来的 ReactDOM.render 将来会被废弃掉。
+
+renderToString 的功能是一口气同步产生最终 HTML，如果 React 组件树很庞大，这样一个同步过程可能比较耗时。
+
+renderToNodeStream 把渲染结果以“流”的形式塞给 response 对象，这意味着不用等到所有 HTML 都渲染出来了才给浏览器端返回结果，“流”的作用就是有多少内容给多少内容，这样可以改进首屏渲染时间。
+
+#### “脱水”和“注水”
+
+React 有一个特点，就是把内容展示和动态功能集中在一个组件中。比如，一个 Counter 组件既负责怎么画出内容，也要负责怎么响应按键点击，这当然符合软件高内聚性的原则，但是也给服务器端渲染带来更多的工作。
+
+设想一下，如果只使用服务器端渲染，那么产生的只有 HTML，虽然能够让浏览器端画出内容，但是，没有 JavaScript 的辅助是无法响应用户交互事件的。
+
+如何让页面响应用户事件？其实我们已经做过这件事了，Counter 组件里面已经有对按钮事件的处理，我们所要做的只是让 Counter 组件在浏览器端重新执行一遍，也就是 mount 一遍就可以了。
+
+也就是说，**如果想要动态交互效果，使用 React 服务器端渲染，必须也配合使用浏览器端渲染**。
+
+现在问题变得更加有趣了，在服务器端我们给 Counter 一个初始值（这个值可以不是缺省的 0），让 Counter 渲染产生 HTML，这些 HTML 要传递给浏览器端，为了让 Counter 的 HTML“活”起来点击相应事件，必须要在浏览器端重新渲染一遍 Counter 组件。在浏览器端渲染 Counter 之前，用户就可以看见 Counter 组件的内容，但是无法点击交互，要想点击交互，就必须要等到浏览器端也渲染一次 Counter 之后。
+
+接下来的一个问题，如果服务器端塞给 Counter 的数据和浏览器端塞给 Counter 的数据不一样呢？
+
+在 React v16 之前，React 在浏览器端渲染之后，会把内容和服务器端给的 HTML 做一个比对。如果完全一样，那最好，接着用服务器端 HTML 就好了；如果有一丁点不一样，就会立刻丢掉服务器端的 HTML，重新渲染浏览器端产生的内容，结果就是用户可以看到界面闪烁。因为 React 抛弃的是整个服务器端渲染内容，组件树越大，这个闪烁效果越明显。
+
+React 在 v16 之后，做了一些改进，不再要求整个组件树两端渲染结果分毫不差，但是如果发生不一致，依然会抛弃局部服务器端渲染结果。
+
+总之，**如果用服务器端渲染，一定要让服务器端塞给 React 组件的数据和浏览器端一致**。
+
+为了达到这一目的，必须把传给 React 组件的数据给保留住，随着 HTML 一起传递给浏览器网页，这个过程，叫做“脱水”（Dehydrate）；在浏览器端，就直接拿这个“脱水”数据来初始化 React 组件，这个过程叫“注水”（Hydrate）。
+
+前面提到过 React v16 之后用 React.hydrate 替换 React.render，这个 hydrate 就是“注水”。
+
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/171.png' width='600'>
+
+总之，为了实现React的服务器端渲染，必须要处理好这两个问题：
+
+- 脱水
+- 注水
+
+<br/>
 
 #### 同构应用
 
@@ -1628,6 +1683,115 @@ react-router 的工作方式，是在组件树顶层放一个 Router 组件，�
 
 
 <br/>
+
+### 使用 Next.js 实现服务端渲染
+
+上文提到[服务器端渲染](#服务器端渲染)，不过，服务器端渲染的问题并不这么简单，一个最直接的问题，就是怎么处理多个页面的『单页应用』?
+
+所谓单页应用，就是虽然用户感觉有多个页面，但是实现上只有一个页面，用户感觉到页面可以来回切换，但其实只是一个页面并没有完全刷新，只是局部界面更新而已。
+
+假设一个单页应用有三个页面 Home、Prodcut 和 About，分别对应的的路径是 /home、/product 和 /about，而且三个页面都依赖于 API 调用来获取外部数据。
+
+现在我们要做服务器端渲染，如果只考虑用户直接在地址栏输入 /home、/product 和 /about 的场景，很容易满足，按照上面说的套路做就是了。但是，这是一个单页应用，用户可以在 Home 页面点击链接无缝切换到 Product，这时候 Product 要做完全的浏览器端渲染。换句话说，每个页面都需要既支持服务器端渲染，又支持完全的浏览器端渲染，更重要的是，对于开发者来说，肯定不希望为了这个页面实现两套程序，所以必须有同时满足服务器端渲染和浏览器端渲染的代码表示方式。
+
+#### getInitialProps
+
+我们通过一个简单的例子来讲解Next.js中最重要的概念getInitialProps。
+
+```js
+import React from 'react';
+
+const timeout = (ms, result) => {
+  return new Promise (resolve => setTimeout (() => resolve (result), ms));
+};
+
+const Home = props => (
+  <h1>
+    Hello {props.userName}
+  </h1>
+);
+
+Home.getInitialProps = async () => {
+  return await timeout (200, {userName: 'Morgan'});
+};
+
+export default Home;
+```
+
+这里模拟了一个延时操作用以获取userName，并将其展示在页面上。
+
+这段代码的关键在于getInitialProps。
+
+这个 getiInitialProps 是 Next.js 最伟大的发明，它确定了一个规范，一个页面组件只要把访问 API 外部资源的代码放在 getInitialProps 中就足够，其余的不用管，Next.js 自然会在服务器端或者浏览器端调用 getInitialProps 来获取外部资源，并把外部资源以 props 的方式传递给页面组件。
+
+注意 getInitialProps 是页面组件的静态成员函数，也可以在组件类中加上 static 关键字定义。
+
+```js
+class Home extends React.Component {
+  static async getInitialProps () {}
+}
+```
+
+我们可以这样来看待 getInitialProps，它就是 Next.js 对代表页面的 React 组件生命周期的扩充。React 组件的生命周期函数缺乏对异步操作的支持，所以 Next.js 干脆定义出一个新的生命周期函数 getInitialProps，在调用 React 原生的所有生命周期函数之前，**Next.js 会调用 getInitialProps 来获取数据，然后把获得数据作为 props 来启动 React 组件的原生生命周期过程**。
+
+这个生命周期函数的扩充十分巧妙，因为：
+
+- 没有侵入 React 原生生命周期函数，以前的 React 组件该怎么写还是怎么写；
+- getInitialProps 只负责获取数据的过程，开发者不用操心什么时候调用 getInitialProps，依然是 React 哲学的声明式编程方式；
+- getInitialProps 是 async 函数，可以利用 JavaScript 语言的新特性，用同步的方式实现异步功能。
+
+#### Next.js 的“脱水”和“注水”
+
+我们打开Next应用的网页源代码，可以看到类似下面的内容：
+
+```html
+<script>
+  __NEXT_DATA__ = {
+    "props":{
+      "pageProps": {"userName":"Morgan"}},
+      "page":"/","pathname":"/","query":{},"buildId":"-","assetPrefix":"","nextExport":false,"err":null,"chunks":[]}
+</script>
+```
+
+Next.js 在做服务器端渲染的时候，页面对应的 React 组件的 getInitialProps 函数被调用，异步结果就是“脱水”数据的重要部分，除了传给页面 React 组件完成渲染，还放在内嵌 script 的 __NEXT_DATA__ 中，这样，在浏览器端渲染的时候，是不会去调用 getInitialProps 的，直接通过 __NEXT_DATA__ 中的“脱水”数据来启动页面 React 组件的渲染。
+
+这样一来，如果 getInitialProps 中有调用 API 的异步操作，只在服务器端做一次，浏览器端就不用做了。
+
+那么，getInitialProps 什么时候会在浏览器端调用呢？
+
+当在单页应用中做页面切换的时候，比如从 Home 页切换到 Product 页，这时候完全和服务器端没关系，只能靠浏览器端自己了，Product页面的 getInitialProps 函数就会在浏览器端被调用，得到的数据用来开启页面的 React 原生生命周期过程。
+
+关键点是，浏览器可能会直接访问 /home 或者 /product，也可能通过网页切换访问这两个页面，也就是说 Home 或者 Product 都可能被服务器端渲染，也可能完全只有浏览器端渲染，不过，这对应用开发者来说无所谓，应用开发者只要写好 getInitialProps，至于调用 getInitialProps 的时机，交给 Next.js 处理就好了。
+
+<br/>
+
+### 服务端渲染小结
+
+react 提供了renderToString、renderToNodeStream、hydrate等API支持服务端渲染，但Facebook官方并没有使用react的服务端渲染，导致react服务端渲染没有一个官方标准。
+
+服务端渲染的思路并不难，就是在服务端渲染出HTML传给浏览器去解析。
+
+难就难在，服务端渲染的数据从何而来。如果服务端渲染的数据和浏览器端渲染的数据不一致，浏览器端会重新执行渲染，页面会出现闪烁。
+
+为什么有了服务端渲染，还需要关注浏览器端渲染呢？
+
+这是因为服务端渲染只是返回了HTML，页面能绘制出来，却没办法响应用户操作，所以必须重新进行浏览器端渲染，让页面可以正常响应用户操作。当浏览器端渲染出的HTML跟服务端返回的HTML不一致时，就会出现上面说的闪烁。
+
+要解决这个问题，就引入了“注水”跟“脱水”的概念。
+
+服务端渲染时，获取的数据，一方面用于生成最终的HTML，另一方面，也会包含在HTML中返回给浏览器端，这个过程称为“脱水”。
+
+浏览器端拿到脱水的数据进行渲染，就保证了渲染出的HTML跟服务端返回的一致，这个过程就是“注水”，涉及的API就是hydrate。
+
+原理搞明白了，如何实施呢？如果我们做的是单页应用，那问题更加麻烦。因为用户可以通过不同的URL返回页面，这意味着我们每个页面都要既支持服务端渲染，也支持浏览器端渲染，但我们肯定不希望为每个页面写两份代码！
+
+这就轮到 Next.js 登场了。
+
+Next.js 是目前解决服务端渲染最好的框架。他通过增加 getInitialProps 这个API优雅的解决了上述的问题。
+
+Next.js 将服务端渲染脱水后的数据，通过 __NEXT_DATA__ 返回给浏览器端，首屏加载可以使用该数据进行渲染，就保证前后数据一致，页面不会闪烁。
+
+浏览器可能会直接访问 /home 或者 /product，也可能通过网页切换访问这两个页面，也就是说 Home 或者 Product 都可能被服务器端渲染，也可能完全只有浏览器端渲染，不过，这对应用开发者来说无所谓，应用开发者只要写好 getInitialProps，至于调用 getInitialProps 的时机，交给 Next.js 处理就好了。
 
 ### 常用开发调试工具
 
@@ -1908,21 +2072,6 @@ redux的相关知识繁多，还包含了Mobx、dva，为此我将他抽离出�
 
 <br/>
 
-
-### setState
-
-setState 通过一个队列机制实现 state 更新。
-
-当执行 setState 时，会将需要更新的 state 合并 后放入状态队列，而不会立刻更新 this.state。
-
-队列机制可以高效地批量更新 state。
-
-如果不通过 setState 而直接修改 this.state 的值，那么该 state 将不会被放入状态队列中，当下次调用 setState 并对状态队列进行合并时，将会忽略之前直接被修改的 state，而造成无法预知的错误。
-
-因此，应该使用 setState 方法来更新 state，同时 React 也正是利用状态队列机制实现了setState 的异步更新，避免频繁地重复更新 state。
-
-<br/>
-
 ### applyMiddleWare
 
 applyMiddleWare 的实现：
@@ -2086,25 +2235,6 @@ React 的合成事件系统只是原生 DOM 事件系统的一个子集。它仅
 
 <br/>
 
-### React数据流
-在 React 中，数据是自顶向下单向流动的，即从父组件到子组件。这条原则让组件之间的关系变得简单且可预测。
-
-把组件看成一个函数，那么它接受了 props 作为参数，内部由 state 作为函数的内部参数，返回一个 VDOM 的实现。
-
-#### state
-
-setState 是一个异步方法，一个生命周期内所有的 setState 方法会合并操 作。 
-
-#### props
-
-- React 的单向数据流，主要的流动管 道就是 props。props 本身是不可变的。当我们试图改变 props 的原始值时，React 会报出类型错 误的警告 
-- props 可以配置默认值，使用defaultProps设置。
-- 子组件 prop ： children （ React.Children 是 React 官方提供的一系列操作children 的方法。它提供诸如 map、 forEach、count 等实用函数 ）
-- 组件 props ： 对于子组件而言，我们不仅可以直接使用 this.props.children 定义，也可以将子组件以 props 的形式传递。 
-- propTypes  ： 规范 props 的类型与必需的状态 
-
-<br/>
-
 
 ## 优劣局限
 
@@ -2118,6 +2248,91 @@ setState 是一个异步方法，一个生命周期内所有的 setState 方法�
 > 技术是在迭代改进和不断淘汰的。了解技术的前生后世，分清技术不变的本质，和变化的脉络，以及与其他技术的共生关系，能体现你对技术发展趋势的关注和思考。这层体现“未来如何”。
 
 <br/>
+
+
+### 拥抱异步渲染
+
+react v16.0.0 引入了叫 Fiber 这个全新的架构。这个架构使得 React 用异步渲染成为可能，但要注意，这个改变只是让异步渲染（async rendering）成为“可能”，React 却并没有在 v16 发布的时候立刻开启这种“可能”，也就是说，React 在 v16 发布之后依然使用的是同步渲染。
+
+不过，虽然异步渲染没有立刻采用，Fiber 架构还是打开了通向新世界的大门，React v16 一系列新功能几乎都是基于 Fiber 架构。
+
+要面向 React 未来，我们首先要理解这个异步渲染的概念。
+
+#### 同步渲染的问题
+
+长期以来，React 一直用的是同步渲染，这样对 React 实现非常直观方便，但是会带来性能问题。
+
+当要渲染的组件树非常庞大，JS的单线程遇到react的同步渲染，结果就是同步渲染霸占 JS 唯一的线程，其他的操作什么都做不了，在这 1 秒钟内，如果用户要点击什么按钮，或者在某个输入框里面按键，都不会看到立即的界面反应，这也就是俗话说的“卡顿”。
+
+在同步渲染下，要解决“卡顿”的问题，只能是尽量缩小组件树的大小，以此缩短渲染时间，但是，应用的规模总是在增大的，不是说缩小就能缩小的，虽然我们利用定义 shouldComponentUpdate 的方法可以减少不必要的渲染，但是这也无法从根本上解决大量同步渲染带来的“卡顿”问题。
+
+#### 异步渲染：两阶段渲染
+
+React Fiber 引入了异步渲染，有了异步渲染之后，React 组件的渲染过程是分时间片的，不是一口气从头到尾把子组件全部渲染完，而是每个时间片渲染一点，然后每个时间片的间隔都可去看看有没有更紧急的任务（比如用户按键），如果有，就去处理紧急任务，如果没有那就继续照常渲染。
+
+根据 React Fiber 的设计，一个组件的渲染被分为两个阶段：第一个阶段（也叫做 render 阶段）是可以被 React 打断的，一旦被打断，这阶段所做的所有事情都被废弃，当 React 处理完紧急的事情回来，依然会重新渲染这个组件，这时候第一阶段的工作会重做一遍；第二个阶段叫做 commit 阶段，一旦开始就不能中断，也就是说第二个阶段的工作会稳稳当当地做到这个组件的渲染结束。
+
+两个阶段的分界点，就是 render 函数。render 函数之前的所有生命周期函数（包括 render)都属于第一阶段，之后的都属于第二阶段。
+
+开启异步渲染，虽然我们获得了更好的感知性能，但是考虑到第一阶段的的生命周期函数可能会被重复调用，不得不对历史代码做一些调整。
+
+在 React v16.3 之前，render 之前的生命周期函数（也就是第一阶段生命周期函数）包括这些：
+
+- componentWillReceiveProps
+- shouldComponentUpdate
+- componentWillUpdate
+- componentWillMount
+- render
+
+React 官方告诫开发者，虽然目前所有的代码都可以照常使用，但是未来版本中会废弃掉，为了将来，使用 React 的程序应该快点去掉这些在第一阶段生命函数中有副作用的功能。
+
+一个典型的错误用例，也是我被问到做多的问题之一：为什么不在 componentWillMount 里去做AJAX？componentWillMount 可是比 componentDidMount 更早调用啊，更早调用意味着更早返回结果，那样性能不是更高吗？
+
+首先，一个组件的 componentWillMount 比 componentDidMount 也早调用不了几微秒，性能没啥提高；而且，等到异步渲染开启的时候，componentWillMount 就可能被中途打断，中断之后渲染又要重做一遍，想一想，在 componentWillMount 中做 AJAX 调用，代码里看到只有调用一次，但是实际上可能调用 N 多次，这明显不合适。相反，若把 AJAX 放在 componentDidMount，因为 componentDidMount 在第二阶段，所以绝对不会多次重复调用，这才是 AJAX 合适的位置
+
+#### getDerivedStateFromProps
+
+到了 React v16.3，React 干脆引入了一个新的生命周期函数 getDerivedStateFromProps，这个生命周期函数是一个 static 函数，在里面根本不能通过 this 访问到当前组件，输入只能通过参数，对组件渲染的影响只能通过返回值。没错，getDerivedStateFromProps 应该是一个纯函数，React 就是通过要求这种纯函数，强制开发者们必须适应异步渲染。
+
+```js
+static getDerivedStateFromProps(nextProps, prevState) {
+  //根据nextProps和prevState计算出预期的状态改变，返回结果会被送给setState
+}
+```
+
+React v16发布时，还增加了异常处理的生命周期函数。
+
+如果异常发生在第一阶段（render阶段），React就会调用`getDerivedStateFromError`，如果异常发生在第二阶段（commit阶段），React会调用`componentDidCatch`。这个区别也体现出两个阶段的区分对待。
+
+#### 适应异步渲染的组件原则
+
+当 React 开启异步渲染的时候，你的代码应该做到在 render 之前最多只能这些函数被调用：
+
+- 构造函数
+- getDerivedStateFromProps
+- shouldComponentUpdate
+
+幸存的这些第一阶段函数，除了构造函数，其余两个全都必须是纯函数，也就是不应该做任何有副作用的操作。
+
+<br/>
+
+### Suspense带来的异步操作革命
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ### react16新特性
