@@ -235,8 +235,158 @@ import "./ControlButtons.css";
 
 <br/>
 
+### 状态管理·组件状态
+
+在前面的章节中，我们反复声明过 React 其实就是这样一个公式：
+
+```js
+UI = f(data)
+```
+
+f 的参数 data，除了 props，就是 state。props 是组件外传递进来的数据，state 代表的就是 React 组件的内部状态。
+
+#### 为什么要了解 React 组件自身状态管理
+
+虽然有 Redux 和 Mobx 这样的状态管理工具，不过，我们首先不要管这些第三方工具，先从了解 React 组件自身的管理开始。
+
+为什么呢？
+
+第一个原因，因为 React 组件自身的状态管理是基础，其他第三方工具都是在这个基础上构筑的，连基础都不了解，无法真正理解第三方工具。
+
+另一个重要原因，对于很多应用场景，React 组件自身的状态管理就足够解决问题，犯不上动用 Redux 和 MobX 这样的大杀器，简单问题简单处理，可以让代码更容易维护。
+
+#### 组件自身状态 state
+
+##### 什么数据放在 state 中
+
+判断一个数据应该放在哪里，用下面的原则：
+
+- 如果数据由外部传入，放在 props 中；
+- 如果是组件内部状态，是否这个状态更改应该立刻引发一次组件重新渲染？如果是，放在 state 中；不是，放在成员变量中。
+
+##### 修改 state 的正确方式
+
+组件自身的状态可以通过 this.state 读到，this.state 本身就是一个对象，但是修改状态不应该通过直接修改 this.state 对象来完成。因为，我们修改 state，当然不只是想修改这个对象的值，而是想引发 React 组件的重新渲染。
+
+```js
+this.state.foo = 'bar'; //错误的方式
+this.setState({foo:'bar'}); //正确的方式
+```
+
+如上面代码所示，如果只是修改 this.state，那改了也就只是改了这个对象，其他的什么都不会发生；如果使用 setState 函数，那不光修改 state，还能引发组件的重新渲染，在重新渲染中就会使用修改后的 state，这也就是达到根据 state 改变公式左侧 UI 的目的。
+
+```js
+UI = f(state)
+```
+
+##### state 改变引发重新渲染的时机
+
+React 为了性能考虑，不会每次 setState 都引发重新渲染。
+
+```js
+this.setState({count: 1});
+this.setState({caption: 'foo'});
+this.setState({count: 2});
+```
+
+连续的同步调用 setState，第三次还覆盖了第一次调用的效果，但是效果只相当于调用了下面这样一次：
+
+```js
+this.setState({count: 2, caption: 'foo'});
+```
+
+每个 setState 都引发一次重新渲染，实在太浪费了。
+
+React 非常巧妙地用任务队列解决了这个问题，可以理解为每次 setState 函数调用都会往 React 的任务队列里放一个任务，多次 setState 调用自然会往队列里放多个任务。React 会选择时机去批量处理队列里执行任务，当批量处理开始时，React 会合并多个 setState 的操作，比如上面的三个 setState 就被合并为只更新 state 一次，也只引发一次重新渲染。
+
+因为这个任务队列的存在，React 并不会同步更新 state，所以，在 React 中，setState 也不保证同步更新 state 中的数据。
+
+##### state 不会被同步修改
+
+简单说来，调用 setState 之后的下一行代码，读取 this.state 并不是修改之后的结果。
+
+```js
+console.log(this.state.count);// 修改之前this.state.count为0
+this.setState({count: 1})
+console.log(this.state.count);// 在这里this.state.count依然为0
+```
+
+这乍看是很让人费解的结果，但是如果你理解了上面 React 任务队列的设计，一切也不难理解。
+
+setState 只是给任务队列里增加了一个修改 this.state 的任务，这个任务并没有立即执行，所以 this.state 并不会立刻改变。
+
+好吧，其实问题也没有那么简单，上面我所举的例子中，都假设 setState 是由 React 的生命周期函数或者事件处理函数中同步调用，这种情况下 setState 不会立即同步更新 state 和重新渲染，但是，如果调用 setState 由其他条件引发，就不是这样了。
+
+看下面的代码，结果可能会出乎你的所料：
+
+```js
+setTimeout(() => {
+  this.setState({count: 2}); //这会立刻引发重新渲染
+  console.log(this.state.count); //这里读取的count就是2
+}, 0);
+```
+
+为什么 setTimeout 能够强迫 setState 同步更新 state 呢？
+
+可以这么理解，当 React 调用某个组件的生命周期函数或者事件处理函数时，React 会想：“嗯，这一次函数可能调用多次 setState，我会先打开一个标记，只要这个标记是打开的，所有的 setState 调用都是往任务队列里放任务，当这一次函数调用结束的时候，我再去批量处理任务队列，然后把这个标记关闭。”
+
+因为 setTimeout 是一个 JavaScript 函数，和 React 无关，对于 setTimeout 的第一个函数参数，这个函数参数的执行时机，已经不是 React 能够控制的了，换句话说，React 不知道什么时候这个函数参数会被执行，所以那个“标记”也没有打开。
+
+当那个“标记”没有打开时，setState 就不会给任务列表里增加任务，而是强行立刻更新 state 和引发重新渲染。这种情况下，React 认为：“这个 setState 发生在自己控制能力之外，也许开发者就是想要强行同步更新呢，宁滥勿缺，那就同步更新了吧。”
+
+知道这个“技巧”之后，可能会有开发者说：好啊，那么以后我就用 setTimeout 来调用 setState 吧，能够立刻更新 state，多好！
+
+我劝你不要这么做。
+
+就像上面所说，React 选择不同步更新 state，是一种性能优化，如果你用上 setTimeout，就没机会让 React 优化了。
+
+而且，每当你觉得需要同步更新 state 的时候，往往说明你的代码设计存在问题，绝大部分情况下，你所需要的，并不是“state 立刻更新”，而是，“确定 state 更新之后我要做什么”，这就引出了 setState 另一个功能。
+
+##### setState 的第二个参数
+
+setState 的第二个参数可以是一个回调函数，当 state 真的被修改时，这个回调函数会被调用。
+
+```js
+console.log(this.state.count); // 0
+this.setState({count: 1}, () => {
+  console.log(this.state.count); // 这里就是1了
+})
+console.log(this.state.count); // 依然为0
+```
+当 setState 的第二个参数被调用时，React 已经处理完了任务列表，所以 this.state 就是更新后的数据。
+
+如果需要在 state 更新之后做点什么，请利用第二个参数。
+
+##### 函数式 setState
+
+到现在为止我们给 setState 的第一个参数都是对象，其实也可以传入一个函数。
+
+当 setState 的第一个参数为函数时，任务列表上增加的就是一个可执行的任务函数了，React 每处理完一个任务，都会更新 this.state，然后把新的 state 传递给这个任务函数。
+
+setState 第一个参数的形式如下：
+
+```js
+function increment(state, props) {
+  return {count: state.count + 1};
+}
+```
+
+可以看到，这是一个纯函数，不光接受当前的 state，还接受组件的 props，在这个函数中可以根据 state 和 props 任意计算，返回的结果会用于修改 this.state。
+
+如此一来，我们就可以这样连续调用 setState：
+
+```js
+this.setState(increment);
+this.setState(increment);
+this.setState(increment);
+```
+
+用这种函数式方式连续调用 setState，就真的能够让 this.state.count 增加 3，而不只是增加 1。
+
+<br/>
 
 ## 最佳实践
+
 > 最佳实践回答“怎么能用好”的问题，反映你实践经验的丰富程度。
 
 <br/>
@@ -1043,6 +1193,237 @@ const MyContainer = WrappedComponent =>
 
 <br/>
 
+### 状态管理·第三方工具
+
+上文提到了[状态管理·组件状态](#状态管理·组件状态)，接下来我们来看看社区主流的状态管理工具。
+
+<br/>
+
+#### Redux
+
+##### 理解 Redux
+
+要理解 Redux，首先要明白我们为什么需要 Redux，或者说，Redux 适用于什么样的场景。
+
+应用的状态往往十分复杂，如果应用状态就是一个普通 JavaScript 对象，而任何能够访问到这个对象的代码都可以修改这个状态，就很容易乱了套。当 bug 发生的时候，我们发现是状态错了，但是也很难理清到底谁把状态改错了，到底是如何走到出 bug 这一步。
+
+Redux 的主要贡献，就是限制了对状态的修改方式，让所有改变都可以被追踪。
+
+在真实应用中，React 组件树会很庞大很复杂，两个没有父子关系的 React 组件之间要共享信息，怎么办呢？
+
+最直观的方法，就是创建一个独立于这两个组件的对象，在这个对象中存放共享的数据，没错，这个对象，相当于一个 Store。
+
+如果只是一个简单对象，那么任何人都可以修改 Store，这不大合适。所以我们做出一些限制，让 Store 只接受某些『事件』，如果要修改 Store 上的数据，就往 Store 上发送这些『事件』，Store 对这些『事件』的响应，就是修改状态。
+
+这里所说的『事件』，就是 action，而对应修改状态的函数，就是 reducer。
+
+##### 适合 Redux 的场景
+
+对于某个状态，到底是放在 Redux 的 Store 中呢，还是放在 React 组件自身的状态中呢？
+
+针对这个问题，有以下原则：
+
+第一步，看这个状态是否会被多个 React 组件共享。
+
+第二步，看这个组件被 unmount 之后重新被 mount，之前的状态是否需要保留。
+
+第三步，到这一步，基本上可以确定，这个状态可以放在 React 组件中了。
+
+##### Redux 和 React 结合的最佳实践
+
+一、Store 上的数据应该范式化。
+
+所谓范式化，就是尽量减少冗余信息，像设计 MySQL 这样的关系型数据库一样设计数据结构。
+
+二、使用 selector。
+
+对于 React 组件，需要的是『反范式化』的数据，当从 Store 上读取数据得到的是范式化的数据时，需要通过计算来得到反范式化的数据。你可能会因此担心出现问题，这种担心不是没有道理，毕竟，如果每次渲染都要重复计算，这种浪费积少成多可能真会产生性能影响，所以，我们需要使用 seletor。业界应用最广的 selector 就是 reslector 。
+
+reselector 的好处，是把反范式化分为两个步骤，第一个步骤是简单映射，第二个步骤是真正的重量级运算，如果第一个步骤发现产生的结果和上一次调用一样，那么第二个步骤也不用计算了，可以直接复用缓存的上次计算结果。
+
+绝大部分实际场景中，总是只有少部分数据会频繁发生变化，所以 reselector 可以避免大量重复计算。
+
+三、只 connect 关键点的 React 组件
+
+当 Store 上状态发生改变的时候，所有 connect 上这个 Store 的 React 组件会被通知：『状态改变了！』
+
+然后，这些组件会进行计算。connect 的实现方式包含 shouldComponentUpdate 的实现，可以阻挡住大部分不必要的重新渲染，但是，毕竟处理通知也需要消耗 CPU，所以，尽量让关键的 React 组件 connect 到 store 就行。
+
+一个实际的例子就是，一个列表种可能包含几百个项，让每一个项都去 connect 到 Store 上不是一个明智的设计，最好是只让列表去 connect，然后把数据通过 props 传递给各个项。
+
+##### 如何实现异步操作
+
+使用 Redux 对于同步状态更新非常顺手，但是，遇到需要异步更新状态的场景，例如调用 AJAX 从服务器获得数据，这时候单用 Redux 就不够了，需要其他方式来辅助。
+
+至今为止，还无法推荐一个杀手级的方法，各种方法都在吹嘘自己多厉害，但是任何一种方法都是易用性和复杂性的平衡。
+
+最简单的 redux-thunk，代码量少，只有几行，用起来也很直观，但是开发者要写很多代码；而比较复杂的 redux-observable 相当强大，可以只用少量代码就实现复杂功能，但是前提是你要学会 RxJS，RxJS 本身学习曲线很陡，内容需要 一本书 的篇幅来介绍，这就是代价。
+
+读者在自己的项目中，无论选择什么方式，一定要考虑这个方式的复杂度和学习成本。
+
+在这里我不想过多介绍任何一种 Redux 扩展，因为任何一种都比不上 React 将要支持的 Suspense，Suspense 才是 React 中做异步操作的未来，在第 19 小节会详细介绍 Suspense。
+
+<br/>
+
+#### Mobx
+
+##### 理解 Mobx
+
+我们用 Mobx 来实现一个很简单的计数工具，首先，需要有一个对象来记录计数值，代码如下：
+
+```js
+import {observable} from 'mobx';
+
+const counter = observable ({
+  count: 0,
+});
+```
+
+在上面的代码中，counter 是一个对象，其实就是用 observable 函数包住一个普通 JavaScript 对象，但是 observable 的介入，让 counter 对象拥有了神力。
+
+我们用最简单的代码来展示这种“神力”，代码如下：
+
+```js
+import {autorun} from 'mobx';
+
+window.counter = counter;
+
+autorun (() => {
+  console.log ('#count', counter.count);
+});
+```
+
+把 counter 赋值给 window.counter，是为了让我们在 Chrome 的开发者界面可以访问。用 autorun 包住了一个函数，这个函数输出 counter.count 的值，这段代码的作用，我们很快就能看到。
+
+在 Chrome 的开发者界面，我们可以直接访问 window.counter.count，神奇之处是，如果我们直接修改 window.counter.count 的值，可以直接触发 autorun 的函数参数！
+
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/170.png' width='500'>
+
+这个现象说明，mobx 的 observable 拥有某种“神力”，任何对这个对象的修改，都会立刻引发某些函数被调用。和 observable 这个名字一样，被包装的对象变成了“被观察者”，而被调用的函数就是“观察者”，在上面的例子中，autorun 的函数参数就是“观察者”。
+
+Mobx 这样的功能，等于实现了设计模式中的“观察者模式”（Observer Pattern），通过建立 observer 和 observable 之间的关联，达到数据联动。不过，传统的“观察者模式”要求我们写代码建立两者的关联，也就是写类似下面的代码：
+
+```js
+observable.register(observer);
+```
+
+Mobx 最了不起之处，在于不需要开发者写上面的关联代码，Mobx自己通过解析代码就能够自动发现 observer 和 observable 之间的关系。
+
+我们很自然想到，如果让我们的数据拥有这样的“神力”，那我们就不用在修改完数据之后，再费心去调用某些函数使用这些数据了，数据管理会变得十分轻松。
+
+##### 用 decorator 来使用 Mobx
+
+Mobx 和 React 并无直接关系，为了建立二者的关系，需要安装 mobx-react
+
+还是以 Counter 为例，看如何用 decorator 使用 Mobx，我们先看代码：
+
+```js
+import {observable} from 'mobx';
+import {observer} from 'mobx-react';
+
+@observer class Counter extends React.Component {
+  @observable count = 0;
+
+  onIncrement = () => {
+    this.count++;
+  };
+
+  onDecrement = () => {
+    this.count--;
+  };
+
+  componentWillUpdate () {
+    console.log ('#enter componentWillUpdate');
+  }
+
+  render () {
+    return (
+      <CounterView
+        caption="With decorator"
+        count={this.count}
+        onIncrement={this.onIncrement}
+        onDecrement={this.onDecrement}
+      />
+    );
+  }
+}
+```
+
+在上面的代码中，Counter 这个 React 组件自身是一个 observer，而 observable 是 Counter 的一个成员变量 count。
+
+注意 observer 这 个decorator 来自于 mobx-react，它是 Mobx 世界和 React 的桥梁，被它“装饰”的组件，就是一个“观察者”。
+
+本例中，成员变量 count 是被观察者，只要被观察者一变化，作为观察者的 Counter 组件就会重新渲染。
+
+##### 独立的 Store
+
+真实的业务场景是一个状态需要多个组件共享，所以 observable 一般是在 React 组件之外。
+
+我们重写一遍 Counter 组件，代码如下：
+
+```js
+const store = observable ({
+  count: 0,
+});
+store.increment = function () {
+  this.count++;
+};
+store.decrement = function () {
+  this.count--;
+}; // this decorator is must
+
+@observer class Counter extends React.Component {
+  onIncrement = () => {
+    store.increment ();
+  };
+
+  onDecrement = () => {
+    store.decrement ();
+  };
+
+  render () {
+    return (
+      <CounterView
+        caption="With external state"
+        count={store.count}
+        onIncrement={this.onIncrement}
+        onDecrement={this.onDecrement}
+      />
+    );
+  }
+}
+```
+
+<br/>
+
+#### Mobx 和 Redux 的比较
+
+Mobx 和 Redux 的目标都是管理好应用状态，但是最根本的区别在于对数据的处理方式不同。
+
+Redux 认为，数据的一致性很重要，为了保持数据的一致性，要求Store 中的数据尽量范式化，也就是减少一切不必要的冗余，为了限制对数据的修改，要求 Store 中数据是不可改的（Immutable），只能通过 action 触发 reducer 来更新 Store。
+
+Mobx 也认为数据的一致性很重要，但是它认为解决问题的根本方法不是让数据范式化，而是不要给机会让数据变得不一致。所以，Mobx 鼓励数据干脆就“反范式化”，有冗余没问题，只要所有数据之间保持联动，改了一处，对应依赖这处的数据自动更新，那就不会发生数据不一致的问题。
+
+值得一提的是，虽然 Mobx 最初的一个卖点就是直接修改数据，但是实践中大家还是发现这样无组织无纪律不好，所以后来 Mobx 还是提供了 action 的概念。和 Redux 的 action 有点不同，Mobx 中的 action 其实就是一个函数，不需要做 dispatch，调用就修改对应数据
+
+如果想强制要求使用 action，禁止直接修改 observable 数据，使用 Mobx 的 configure，如下：
+
+```js
+import {configure} from 'mobx';
+
+configure({enforceActions: true});
+```
+
+总结一下 Redux 和 Mobx 的区别，包括这些方面：
+
+- Redux 鼓励一个应用只用一个 Store，Mobx 鼓励使用多个 Store；
+- Redux 使用“拉”的方式使用数据，这一点和 React是一致的，但 Mobx 使用“推”的方式使用数据，和 RxJS 这样的工具走得更近；
+- Redux 鼓励数据范式化，减少冗余，Mobx 容许数据冗余，但同样能保持数据一致。
+
+<br/>
+
 ### 样式处理
 
 #### 基本样式设置
@@ -1161,49 +1542,57 @@ import style from 'config.scss';
 
 ### React Router
 
-路由的基本原理：保证 View 和 URL 同步。
+随着 AJAX 技术的成熟，现在单页应用（Single Page Application）已经是前端网页界的标配，名为“单页”，其实在设计概念上依然是多页的界面，只不过从技术层面上页之间的切换是没有整体网页刷新的，只需要做局部更新。
 
-在 React 中，组件就是一个方法。 props 作为方法的参数，当它们发生变化时会触发方法执行，进而帮助我们重新绘制 View。在 React Router 中，我们同样可以把 Router 组件看成一个方法，location 作为参数，返回的结果同 样是 View。
+要实现“单页应用”，一个最要紧的问题就是做好“路由”（Routing)，也就是处理好下面两件事：
 
-路由切换方式：hashChange （hashHistory） 或是history.pushState（browserHistory）
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/167.jpg' width='600'>
-<br/>
-
-
-**为什么需要路由?**
-
-1. 单页应用需要进行页面切换
-2. 通过URL可以定位到页面
-3. 更有语义的组织资源
-
-**路由实现的基本架构**
-
-原理：React Router 在一个组件容器中，根据URL来显示路由配置中的组件。
+- 把 URL 映射到对应的页面来处理；
+- 页面之间切换做到只需局部更新。
 
 <br/>
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/127.jpg' width='600'>
 <br/>
 
-**React Router的使用**
+#### react router v4 的动态路由
 
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/128.jpg' width='600'>
-<br/>
+react-router 的 v3 和 v4 版完完全全是不同的两个工具，最大的区别是 v3 为静态路由， v4 做到了动态路由。
 
-**React Router的特性**
+所谓“静态路由”，就是说路由规则是固定的。
 
-1. 声明式路由定义：像使用react标记一样，可以在任何地方使用路由，而不需要特殊的路由表
-2. 动态路由：对比的是静态路由，传统的服务器端路由一旦配置了，就是一个静态的配置文件，而React Router只有在组件render时，才会实时去解析。
+所谓动态路由，指的是路由规则不是预先确定的，而是在渲染过程中确定的。
 
-**三种路由实现方式**
+#### 使用
 
-1. URL路由
-2. hash路由
-3. 内存路由
+react-router 的工作方式，是在组件树顶层放一个 Router 组件，然后在组件树中散落着很多 Route 组件（注意比 Router 少一个“r”），顶层的 Router 组件负责分析监听 URL 的变化，在它保护伞之下的 Route 组件可以直接读取这些信息。
 
-**React Router API**
+很明显，Router 和 Route 的配合，就是之前我们介绍过的“提供者模式”，Router 是“提供者”，Route是“消费者”。
+
+更进一步，Router 其实也是一层抽象，让下面的 Route 无需各种不同 URL 设计的细节，不要以为 URL 就一种设计方法，至少可以分为两种。
+
+第一种很自然，比如 / 对应 Home 页，/about 对应 About 页，但是这样的设计需要服务器端渲染，因为用户可能直接访问任何一个 URL，服务器端必须能对 /的访问返回 HTML，也要对 /about 的访问返回 HTML。
+
+第二种看起来不自然，但是实现更简单。只有一个路径 /，通过 URL 后面的 # 部分来决定路由，/#/ 对应 Home 页，/#/about 对应 About 页。因为 URL 中#之后的部分是不会发送给服务器的，所以，无论哪个 URL，最后都是访问服务器的 / 路径，服务器也只需要返回同样一份 HTML 就可以，然后由浏览器端解析 # 后的部分，完成浏览器端渲染。
+
+在 react-router，有 BrowserRouter 支持第一种 URL，有 HashRouter 支持第二种 URL。
+
+#### 动态路由
+
+假设，我们增加一个新的页面叫 Product，对应路径为 /product，但是只有用户登录了之后才显示。如果用静态路由，我们在渲染之前就确定这条路由规则，这样即使用户没有登录，也可以访问 product，我们还不得不在 Product 组件中做用户是否登录的检查。
+
+如果用动态路由，则只需要在代码中的一处涉及这个逻辑：
+
+```js
+<Switch>
+  <Route exact path='/' component={Home}/>
+  {
+    isUserLogin() &&
+    <Route exact path='/product' component={Product}/>,
+  }  
+  <Route path='/about' component={About}/>
+</Switch>
+```
+
+#### 常见API
 
 1. `<Link>` ：普通链接，不会触发浏览器刷新
 2. `<NavLink>`：类似`<Link>`但是会添加当前选中状态
@@ -1212,72 +1601,26 @@ import style from 'config.scss';
 5. `<Route>`：路由配置的核心标记，路径匹配时显示对应组件
 6. `<Switch>`：只现实第一个匹配路由
 
-**React Router可以通过URL传递参数**
+#### React Router技巧
 
 1. 如何通过URL传递参数：<Route path='/topic/:id'/>
 2. 如何获取参数：this.props.match.params
 3. 路由匹配进阶[资料](https://github.com/pillarjs/path-to-regexp)
 
-**何时需要URL参数**
-
-页面状态尽量通过URL参数定义
-
-
-<br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/129.jpg' width='600'>
 <br/>
 
+### 服务器端渲染
+
+最近几年浏览器端框架很繁荣，以至于很多新入行的开发者只知道浏览器端渲染框架，都不知道存在服务器端渲染这回事，其实，网站应用最初全都是服务器端渲染，由服务器端用 PHP、Java 或者 Python 等其他语言产生 HTML 来给浏览器端解析。
+
+相比于浏览器端渲染，服务器端渲染的好处是：
+
+1. 缩短首屏渲染时间
+2. 更好的搜索引擎优化
 
 
-### react性能优化
 
-问题：浏览器重绘，重排是影响性能的第一要素
-
-解决：React render 会更新虚拟DOM，虚拟DOM会去渲染真实DOM，尽可能减少render的次数是关键所在
-
-优化原则：减少渲染
-
-纯函数
-- 相同的输入总是有相同的输出
-- 过程没有副作用，不改变外部状态
-- 没有额外的状态依赖，方法内部的状态只在方法生命周期内存活
-
-React组件与纯函数的关系
-- React组件本身就是纯函数，传入相同的props和state总是得到相同的virtualDom
-- 从而引申出PureRender
-
-shouldComponentUpdate
-- PureRender
-    - 重新实现shouldComponentUpdate方法，对props和state作浅比较
-    - 少为组件绑定箭头函数
-    - 不直接设置props为数组或者对象
-- 使用redux connect函数优化
-    - 实现了shouldComponentUpdate函数的实现,会进行浅层比较​
-    - 父组件尽量不传无意义的参数,特别是箭头函数,不然会导致子组件无意义render，浪费性能
-
-**如何检测react性能**
-
-在Chrome中监测react性能：在URL后加?react_perf，比如：localhost:3000/?react_perf
-
-<br/>
-
-
-### UI组件库对比
-目前热门的react UI框架有：Ant.Design、Material UI、Semantic UI
-
-选择UI库的考虑因素:
-
-1. 组件库是否齐全
-2. 样式风格是否符合业务需求
-3. API设计是否便捷和灵活
-4. 技术支持是否完善
-5. 开发是否活跃
-
-<br/>
-
-### 同构应用
-
-**什么是同构应用**
+#### 同构应用
 
 <br/>
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/130.jpg' width='600'>
@@ -1297,6 +1640,8 @@ ESLint
 Prettier
 - 代码格式化的神器
 - 保证更容易写出风格一致的代码
+
+> 小技巧：在Chrome中监测react性能：在URL后加?react_perf，比如：localhost:3000/?react_perf
 
 <br/>
 
