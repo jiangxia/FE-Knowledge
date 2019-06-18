@@ -2318,53 +2318,389 @@ React v16发布时，还增加了异常处理的生命周期函数。
 
 ### Suspense带来的异步操作革命
 
+Suspense 应用的场合就是异步数据处理，最常见的例子，就是通过 AJAX 从服务器获取数据，每一个 React 开发者都曾为这个问题纠结。
 
+如果用一句话概括 Suspense 的功用，那就是：用同步的代码来实现异步操作。
 
+#### React 同步操作的不足
 
+React 最初的设计，整个渲染过程都是同步的。同步的意思是，当一个组件开始渲染之后，就必须一口气渲染完，不能中断，对于特别庞大的组件树，这个渲染过程会很耗时，而且，这种同步处理，也会导致我们的代码比较麻烦。
 
+当我们开始渲染某个组件的时候，假设这个组件需要从服务器获取数据，那么，要么由这个组件的父组件想办法拿到服务器的数据，然后通过 props 传递进来，要么就要靠这个组件自力更生来获取数据，但是，没有办法通过一次渲染完成这个过程，因为渲染过程是同步的，不可能让 React 等待这个组件调用 AJAX 获取数据之后再继续渲染。
 
+常用的做法，需要组件的 render 和 componentDidMount 函数配合。
 
+1. 在 componentDidMount 中使用 AJAX，在 AJAX 成功之后，通过 setState 修改自身状态，这会引发一次新的渲染过程。
+2. 在 render 函数中，如果 state 中没有需要的数据，就什么都不渲染或者渲染一个“正在装载”之类提示；如果 state 中已经有需要的数据，就可以正常渲染了，但这也必定是在 componentDidMount 修改了 state 之后，也就是只有在第二次渲染过程中才可以。
 
+下面是代码实例：
 
+```js
+class Foo extends React.Component {
+  state = {
+    data: null,
+  };
 
+  render () {
+    if (!this.state.data) {
+      return null;
+    } else {
+      return <div>this.state.data</div>;
+    }
+  }
 
+  componentDidMount () {
+    callAPI ().then (result => {
+      this.setState ({data: result});
+    });
+  }
+}
+```
 
+这种方式虽然可行，我们也照这种套路写过不少代码，但它的缺点也是很明显的。
 
+- 组件必须要有自己的 state 和 componentDidMount 函数实现，也就不可能做成纯函数形式的组件。
+- 需要两次渲染过程，第一次是 mount 引发的渲染，由 componentDidMount 触发 AJAX 然后修改 state，然后第二次渲染才真的渲染出内容。
+- 代码啰嗦，十分啰嗦。
 
+#### 理想中的代码形式
 
+而 Suspense 就是为了克服上述 React 的缺点。
 
+在了解 Suspense 怎么解决这些问题之前，我们不妨自己想象一下，如果要利用 AJAX 获取数据，代码怎样写最简洁高效？
 
+我先来说一说自己设想的最佳代码形式。首先，我不想写一个有状态的组件，因为通过 AJAX 获取的数据往往也就在渲染用一次，没必要存在 state 里；其次，想要使数据拿来就用，不需要经过 componentDidMount 走一圈。所以，代码最好是下面这样：
 
-### react16新特性
+```js
+const Foo = () => {
+  const data = callAPI ();
+  return <div>{data}</div>;
+};
+```
 
-1. 新的核心算法Fiber
-2. Render 可以返回数据、字符串
-3. 错误处理机制
+够简洁吧，可是目前的 React 版本做不到啊！
 
-新版本带来的优化和新功能：
+因为 callAPI 肯定是一个异步操作，不可能获得同步数据，无法在同步的 React 渲染过程中立足。
 
-1. Portals 组件
-2. 更好更快的服务端渲染
-3. 体积更小，MIT协议
+不过，现在做不到，不代表将来做不到，将来 React 会支持这样的代码形式，这也就是 Suspense。
 
-异步渲染
+有了Suspense，我们可以这样写代码：
 
-异步渲染的两个部分
+```js
+const Foo = () => {
+  const data = createFetcher (callAJAX).read ();
+  return <div>{data}</div>;
+};
+```
 
-1. 时间分片：DOM操作的优先级低于浏览器原生行为，例如键盘和鼠标的输入，从而保证操作的流畅
-2. 渲染挂起：虚拟DOM节点可以等待某个异步操作的完成，并指定timeout，之后才完成真正的渲染。
+接下来，我们就介绍一下 Suspense 的原理。
 
-时间分片
+在 React 推出 v16 的时候，就增加了一个新生命周期函数 componentDidCatch。如果某个组件定义了 componentDidCatch，那么这个组件中所有的子组件在渲染过程中抛出异常时，这个 componentDidCatch 函数就会被调用。
 
-1. 虚拟DOM的diff操作可以分片进行
-2. React 新API：unstable_deferredUpdates
-3. Chome 新API：requestIdleCallback
+可以这么设想，componentDidCatch 就是 JavaScript 语法中的 catch，而对应的 try 覆盖所有的子组件，就像下面这样:
 
-渲染挂起
+```js
+try {
+  //渲染子组件
+} catch (error) {
+  // componentDidCatch被调用
+}
+```
 
-1. 新内置组件：Timeout
-2. unstable_deferUpdate
+Suspense 就是巧妙利用 componentDidCatch 来实现同步形式的异步处理。
 
+Suspense 提供的 createFetcher 函数会封装异步操作，当尝试从 createFetcher 返回的结果读取数据时，有两种可能：一种是数据已经就绪，那就直接返回结果；还有一种可能是异步操作还没有结束，数据没有就绪，这时候 createFetcher 会抛出一个“异常”。
 
+你可能会说，抛出异常，渲染过程不就中断了吗？
 
+的确会中断，不过，createFetcher 抛出的这个“异常”比较特殊，这个“异常”实际上是一个 Promise 对象，这个 Promise 对象代表的就是异步操作，操作结束时，也是数据准备好的时候。当 componentDidCatch 捕获这个 Promise 类型的“异常”时，就可以根据这个 Promise 对象的状态改变来重新渲染对应组件，第二次渲染，肯定就能够成功。
+
+下面是 createFetcher 的一个简单实现方式：
+
+```js
+var NO_RESULT = {};
+
+export const createFetcher = task => {
+  let result = NO_RESULT;
+
+  return () => {
+    const p = task ();
+
+    p.then (res => {
+      result = res;
+    });
+
+    if (result === NO_RESULT) {
+      throw p;
+    }
+
+    return result;
+  };
+};
+```
+
+在上面的代码中，createFetcher 的参数 task 被调用应该返回一个 Promise 对象，这个对象在第一次调用时会被 throw 出去，但是，只要这个对象完结，那么 result 就有实际的值，不会再被 throw。
+
+还需要一个和 createFetcher 配合的 Suspense，代码如下：
+
+```js
+class Suspense extends React.Component {
+  state = {
+    pending: false,
+  };
+
+  componentDidCatch (error) {
+    // easy way to detect Promise type
+    if (typeof error.then === 'function') {
+      this.setState ({pending: true});
+
+      error.then (() =>
+        this.setState ({
+          pending: false,
+        })
+      );
+    }
+  }
+
+  render () {
+    return this.state.pending ? null : this.props.children;
+  }
+}
+```
+
+上面的 Suspense 组件实现了 componentDidCatch，如果捕获的 error 是 Promise 类型，那就说明子组件用 createFetcher 获取异步数据了，就会等到它完结之后重设 state，引发一次新的渲染过程，因为 createFetcher 中会记录异步返回的结果，新的渲染就不会抛出异常了。
+
+使用 createFetcher 和 Suspense 的示例代码如下:
+
+```js
+const getName = () =>
+  new Promise (resolve => {
+    setTimeout (() => {
+      resolve ('Morgan');
+    }, 1000);
+  });
+
+const fetcher = createFetcher (getName);
+
+const Greeting = () => {
+  return <div>Hello {fetcher ()}</div>;
+};
+
+const SuspenseDemo = () => {
+  return (
+    <Suspense>
+      <Greeting />
+    </Suspense>
+  );
+};
+```
+
+上面的 getName 利用 setTimeout 模拟了异步 AJAX 获取数据，第一次渲染 Greeting 组件时，会有 Promise 类型的异常抛出，被 Suspense 捕获。1 秒钟之后，当 getName 返回实际结果的时候，Suspense 会引发重新渲染，这一次 Greeting 会显示出 hello Morgan。
+
+上面的 createFetcher 和 Suspense 是一个非常简陋的实现，主要用来让读者了解 Suspense 的工作原理，正式发布的 Suspense 肯定会具备更强大的功能。
+
+#### Suspense 带来的 React 使用模式改变
+
+Suspense 被推出之后，可以极大地减少异步操作代码的复杂度。
+
+之前，只要有 AJAX 这样的异步操作，就必须要用两次渲染来显示 AJAX 结果，这就需要用组件的 state 来存储 AJAX 的结果，用 state 又意味着要把组件实现为一个 class。总之，我们需要做这些：
+
+- 实现一个 class；
+- class 中需要有 state；
+- 需要实现 componentDidMount 函数；
+- render 必须要根据 this.state 来渲染不同内容。
+
+有了 Suspense 之后，不需要做上面这些杂事，只要一个函数形式组件就足够了。
+
+在介绍 Redux 时，我们提到过在 Suspense 面前，Redux 的一切异步操作方案都显得繁琐，读者现在应该能够通过代码理解这一点了。
+
+很可惜，目前 Suspense 还不支持服务器端渲染，当 Suspense 支持服务器端渲染的时候，那就真的会对 React 社区带来革命性影响。
+
+<br/>
+
+### 函数化的 Hooks
+
+Hooks 的目的，简而言之就是让开发者不需要再用 class 来实现组件。
+
+#### useState
+
+Hooks 会提供一个叫 useState 的方法，它开启了一扇新的定义 state 的门，对应 Counter 的代码可以这么写：
+
+```js
+import {useState} from 'react';
+
+const Counter = () => {
+  const [count, setCount] = useState (0);
+
+  return (
+    <div>
+      <div>{count}</div>
+      <button onClick={() => setCount (count + 1)}>+</button>
+      <button onClick={() => setCount (count - 1)}>-</button>
+    </div>
+  );
+};
+```
+
+注意看，Counter 拥有自己的“状态”，但它只是一个函数，不是 class。
+
+useState 只接受一个参数，也就是 state 的初始值，它返回一个只有两个元素的数组，第一个元素就是 state 的值，第二个元素是更新 state 的函数。
+
+这个例子中，我们可以利用 count 可以读取到这个 state，利用 setCount 可以更新这个 state。
+
+因为 useState 在 Counter 这个函数体中，每次 Counter 被渲染的时候，这个 useState 调用都会被执行，useState 自己肯定不是一个纯函数，因为它要区分第一次调用（组件被 mount 时）和后续调用（重复渲染时），只有第一次才用得上参数的初始值，而后续的调用就返回“记住”的 state 值。
+
+读者看到这里，心里可能会有这样的疑问：如果组件中多次使用 useState 怎么办？React 如何“记住”哪个状态对应哪个变量？
+
+React 是完全根据 useState 的调用顺序来“记住”状态归属的，假设组件代码如下：
+
+```js
+const Counter = () => {
+  const [count, setCount] = useState (0);
+  const [foo, updateFoo] = useState ('foo');
+
+  // ...
+};
+```
+
+每一次 Counter 被渲染，都是第一次 useState 调用获得 count 和 setCount，第二次 useState 调用获得 foo 和 updateFoo。
+
+React 不知道你把 useState 等 Hooks API 返回的结果赋值给什么变量，但是它也不需要知道，它只需要按照 useState 调用顺序记录就好了。
+
+正因为这个原因，Hooks，千万不要在 if 语句或者 for 循环语句中使用！
+
+像下面的代码，肯定会出乱子的：
+
+```js
+const Counter = () => {
+  const [count, setCount] = useState (0);
+  if (count % 2 === 0) {
+    const [foo, updateFoo] = useState ('foo');
+  }
+  const [bar, updateBar] = useState ('bar');
+};
+```
+
+因为条件判断，让每次渲染中 useState 的调用次序不一致了，于是 React 就错乱了。
+
+#### useEffect
+
+除了 useState，React 还提供 useEffect，用于支持组件中增加副作用的支持。
+
+在 React 组件生命周期中如果要做有副作用的操作，代码放在哪里？
+
+当然是放在 componentDidMount 或者 componentDidUpdate 里，但是这意味着组件必须是一个 class。
+
+在 Counter 组件，如果我们想要在用户点击“+”或者“-”按钮之后把计数值体现在网页标题上，这就是一个修改 DOM 的副作用操作，所以必须把 Counter 写成 class，而且添加下面的代码：
+
+```js
+componentDidMount () {
+    document.title = `Count: ${this.state.count}`;
+  }
+
+  componentDidUpdate () {
+    document.title = `Count: ${this.state.count}`;
+  }
+```
+
+而有了 useEffect，我们就不用写一个 class 了，对应代码如下：
+
+```js
+import {useState, useEffect} from 'react';
+
+const Counter = () => {
+  const [count, setCount] = useState (0);
+
+  useEffect (() => {
+    document.title = `Count: ${count}`;
+  });
+
+  return (
+    <div>
+      <div>{count}</div>
+      <button onClick={() => setCount (count + 1)}>+</button>
+      <button onClick={() => setCount (count - 1)}>-</button>
+    </div>
+  );
+};
+```
+
+useEffect 的参数是一个函数，组件每次渲染之后，都会调用这个函数参数，这样就达到了 componentDidMount 和 componentDidUpdate 一样的效果。
+
+虽然本质上，依然是 componentDidMount 和 componentDidUpdate 两个生命周期被调用，但是现在我们关心的不是 mount 或者 update 过程，而是“after render”事件，useEffect 就是告诉组件在“渲染完”之后做点什么事。
+
+读者可能会问，现在把 componentDidMount 和 componentDidUpdate 混在了一起，那假如某个场景下我只在 mount 时做事但 update 不做事，用 useEffect 不就不行了吗？
+
+其实，用一点小技巧就可以解决。useEffect 还支持第二个可选参数，只有同一 useEffect 的两次调用第二个参数不同时，第一个函数参数才会被调用，所以，如果想模拟 componentDidMount，只需要这样写：
+
+```js
+useEffect(() => {
+  // 这里只有mount时才被调用，相当于componentDidMount
+}, [123]);
+```
+
+在上面的代码中，useEffect 的第二个参数是 [123]，其实也可以是任何一个常数，因为它永远不变，所以 useEffect 只在 mount 时调用第一个函数参数一次，达到了 componentDidMount 一样的效果。
+
+#### useContext
+
+Context API的设计不完美，在多个 Context 嵌套的时候尤其麻烦。
+
+比如，一段 JSX 如果既依赖于 ThemeContext 又依赖于 LanguageContext，那么按照 React Context API 应该这么写：
+
+```js
+<ThemeContext.Consumer>
+  {theme => (
+    <LanguageContext.Cosumer>
+      language => {
+        //可以使用theme和lanugage了
+      }
+    </LanguageContext.Cosumer>
+  )}
+</ThemeContext.Consumer>;
+
+```
+
+因为 Context API 要用 render props，所以用两个 Context 就要用两次 render props，也就用了两个函数嵌套，这样的缩格看起来也的确过分了一点点。
+
+使用 Hooks 的 useContext，上面的代码可以缩略为下面这样：
+
+```js
+const theme = useContext(ThemeContext);
+const language = useContext(LanguageContext);
+// 这里就可以用theme和language了
+```
+
+这个useContext把一个需要很费劲才能理解的 Context API 使用大大简化，不需要理解render props，直接一个函数调用就搞定。
+
+但是，useContext也并不是完美的，它会造成意想不到的重新渲染，我们看一个完整的使用useContext的组件。
+
+```js
+const ThemedPage = () => {
+  const theme = useContext (ThemeContext);
+
+  return (
+    <div>
+      <Header color={theme.color} />
+      <Content color={theme.color} />
+      <Footer color={theme.color} />
+    </div>
+  );
+};
+```
+
+因为这个组件ThemedPage使用了useContext，它很自然成为了Context的一个消费者，所以，只要Context的值发生了变化，ThemedPage就会被重新渲染，这很自然，因为不重新渲染也就没办法重新获得theme值，但现在有一个大问题，对于ThemedPage来说，实际上只依赖于theme中的color属性，如果只是theme中的size发生了变化但是color属性没有变化，ThemedPage依然会被重新渲染，当然，我们通过给Header、Content和Footer这些组件添加shouldComponentUpdate实现可以减少没有必要的重新渲染，但是上一层的ThemedPage中的JSX重新渲染是躲不过去了。
+
+说到底，useContext需要一种表达方式告诉React：“我没有改变，重用上次内容好了。”
+
+希望Hooks正式发布的时候能够弥补这一缺陷。
+
+#### Hooks 带来的代码模式改变
+
+Hooks 将大大简化使用 React 的代码。
+
+我们可能不再需要 class了,只用函数形式来编写组件。
+
+对于 useContext，它并没有为消除 class 做贡献，却为消除 render props 模式做了贡献
+
+对了，所有的 Hooks API 都只能在函数类型组件中调用，class 类型的组件不能用，从这点看，很显然，class 类型组件将会走向消亡。
 
