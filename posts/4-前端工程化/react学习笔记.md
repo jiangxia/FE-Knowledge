@@ -257,7 +257,7 @@ setTimeout(() => {
 
 可以这么理解，当 React 调用某个组件的生命周期函数或者事件处理函数时，React 会想：“嗯，这一次函数可能调用多次 setState，我会先打开一个标记，只要这个标记是打开的，所有的 setState 调用都是往任务队列里放任务，当这一次函数调用结束的时候，我再去批量处理任务队列，然后把这个标记关闭。”
 
-因为 setTimeout 是一个 JavaScript 函数，和 React 无关，对于 setTimeout 的第一个函数参数，这个函数参数的执行时机，已经不是 React 能够控制的了，换句话说，React 不知道什么时候这个函数参数会被执行，所以那个“标记”也没有打开。
+因为 setTimeout 是一个 JS 函数，和 React 无关，对于 setTimeout 的第一个函数参数，这个函数参数的执行时机，已经不是 React 能够控制的了，换句话说，React 不知道什么时候这个函数参数会被执行，所以那个“标记”也没有打开。
 
 当那个“标记”没有打开时，setState 就不会给任务列表里增加任务，而是强行立刻更新 state 和引发重新渲染。这种情况下，React 认为：“这个 setState 发生在自己控制能力之外，也许开发者就是想要强行同步更新呢，宁滥勿缺，那就同步更新了吧。”
 
@@ -811,6 +811,8 @@ const Paragraph = (props, context) => {
 
 > 组合组件：简化父组件向子组件传递props的方式
 
+<br/>
+
 组合组件模式要解决的是这样一类问题：父组件想要传递一些信息给子组件，但是，如果用 props 传递又显得十分麻烦。
 
 利用 Context 可以解决问题，但非常繁琐，组合组件让我们可以用更简洁的方式去实现。
@@ -1131,7 +1133,7 @@ const MyContainer = WrappedComponent =>
 
 要理解 Redux，首先要明白我们为什么需要 Redux，或者说，Redux 适用于什么样的场景。
 
-应用的状态往往十分复杂，如果应用状态就是一个普通 JavaScript 对象，而任何能够访问到这个对象的代码都可以修改这个状态，就很容易乱了套。当 bug 发生的时候，我们发现是状态错了，但是也很难理清到底谁把状态改错了，到底是如何走到出 bug 这一步。
+应用的状态往往十分复杂，如果应用状态就是一个普通 JS 对象，而任何能够访问到这个对象的代码都可以修改这个状态，就很容易乱了套。当 bug 发生的时候，我们发现是状态错了，但是也很难理清到底谁把状态改错了，到底是如何走到出 bug 这一步。
 
 Redux 的主要贡献，就是限制了对状态的修改方式，让所有改变都可以被追踪。
 
@@ -1205,7 +1207,7 @@ const counter = observable ({
 });
 ```
 
-在上面的代码中，counter 是一个对象，其实就是用 observable 函数包住一个普通 JavaScript 对象，但是 observable 的介入，让 counter 对象拥有了神力。
+在上面的代码中，counter 是一个对象，其实就是用 observable 函数包住一个普通 JS 对象，但是 observable 的介入，让 counter 对象拥有了神力。
 
 我们用最简单的代码来展示这种“神力”，代码如下：
 
@@ -1225,7 +1227,7 @@ autorun (() => {
 
 
 <br/>
-<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/170.png' width='500'>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/170.png' width='400'>
 
 这个现象说明，mobx 的 observable 拥有某种“神力”，任何对这个对象的修改，都会立刻引发某些函数被调用。和 observable 这个名字一样，被包装的对象变成了“被观察者”，而被调用的函数就是“观察者”，在上面的例子中，autorun 的函数参数就是“观察者”。
 
@@ -1249,7 +1251,8 @@ Mobx 和 React 并无直接关系，为了建立二者的关系，需要安装 m
 import {observable} from 'mobx';
 import {observer} from 'mobx-react';
 
-@observer class Counter extends React.Component {
+@observer 
+class Counter extends React.Component {
   @observable count = 0;
 
   onIncrement = () => {
@@ -1300,7 +1303,8 @@ store.decrement = function () {
   this.count--;
 }; // this decorator is must
 
-@observer class Counter extends React.Component {
+@observer 
+class Counter extends React.Component {
   onIncrement = () => {
     store.increment ();
   };
@@ -1576,7 +1580,7 @@ renderToNodeStream 把渲染结果以“流”的形式塞给 response 对象，
 
 React 有一个特点，就是把内容展示和动态功能集中在一个组件中。比如，一个 Counter 组件既负责怎么画出内容，也要负责怎么响应按键点击，这当然符合软件高内聚性的原则，但是也给服务器端渲染带来更多的工作。
 
-设想一下，如果只使用服务器端渲染，那么产生的只有 HTML，虽然能够让浏览器端画出内容，但是，没有 JavaScript 的辅助是无法响应用户交互事件的。
+设想一下，如果只使用服务器端渲染，那么产生的只有 HTML，虽然能够让浏览器端画出内容，但是，没有 JS 的辅助是无法响应用户交互事件的。
 
 如何让页面响应用户事件？其实我们已经做过这件事了，Counter 组件里面已经有对按钮事件的处理，我们所要做的只是让 Counter 组件在浏览器端重新执行一遍，也就是 mount 一遍就可以了。
 
@@ -1609,12 +1613,12 @@ React 在 v16 之后，做了一些改进，不再要求整个组件树两端渲
 
 #### 同构应用
 
+有很多文章都提到同构应用，其实就是首屏使用服务端渲染，后面使用浏览器端渲染的应用。
+
 <br/>
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/130.jpg' width='600'>
 <br/>
 
-
-<br/>
 
 ### 使用 Next.js 实现服务端渲染
 
@@ -1670,7 +1674,7 @@ class Home extends React.Component {
 
 - 没有侵入 React 原生生命周期函数，以前的 React 组件该怎么写还是怎么写；
 - getInitialProps 只负责获取数据的过程，开发者不用操心什么时候调用 getInitialProps，依然是 React 哲学的声明式编程方式；
-- getInitialProps 是 async 函数，可以利用 JavaScript 语言的新特性，用同步的方式实现异步功能。
+- getInitialProps 是 async 函数，可以利用 JS 语言的新特性，用同步的方式实现异步功能。
 
 #### Next.js 的“脱水”和“注水”
 
@@ -2329,7 +2333,7 @@ const Foo = () => {
 
 在 React 推出 v16 的时候，就增加了一个新生命周期函数 componentDidCatch。如果某个组件定义了 componentDidCatch，那么这个组件中所有的子组件在渲染过程中抛出异常时，这个 componentDidCatch 函数就会被调用。
 
-可以这么设想，componentDidCatch 就是 JavaScript 语法中的 catch，而对应的 try 覆盖所有的子组件，就像下面这样:
+可以这么设想，componentDidCatch 就是 JS 语法中的 catch，而对应的 try 覆盖所有的子组件，就像下面这样:
 
 ```js
 try {
