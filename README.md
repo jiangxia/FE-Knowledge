@@ -107,6 +107,7 @@ winter大神说得好：
     - [webpack4][409]
     - [react学习笔记][410]
 6. 其他
+    - [数组和字符串API汇总][503]
     - [VS Code使用手册][501]
     - [《程序员进阶攻略》学习笔记][502]
     - [《面试现场》学习笔记][505]
@@ -187,4 +188,5 @@ winter大神说得好：
 
 [501]: https://www.yuque.com/mingyi-8nuow/rm3h54/gdf9cq
 [502]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/《程序员进阶攻略》学习笔记.md
+[503]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/数组和字符串API汇总.md
 [505]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/《面试现场》学习笔记.md
