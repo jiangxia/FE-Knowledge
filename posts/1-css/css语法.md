@@ -66,10 +66,10 @@ page用于分页媒体访问网页时的表现设置，页面是一种特殊的�
   size: 8.5in 11in;
   margin: 10%;
   @top-left {
-  	content: "Hamlet";
-	}
+    content: "Hamlet";
+  }
   @top-right {
-  	content: "Page " counter(page);
+    content: "Page " counter(page);
   }
 }
 ```
