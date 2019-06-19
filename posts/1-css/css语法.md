@@ -51,7 +51,7 @@ media就是大名鼎鼎的media query使用的规则了，它能够对设备的�
 
 ```css
 @media print {
-	body { font-size: 10pt }
+  body { font-size: 10pt }
 }
 ```
 
