@@ -32,7 +32,14 @@
 
 # 字符串API
 
+字符串API少得多，直接上图~
 
 <br/>
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/174.png' width='1000'>
 <br/>
+
+# 写在最后
+
+平时用这些API时，多联系相同类型的API，能增强记忆。
+
+将常用的API记熟，对日常工作意义重大，这点投入是值得的！
