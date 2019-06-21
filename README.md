@@ -50,15 +50,20 @@ winter大神说得好：
                 * [对象][007]
                 * [面向对象][008]
                 * [对象的分类][009]
-                * [常见数据结构][010]
         * 执行过程（算法）
             + [事件循环][011]
             + [闭包和执行上下文][012]
             + [函数的执行][013]
             + [语句级的执行][014]
         * 延展阅读
+            + [模块化的演变][018]
             + [字符编码][015]
             + [规范类型][017]
+            + [常见数据结构][010]
+            + [新特性：async/await][019]
+            + [常见定时器函数][020]
+
+            
 2. [css][100]
     - 语言
         + [css语法][101]
@@ -138,6 +143,9 @@ winter大神说得好：
 [015]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/字符编码.md
 [016]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/类型转换.md
 [017]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/规范类型.md
+[018]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/模块化的演变.md
+[019]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/async.md
+[020]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/常见定时器函数.md
 
 
 
