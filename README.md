@@ -44,7 +44,8 @@ winter大神说得好：
     - 运行时
         * 数据结构
             + 类型
-                * [类型 及 类型转换][006]
+                * [类型][006]
+                * [类型转换][016]
             + 实例
                 * [对象][007]
                 * [面向对象][008]
@@ -55,6 +56,9 @@ winter大神说得好：
             + [闭包和执行上下文][012]
             + [函数的执行][013]
             + [语句级的执行][014]
+        * 延展阅读
+            + [字符编码][015]
+            + [规范类型][017]
 2. [css][100]
     - 语言
         + [css语法][101]
@@ -122,7 +126,7 @@ winter大神说得好：
 [003]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/语法特性.md
 [004]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/语句.md
 [005]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/表达式.md
-[006]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/类型及类型转换.md
+[006]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/类型.md
 [007]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/对象.md
 [008]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/面向对象.md
 [009]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/对象的分类.md
@@ -131,6 +135,9 @@ winter大神说得好：
 [012]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/闭包和执行上下文.md
 [013]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/函数的执行.md
 [014]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/语句级的执行.md
+[015]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/字符编码.md
+[016]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/类型转换.md
+[017]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/规范类型.md
 
 
 

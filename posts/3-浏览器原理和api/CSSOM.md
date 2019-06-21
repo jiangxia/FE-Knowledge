@@ -2,7 +2,7 @@
 
 DOM中的所有的属性都是用来表现语义的属性，CSSOM的则都是表现的属性，width和height这类显示相关的属性，都属于我们今天要讲的CSSOM。
 
-顾名思义，CSSOM是CSS的对象模型，在W3C标准中，它包含两个部分：描述样式表和规则等CSS的模型部分（CSSOM），和跟元素视图相关的View部分（CSSOM View）。
+顾名思义，CSSOM是CSS的对象模型，在W3C标准中，它包含两个部分：描述**样式表和规则等CSS的模型部分**（CSSOM），和跟**元素视图相关的View部分**（CSSOM View）。
 
 在实际使用中，CSSOM View比CSSOM更常用一些，因为我们很少需要用代码去动态地管理样式表。
 
@@ -19,7 +19,7 @@ DOM中的所有的属性都是用来表现语义的属性，CSSOM的则都是表
 ```html
 <style title="Hello">
 a {
-color:red;
+  color:red;
 }
 </style>
 <link rel="stylesheet" title="x" href="data:text/css,p%7Bcolor:blue%7D">
