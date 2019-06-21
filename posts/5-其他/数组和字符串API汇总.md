@@ -23,7 +23,7 @@
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/172.png' width='500'>
 <br/>
 
-再往下细分，我们可以看到数组API的全貌了~
+再往下细分，我们可以看到数组API的全貌了（带✨是ES6新增的API）~
 
 - 更改原数组
     - 添加
