@@ -107,6 +107,7 @@ winter大神说得好：
     - [webpack4][409]
     - [react学习笔记][410]
 6. 其他
+    - [前端自查清单](https://mp.weixin.qq.com/s/A8YyeM2N2MP23gEMzVLesw)
     - [数组和字符串API汇总][503]
     - [VS Code使用手册][501]
     - [《程序员进阶攻略》学习笔记][502]
