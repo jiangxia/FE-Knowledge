@@ -62,8 +62,7 @@ winter大神说得好：
             + [常见数据结构][010]
             + [新特性：async/await][019]
             + [常见定时器函数][020]
-
-            
+            + [数组和字符串API汇总][021]
 2. [css][100]
     - 语言
         + [css语法][101]
@@ -87,37 +86,37 @@ winter大神说得好：
     - 补充标准
         + [ARIA][206]
 4. [浏览器原理和API][300]
-    - 原理
-        + [浏览器实现原理][301]
-            - [网络通讯][302]
-            - [构建DOM树][303]
-            - [计算CSS][304]
-            - [排版][305]
-            - [渲染、合成、绘制][306]
-            - [补充知识点][307]
-        + [浏览器缓存机制][308]
-        + [浏览器安全机制][309]
-        + [网络协议][310]
+    - [原理][301]
+        - [网络通讯][302]
+        - [构建DOM树][303]
+        - [计算CSS][304]
+        - [排版][305]
+        - [渲染、合成、绘制][306]
+        - [补充知识点][307]
     - API
         + [DOM][311]
         + [CSSOM][312]
         + [事件][313]
         + [跨域][314]
         + [存储][315]
+    - 延展阅读
+        + [浏览器缓存机制][308]
+        + [浏览器安全机制][309]
+        + [网络协议][310]
 5. 前端工程化
     - [性能][401]
-    - [性能优化][402]
     - [工具链][403]
     - [持续集成][404]
     - [搭建系统][405]
     - [前端架构][406]
-    - [监控][407]
-    - [设计模式][408]
-    - [webpack4][409]
-    - [react学习笔记][410]
+    - 延展阅读
+        - [性能优化][402]
+        - [监控][407]
+        - [设计模式][408]
+        - [webpack4][409]
+        - [react学习笔记][410]
 6. 其他
     - [前端自查清单](https://mp.weixin.qq.com/s/A8YyeM2N2MP23gEMzVLesw)
-    - [数组和字符串API汇总][503]
     - [VS Code使用手册][501]
     - [《程序员进阶攻略》学习笔记][502]
     - [《面试现场》学习笔记][505]
@@ -146,6 +145,7 @@ winter大神说得好：
 [018]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/模块化的演变.md
 [019]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/async.md
 [020]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/常见定时器函数.md
+[021]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/数组和字符串API汇总.md
 
 
 
@@ -204,5 +204,4 @@ winter大神说得好：
 
 [501]: https://www.yuque.com/mingyi-8nuow/rm3h54/gdf9cq
 [502]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/《程序员进阶攻略》学习笔记.md
-[503]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/数组和字符串API汇总.md
 [505]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/《面试现场》学习笔记.md
