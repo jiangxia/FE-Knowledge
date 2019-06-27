@@ -12,7 +12,7 @@
 
 # Flex的设计
 
-Flex排版的核心是display:flex和flex属性，它们配合使用。具有display:flex的元素我们称为flex容器，它的子元素或者盒被称作flex项。
+Flex排版的核心是`display:flex`和flex属性，它们配合使用。具有`display:flex`的元素我们称为flex容器，它的子元素或者盒被称作flex项。
 
 flex项如果有flex属性，会根据flex方向代替宽/高属性，形成“填补剩余尺寸”的特性，这是一种典型的“根据外部容器决定内部尺寸”的思路。
 

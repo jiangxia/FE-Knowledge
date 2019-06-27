@@ -4,6 +4,7 @@
 
 我们接着来看两个过程：如何解析请求回来的HTML代码，DOM树又是如何构建的。
 
+下面这张图完整展示了这个过程，也是本文的线索。本文的内容仅供拓宽眼界，让你明白浏览器工程师是如何工作的。
 
 <br/>
 <img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/40.png' width='800'>
