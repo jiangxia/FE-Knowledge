@@ -63,6 +63,7 @@ winter大神说得好：
             + [新特性：async/await][019]
             + [常见定时器函数][020]
             + [数组和字符串API汇总][021]
+            <!-- + [算法与数据结构汇总][022] -->
 2. [css][100]
     - 语言
         + [css语法][101]
@@ -145,7 +146,8 @@ winter大神说得好：
 [018]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/模块化的演变.md
 [019]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/async.md
 [020]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/常见定时器函数.md
-[021]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/数组和字符串API汇总.md
+[021]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/数组和字符串API汇总.md
+[022]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/0-JavaScript/算法与数据结构汇总.md
 
 
 
