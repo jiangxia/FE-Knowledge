@@ -1,0 +1,186 @@
+body {
+	padding: 20px;
+	margin: 0 auto;
+	background-color: #E2E2E2;
+	max-width: 1024px;
+	color: #595B66;
+	font-family: 'Microsoft Yahei', sans-serif;
+}
+h1,h2,h3,h4 {
+	color: #797979;
+    border-bottom: solid 1px #797979;
+    padding: 5px 0;
+}
+h1, h2 {
+    border-bottom: solid 2px #797979;
+}
+p {
+	font-size: 15px;
+    background: #797979;
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    line-height: 2;
+}
+a {
+	color: #FFD200;
+}
+.box {
+	background-color: white;
+	margin: 0 0 55px;
+	display: flex;
+	
+}
+.box-tall {
+	height: 800px;
+}
+.box-item {
+	width: 200px;
+	height: 200px;
+	line-height: 200px;
+	vertical-align: middle;
+	margin: 5px;
+	background-color: #ffd200;
+	font-size: 100px;
+	color: white;
+	text-align: center;
+}
+.item-tall {
+	height: 400px;
+	line-height: 400px;
+}
+.box-item div{
+	font-size: 14px;
+	position: relative;
+	top: -150px;
+}
+
+.box-1 {
+	flex-direction: row;
+}
+
+.box-2 {
+	flex-direction: row;
+	flex-wrap: nowrap;
+}
+
+.box-3 {
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.box-4 {
+	flex-direction: row;
+	flex-wrap: wrap-reverse;
+}
+
+.box-5 {
+	flex-flow: row nowrap;
+}
+
+.box-6 {
+	justify-content: flex-start;
+}
+.box-7 {
+	justify-content: flex-end;
+}
+.box-8 {
+	justify-content: center;
+}
+.box-9 {
+	justify-content: space-between;
+}
+.box-10 {
+	justify-content: space-around;
+}
+
+.box-11 {
+	align-items: flex-start;
+}
+.box-12 {
+	align-items: flex-end;
+}
+.box-13 {
+	align-items: center;
+}
+.box-14 {
+	align-items: baseline;
+}
+.box-14 .box-item{
+	font-size: 88px;
+	line-height: initial;
+	text-decoration: underline;
+}
+.box-14 .item-tall{
+	font-size: 122px;
+	line-height: initial;
+}
+.box-15 {
+	align-items: stretch;
+}
+.box-15 .box-item {
+	height: auto;
+}
+
+.box-16 {
+	flex-wrap: wrap;
+	align-content: flex-start;
+}
+.box-17 {
+	flex-wrap: wrap;
+	align-content: flex-end;
+}
+.box-18 {
+	flex-wrap: wrap;
+	align-content: center;
+}
+.box-19 {
+	flex-wrap: wrap;
+	align-content: space-between
+}
+.box-20 {
+	flex-wrap: wrap;
+	align-content: space-around;
+}
+.box-21 {
+	flex-wrap: wrap;
+	align-content: stretch;
+}
+.box-21 .box-item {
+	height: auto;
+}
+
+.box-22 .order {
+	order: -1;
+}
+
+
+.box-23 .box-item{
+	flex-grow: 1;
+	width: auto;
+}
+.box-23	.grow-2 {
+	flex-grow: 2;
+}
+
+.box-24 .box-item {
+	width: 400px;
+}
+.box-24 .shrink{
+	flex-shrink: 0;
+}
+
+.box-25 .box-item {
+	flex-basis: 200px;
+	width: 400px; // width 将失去作用
+}
+
+.box-26 {
+	height: 400px;
+}
+.box-26 .box-item {
+	align-self: flex-start;
+}
+.box-26 .end {
+	align-self: flex-end;
+}
