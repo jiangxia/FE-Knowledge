@@ -134,8 +134,30 @@ flex属性有两个快捷值：auto (1 1 auto) 和 none (0 0 auto)。
 
 建议优先使用这个属性，而不是单独写三个分离的属性。
 
+## 简单记忆
+
+讲了这么多，可能你还是记不住，让我们记住一个简单的套路吧：
+
+```css
+.parent {
+  display:flex;
+  flex-flow:row nowrap;
+}
+.child {
+  flex: 0 1 auto;
+}
+```
+
+如需调整对齐方式，就在parent下增加justify-content、align-items、align-content 即可。
+
 <br/>
 
 # flex 布局实例
 
+这里整理了一些示例，请看：
+
+- [示例1](https://github.com/jiangxia/FE-Knowledge/blob/master/code/flex/index.html)
+- [示例2](https://github.com/jiangxia/FE-Knowledge/blob/master/code/flex/demo1.html)
+- [示例3](https://github.com/jiangxia/FE-Knowledge/blob/master/code/flex/demo2.html)
+- [示例4](https://github.com/jiangxia/FE-Knowledge/blob/master/code/flex/demo3.html)
 

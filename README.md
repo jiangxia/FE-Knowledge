@@ -76,6 +76,9 @@ winter大神说得好：
             - [CSS动画与交互][105]
         + 绘制
             - [渲染:绘制颜色][106]
+    - 延展阅读
+        + [《css揭秘》在线阅读](http://cdn.luoyelusheng.cn/assets/books/css%E6%8F%AD%E7%A7%98.pdf)
+        + [我理解的flex][107]
 3. [html][200]
     - 标签（功能）
         + [语义类标签][201]
@@ -158,6 +161,7 @@ winter大神说得好：
 [104]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/1-css/flex.md
 [105]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/1-css/CSS动画与交互.md
 [106]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/1-css/绘制颜色.md
+[107]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/1-css/我理解的flex.md
 
 
 

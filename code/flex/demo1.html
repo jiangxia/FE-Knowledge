@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>让一个元素在容器内完美居中</title>
+  <style>
+    body {
+      font: 12px/1.5 'Microsoft Yahei', '\5b8b\4f53', tahoma, arial, sans-serif;
+      color: #f00;
+      background: #F2F8FD
+    }
+
+    .container {
+      display: flex;
+      margin-bottom: 10px;
+      flex-flow: row nowrap;
+      justify-content: center;
+      align-items: center;
+      width: 300px;
+      height: 300px;
+      background: #DBEFFA;
+    }
+
+    .flex-item {
+      background: #BDD8F5;
+      color: #000;
+      text-align: center;
+      font-size: 14px;
+      padding: 10px
+    }
+
+    .flex-item1 {
+      width: 200px;
+      height: 200px
+    }
+
+    .flex-item3,
+    .flex-item4 {
+      margin: 5px;
+      flex: 1
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="flex-item flex-item1">测试文字测试文字<br />测试文字测试文字测试文字<br />测试文字</div>
+  </div>
+  <div class="container">
+    <div class="flex-item">测试文字测试文字<br />测试文字测试文字测试文字<br />测试文字</div>
+  </div>
+  <div class="container">
+    <div class="flex-item flex-item3">测试文字测试文字<br />测试文字测试文字测试文字<br />测试文字</div>
+    <div class="flex-item flex-item4">测试文字测试文字<br />测试文字测试文字测试文字<br />测试文字</div>
+  </div>
+</body>
+
+</html>
