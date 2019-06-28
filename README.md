@@ -124,6 +124,7 @@ winter大神说得好：
     - [VS Code使用手册][501]
     - [《程序员进阶攻略》学习笔记][502]
     - [《面试现场》学习笔记][505]
+    - [winter-组件化的前世今生][506]
     
 
 
@@ -211,3 +212,4 @@ winter大神说得好：
 [501]: https://www.yuque.com/mingyi-8nuow/rm3h54/gdf9cq
 [502]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/《程序员进阶攻略》学习笔记.md
 [505]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/《面试现场》学习笔记.md
+[505]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/5-其他/winter-组件化的前世今生.md
