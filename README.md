@@ -118,6 +118,7 @@ winter大神说得好：
         - [监控][407]
         - [设计模式][408]
         - [webpack4][409]
+        - [前端构建工具发展及其比较][411]
         - [react学习笔记][410]
 6. 其他
     - [前端自查清单](https://mp.weixin.qq.com/s/A8YyeM2N2MP23gEMzVLesw)
@@ -207,6 +208,7 @@ winter大神说得好：
 [408]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/设计模式.md
 [409]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/webpack4学习笔记.md
 [410]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/react学习笔记.md
+[411]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/4-前端工程化/前端构建工具发展及其比较.md
 
 
 [501]: https://www.yuque.com/mingyi-8nuow/rm3h54/gdf9cq
