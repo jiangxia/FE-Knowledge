@@ -125,10 +125,12 @@ winter大神说得好：
         - [前端构建工具发展及其比较][411]
 6. 其他
     - [前端自查清单](https://mp.weixin.qq.com/s/A8YyeM2N2MP23gEMzVLesw)
+    - [web前端学习资源分享](https://juejin.im/post/5a0c1956f265da430a501f51#heading-2)
     - [VS Code使用手册][501]
     - [《程序员进阶攻略》学习笔记][502]
     - [《面试现场》学习笔记][505]
     - [winter-组件化的前世今生][506]
+    - [阿里·飞冰](https://ice.work/)
     
 
 
