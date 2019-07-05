@@ -42,7 +42,7 @@ CSS规则并不是等DOM树构建好了以后，才给它添加样式的。
 
 这部分具体的做法属于编译原理的内容，这里就不做赘述了。我们这里假设CSS已经被解析成了一棵可用的抽象语法树。
 
-我们在之前的[CSS课程](https://github.com/jiangxia/FE-Knowledge/blob/master/posts/1-css/css语法.md#选择器)中已经介绍过 `compound-selector`（复合选择器） 的概念，一个 `compound-selector` 是检查一个元素的规则，而一个复杂选择器，则是由数个 `compound-selector` 通过前面讲的符号连接起来的。
+我们在之前的[CSS课程](https://github.com/jiangxia/FE-Knowledge/blob/master/posts/css/css语法.md#选择器)中已经介绍过 `compound-selector`（复合选择器） 的概念，一个 `compound-selector` 是检查一个元素的规则，而一个复杂选择器，则是由数个 `compound-selector` 通过前面讲的符号连接起来的。
 
 <br/>
 

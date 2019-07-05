@@ -18,6 +18,8 @@ JS 的知识体系，可以分为：文法、语义、运行时。也就是“�
         + [语法特性][003]
         + [语句][004]
         + [表达式][005]
+    * 延展阅读
+        + [严格模式][023]
 - 运行时
     * 数据结构
         + 类型
@@ -65,4 +67,5 @@ JS 的知识体系，可以分为：文法、语义、运行时。也就是“�
 [020]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/JavaScript/常见定时器函数.md
 [021]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/JavaScript/数组和字符串API汇总.md
 [022]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/JavaScript/算法与数据结构汇总.md
+[023]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/JavaScript/严格模式.md
 
