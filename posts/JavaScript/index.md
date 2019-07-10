@@ -39,9 +39,9 @@ JS 的知识体系，可以分为：文法、语义、运行时。也就是“�
         + [字符编码][015]
         + [规范类型][017]
         + [常见数据结构][010]
-        + [新特性：async/await][019]
         + [常见定时器函数][020]
         + [数组和字符串API汇总][021]
+        + [属性的遍历][024]
         <!-- + [算法与数据结构汇总][022] -->
 
 
@@ -63,9 +63,8 @@ JS 的知识体系，可以分为：文法、语义、运行时。也就是“�
 [016]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/JavaScript/类型转换.md
 [017]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/JavaScript/规范类型.md
 [018]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/JavaScript/模块化的演变.md
-[019]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/JavaScript/async.md
 [020]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/JavaScript/常见定时器函数.md
 [021]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/JavaScript/数组和字符串API汇总.md
 [022]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/JavaScript/算法与数据结构汇总.md
 [023]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/JavaScript/严格模式.md
-
+[024]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/JavaScript/属性的遍历.md

@@ -13,6 +13,5 @@
 - [前端面试10：错误监控/产品性能体系](https://juejin.im/post/5c072a7a6fb9a049d235d410)
 - [前端面试11：通讯类](https://juejin.im/post/5c072a9be51d451d8e5c9796)
 - [前端面试12：安全类](https://juejin.im/post/5c072ad36fb9a049e307e0e0)
-- [前端面试13：前端性能优化的关键时间点](https://juejin.im/post/5c072b05e51d451dca308530)
 
 [601]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/面试/面试相关.md
