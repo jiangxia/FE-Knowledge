@@ -1,3 +1,10 @@
+# 前言
+
+系统讲解CSS之前，需要先了解下HTML跟CSS的基本知识。
+
+
+<br/>
+
 # HTML基础知识
 
 ## H5的理解
@@ -121,3 +128,21 @@ $0.setAttribute('value',5) // 要想改变attribute值，可以使用setAttribut
 可见，attribute是HTML的属性，而property是DOM上的特性，HTML是“死”的，所以attribute也是“死”的，渲染出DOM元素后，就跟DOM元素没有关联。
 
 而DOM元素是活的，property也是活的，当我们改变property的值时，页面输入框的值也会跟着改变。
+
+<br/>
+
+# CSS 基础知识
+
+## CSS 选择器权重问题
+
+class的权重是10，id的权重是100。
+
+如果有11个class选择器，权重是110，是否意味着比一个id选择器的权重大？
+
+答案是否定的！css选择器的权重计算是不进位的。可以理解为“官大一级压死人”。id选择器的权重就是比class大，class权重的计算值是不进位的。
+
+也就是说，十位虽然是11，但不会进位，所以百位仍是0.
+
+此外，还有一些特殊场景，也就是内联样式、!important、id选择器的优先级。他们的优先级是：!important > 内联样式 > id选择器。
+
+<br/>
