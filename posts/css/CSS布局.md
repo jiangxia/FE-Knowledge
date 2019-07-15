@@ -1,3 +1,9 @@
+# 前言
+
+写布局时，可以先把HTML结构写出来，这个过程中，先不关心样式如何去实现，先把结构完整写出来。然后，再考虑如何布局，优先使用flex布局。这里有一篇文章详细介绍了这个过程：[从原型图到成品：步步深入 CSS 布局](https://mp.weixin.qq.com/s/Vl1aI09AglKA4qmq0y7rlg)
+
+# 其他资料
+
 - [网格布局](http://www.ruanyifeng.com/blog/2019/03/grid-layout-tutorial.html)
 - [我理解的flex][001]
 - [深入浅出CSS布局](http://layout.imweb.io/)
