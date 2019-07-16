@@ -2649,3 +2649,7 @@ Hooks 将大大简化使用 React 的代码。
 
 对了，所有的 Hooks API 都只能在函数类型组件中调用，class 类型的组件不能用，从这点看，很显然，class 类型组件将会走向消亡。
 
+# 相关资料
+
+- [React.js 小书](http://huziketang.mangojuice.top/books/react/)
+- [Ant Design 实战教程](https://www.yuque.com/ant-design/course)
