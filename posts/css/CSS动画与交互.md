@@ -114,3 +114,7 @@ div
 我们今天的课程，重点介绍了动画和它背后的一些机制。
 
 CSS用transition和animation两个属性来实现动画，这两个属性的基本用法很简单，我们今天还介绍了它们背后的原理：贝塞尔曲线。
+
+更多资料：
+- [css3的新特性transform,transition,animation](https://www.cnblogs.com/bobodeboke/p/6252869.html)
+- [transition、translate、transform、animation的区别](https://blog.csdn.net/qq_22755565/article/details/78603095)
