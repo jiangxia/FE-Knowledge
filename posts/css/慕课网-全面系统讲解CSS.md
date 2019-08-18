@@ -5,7 +5,7 @@
 
 <br/>
 
-# HTML基础知识
+# HTML
 
 ## H5的理解
 
@@ -131,7 +131,7 @@ $0.setAttribute('value',5) // 要想改变attribute值，可以使用setAttribut
 
 <br/>
 
-# CSS 基础知识
+# CSS
 
 ## CSS 选择器权重问题
 
@@ -146,3 +146,55 @@ class的权重是10，id的权重是100。
 此外，还有一些特殊场景，也就是内联样式、!important、id选择器的优先级。他们的优先级是：!important > 内联样式 > id选择器。
 
 <br/>
+
+## 非布局样式
+
+- 文字相关：字体、字重、颜色、大小、行高、换行
+- 盒子相关：背景、边框
+- 页面相关：滚动
+- 装饰相关：粗体、下划线、斜体
+
+### 文字
+
+#### 字体族
+
+一共有5种字体族，分别是： serif (衬线字体) 、 sans-serif （非衬线字体）、 monospace （等宽字体）、 cursive （手写体） 、 fantasy （花体）
+
+设置字体时，可以同时设置多种字体，如果一个字体找不到，就会往后找下一个。这就是**多字体的fallback机制**。
+
+#### 行高
+
+也就是line-height，它不会影响inline box的高度，但可以决定空余空间在inline box上下的均分。所以可以用line-height实现垂直居中。
+
+请看[例子](https://github.com/jiangxia/FE-Knowledge/blob/master/code/line-height.html)
+
+#### 文字折行
+
+- overflow-wrap（word-wrap）是否保留单词
+- word-break 是否把单词看成一个单位。（keep-all表示把单词、中文句子看成整体，break-all表示不把单词看成一个整理）
+- white-space 空白处是否断行。设置nowrap表示不换行
+
+### 盒子
+
+#### 背景
+
+如果想给一个盒子同时设置背景图片跟渐变色背景，可以这样做：
+
+```css
+.class{
+  background: url(./test.png) 174px center no-repeat,linear-gradient(to bottom,red,green);
+}
+```
+
+CSS3 为 background 增加了一些属性，其中需要重点关注的是：background-origin、background-clip、background-size: contain;
+
+- background-origin设置图片的定位，即图片左上角的位置(从哪开始显示)，跟background-position配合。
+- background-clip设置图片显示哪部分区域，可以实现背景图片的裁剪(显示哪)，例如可以设置图片从边框左上角进行定位，但是针对内容区域进行裁剪
+- background-size: contain;背景图像可以完整显示，但可能不能完全覆盖背景区域
+- background-size: cover;背景图像可以完整覆盖背景区域，但是图像可能显示不完整
+
+更多资料，看[这里](https://blog.csdn.net/m0_37617778/article/details/84988372)
+
+<br/>
+
+## CSS 布局
