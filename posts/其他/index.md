@@ -2,6 +2,7 @@
 
 - [一些关于前端的思考][507]
 - [前端自查清单](https://mp.weixin.qq.com/s/A8YyeM2N2MP23gEMzVLesw)
+- [一个合格(优秀)的前端都应该阅读这些文章](https://juejin.im/post/5d387f696fb9a07eeb13ea60)
 - [web前端学习资源分享](https://juejin.im/post/5a0c1956f265da430a501f51#heading-2)
 - [VS Code使用手册][501]
 - [《程序员进阶攻略》学习笔记][502]

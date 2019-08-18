@@ -2653,3 +2653,4 @@ Hooks 将大大简化使用 React 的代码。
 
 - [React.js 小书](http://huziketang.mangojuice.top/books/react/)
 - [Ant Design 实战教程](https://www.yuque.com/ant-design/course)
+- [对React children 的深入理解](https://www.jianshu.com/p/d1975493b5ea)
