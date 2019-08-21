@@ -134,6 +134,86 @@ vue 实例化时，会对数据进行代理，不管是取数据，还是设置�
 两者的区别：computed 能做的，watch都能做，反之则不行。能用computed的尽量使用computed。
 
 
+### 生命周期
+
+一、创建阶段
+beforeCreate => created => beforeMount => render => mounted
+
+二、更新阶段
+beforeUpdate => render => updated
+
+三、销毁阶段
+beforeDestroy => destroyed
+
+#### 创建阶段
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/183.png' width='600'>
+<br/>
+
+具体过程如下：
+
+```
+初始化事件和生命周期
+beforeCreate
+数据观测、属性、侦听器配置等
+created
+模板编译到render
+beforeMount
+render
+mounted
+异步请求、操作DOM、定时器等
+```
+
+#### 更新阶段
+
+```
+依赖数据改变或 $forceUpdate 强制刷新
+beforeUpdate
+移除已经添加的事件监听器等，万万不可更改依赖数据
+render
+updated
+操作DOM添加事件监听器等，万万不可更改依赖数据
+```
+
+### 函数式组件
+
+特点：无状态、无实例、没有this上下文、无生命周期
+设置 `functional: true` 就可以声明函数式组件
+
+### 组件通信
+
+provide / inject
+
+### 指令
+
+#### 内置指令
+```
+v-text
+v-html
+v-show
+v-if
+v-else
+v-else-if
+v-for
+v-on
+v-bind
+v-model
+v-slot
+v-pre
+v-cloak
+v-once
+```
+
+#### 自定义指令
+
+```
+bind  
+inserted  
+update  
+componentuUpdate  
+unbind
+```
 
 ## 最佳实践
 
