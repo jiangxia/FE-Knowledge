@@ -181,9 +181,6 @@ updated
 特点：无状态、无实例、没有this上下文、无生命周期
 设置 `functional: true` 就可以声明函数式组件
 
-### 组件通信
-
-provide / inject
 
 ### 指令
 
@@ -215,6 +212,18 @@ componentuUpdate
 unbind
 ```
 
+### 组件通信
+
+provide / inject
+
+### 组件实例
+
+```html
+<!-- vm.$refs.p可以获取组件实例 -->
+<p ref="p">hello</p>
+<!-- vm.$refs.child可以获取组件实例 -->
+<child-component ref="child"></child-component>
+```
 ## 最佳实践
 
 > 最佳实践回答“怎么能用好”的问题，反映你实践经验的丰富程度。
