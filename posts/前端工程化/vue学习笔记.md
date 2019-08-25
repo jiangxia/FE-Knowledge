@@ -224,10 +224,31 @@ provide / inject
 <!-- vm.$refs.child可以获取组件实例 -->
 <child-component ref="child"></child-component>
 ```
+
+### 数组对响应式更新的支持情况
+
+支持：push pop shift unshift splice sort reverse
+
+不支持：filter concat slice
+
+原理是使用 Object.definedProperty 对数组方法进行改写
+
 ## 最佳实践
 
 > 最佳实践回答“怎么能用好”的问题，反映你实践经验的丰富程度。
 
+### vuex
+
+#### 核心概念
+State —— this.$store.state.xxx 取值 —— 提供一个响应式数据
+
+Getter —— this.$store.getters.xxx 取值 —— 借助vue的计算属性computed来实现缓存
+
+Mutation —— this.$store.commit("xxx") 赋值 —— 更新state的方法
+
+Action —— this.$store.dispatch("xxx") 赋值 —— 触发 mutation的方法
+
+Module —— Vue.set 动态添加state 到响应式数据中
 <br/>
 
 ## 市场应用趋势
