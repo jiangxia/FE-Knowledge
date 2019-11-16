@@ -13,11 +13,7 @@
 
 <br/>
 
-vue 的诞生其实是要解决两个问题。UI细节问题问题 和 数据模型的问题。
-
-**UI细节问题问题**
-
-**数据模型的问题**
+vue 的诞生其实是要解决两个问题。**UI细节问题问题** 和 **数据模型的问题**。
 
 <br/>
 
@@ -27,91 +23,125 @@ vue 的诞生其实是要解决两个问题。UI细节问题问题 和 数据模
 
 <br/>
 
-### Vue组件的核心概念 （属性、事件、插槽）
-
-#### vue 组件
-
-Vue组件 = Vue实例 = new Vue(option)
-
-#### 属性
+### vue属性
 
 - 自定义属性 props ：组件props中声明的属性
 - 原生属性 ： 没有声明的属性，默认自动挂载到组件根元素上，设置inheritAttrs 为false可以关闭自动挂载
 - 特殊属性 class、style ：挂载到组件根元素上，支持字符串、对象、数组等多种语法
 
-```js
-// inheritAttrs: false,
-// props: ['name', 'type', 'list', 'isVisible'],
-props: {
-  name: String,
-  type: {
-    validator: function(value) {
-      // 这个值必须匹配下列字符串中的一个
-      return ["success", "warning", "danger"].includes(value);
-    }
-  },
-  list: {
-    type: Array,
-    // 对象或数组默认值必须从一个工厂函数获取
-    default: () => []
-  },
-  isVisible: {
-    type: Boolean,
-    default: false
-  },
-  onChange: {
-    type: Function,
-    default: () => {}
-  }
-},
-```
-
-#### 事件
+### 事件
 
 - 普通事件：@click、@import、@change、@xxx等事件，通过 this.$emit('xxx', ...) 触发
 - 修饰符事件：@input.trim、@click.stop、@submit.prevent等，一般用于原生HTML元素，自定义组件需要自行开发支持
 
-#### 插槽
+### 插槽
 
 - 普通插槽
-
-```
-<template slot='xxx'>...</template>
-<template v-slot:xxx>...</template>  // 2.6
-```
-
 - 作用域插槽
 
-```
-<template slot='xxx' slot-scope='props'>...</template>
-<template v-slot:xxx='props'>...</template> // 2.6
-```
+### 计算属性 与 监听器
 
-建议使用 2.6 版本的写法
+计算属性：可以写计算逻辑的属性，通常用于数据缓存，数据没有变化，不会重复计算。计算属性依赖的数据，必须是响应式数据
 
+监听器 watch ： 更加灵活通用，可以执行任何逻辑，如函数节流、ajax异步获取数据，甚至操作DOM
 
-#### 大属性
-
-- 大属性
-  - 属性
-    - 自定义属性 props
-    - 原生属性 attrs
-    - 特殊属性 class、style
-  - 事件
-    - 普通事件
-    - 修饰符事件
-  插槽
-    - 普通插槽
-    - 作用域插槽
-
-都是通过父组件传递给子组件，由子组件根据传递的内容，去执行一些行为。
+两者的区别：computed 能做的，watch都能做，反之则不行。能用computed的尽量使用computed。
 
 <br/>
 
 
+### 函数式组件
+
+特点：无状态、无实例、没有this上下文、无生命周期
+设置 `functional: true` 就可以声明函数式组件
+
+
+### 生命周期
+
+一、创建阶段
+beforeCreate => created => beforeMount => render => mounted
+
+二、更新阶段
+beforeUpdate => render => updated
+
+三、销毁阶段
+beforeDestroy => destroyed
+
+### 指令
+
+#### 内置指令
+```
+v-text
+v-html
+v-show
+v-if
+v-else
+v-else-if
+v-for
+v-on
+v-bind
+v-model
+v-slot
+v-pre
+v-cloak
+v-once
+```
+
+#### 自定义指令
+
+```
+bind  
+inserted  
+update  
+componentuUpdate  
+unbind
+```
+
+### 组件实例
+
+```html
+<!-- vm.$refs.p可以获取组件实例 -->
+<p ref="p">hello</p>
+<!-- vm.$refs.child可以获取组件实例 -->
+<child-component ref="child"></child-component>
+```
+
+### 数组对响应式更新的支持情况
+
+支持：push pop shift unshift splice sort reverse
+
+不支持：filter concat slice
+
+原理是使用 Object.definedProperty 对数组方法进行改写
+
+-----------------
+
+### 单向数据流
+
+vue是单向数据流，不是双向绑定。
+vue的双向绑定不过是语法糖
+Object.definedProperty 是用来做响应式更新的，和双向绑定没关系。
+
+
+### 组件通信
+
+provide / inject
+
 ## 最佳实践
 
 > 最佳实践回答“怎么能用好”的问题，反映你实践经验的丰富程度。
+
+### vuex
+
+State —— `this.$store.state.xxx` 取值 —— 提供一个响应式数据
+
+Getter —— `this.$store.getters.xxx` 取值 —— 借助vue的计算属性computed来实现缓存
+
+Mutation —— `this.$store.commit("xxx")` 赋值 —— 更新state的方法
+
+Action —— `this.$store.dispatch("xxx")` 赋值 —— 触发 mutation的方法
+
+Module —— `Vue.set` 动态添加state 到响应式数据中
 
 <br/>
 
@@ -136,6 +166,17 @@ props: {
 > 为了达到设计目标，该技术采用了什么原理和机制。实现原理层回答“怎么做到”的问题。把实现原理弄懂，并且讲清楚，是技术人员的基本功。
 
 <br/>
+
+### 响应式更新
+
+<br/>
+<img src='https://github.com/jiangxia/FE-Knowledge/raw/master/images/182.png' width='800'>
+<br/>
+
+vue 实例化时，会对数据进行代理，不管是取数据，还是设置数据，都会对数据进行代理。
+
+对于render需要的数据，才会把数据加入 watcher，下次数据有更新时，才会通知 watcher，并且通知组件的更新。
+
 
 ## 优劣局限
 
