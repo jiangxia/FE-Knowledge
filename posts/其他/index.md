@@ -20,7 +20,7 @@
 
 
 [501]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/其他/《软件工程之美》学习笔记.md
-[502]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/其他/《浏览器工作原理与实践》学习笔记.md
+[502]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/其他/浏览器工作原理.md
 [503]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/其他/一些关于前端的思考.md
 [504]: https://www.yuque.com/mingyi-8nuow/rm3h54/gdf9cq
 [505]: https://github.com/jiangxia/FE-Knowledge/blob/master/posts/其他/《程序员进阶攻略》学习笔记.md
