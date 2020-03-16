@@ -9,6 +9,7 @@
     - [react学习笔记][410]
     - [彻彻底底教会你使用Redux-saga](https://github.com/forthealllight/blog/issues/14)
     - [redux-saga核心API][412]
+    - [react vs vue](https://segmentfault.com/a/1190000017414633)
 - 延展阅读
     - [性能优化][402]
     - [监控][407]
